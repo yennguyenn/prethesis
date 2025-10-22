@@ -1,60 +1,67 @@
-// import express from "express";
-// import cors from "cors";
-// import dotenv from "dotenv";
-// dotenv.config();
+import dotenv from 'dotenv';
+import express from 'express';
+import bodyParser from 'body-parser';
+import db from './models/index.js';
+import authRoutes from './routes/auth.js';
+import adminRoutes from './routes/admin.js';
+import quizRoutes from './routes/quiz.js';
 
-// import authRoutes from "./routes/auth.js";
-// import majorsRoutes from "./routes/majors.js";
-// import questionsRoutes from "./routes/questions.js";
-// import resultsRoutes from "./routes/results.js";
+dotenv.config();
 
-// const app = express();
-// app.use(cors());
-// app.use(express.json());
+const app = express();
+app.use(bodyParser.json());
 
-// app.use("/api/auth", authRoutes);
-// app.use("/api/majors", majorsRoutes);
-// app.use("/api/questions", questionsRoutes);
-// app.use("/api/results", resultsRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/quiz', quizRoutes);
 
-// const port = process.env.PORT || 5000;
-// app.listen(port, () => console.log(`Server running on port ${port}`));
+const PORT = process.env.PORT || 4000;
 
-const { Sequelize } = require('sequelize');
-require('dotenv').config();
-const config = require('../config/config').development;
+import { initializeDatabase } from './utils/initDb.js';
 
-const sequelize = new Sequelize(config.database, config.username, config.password, {
-  host: config.host,
-  port: config.port,
-  dialect: config.dialect,
-  logging: false
-});
+async function start() {
+  try {
+    // Try initializing database first
+    try {
+      await initializeDatabase();
+      console.log('Database initialization completed');
+    } catch (initErr) {
+      if (initErr.code === 'ENOENT') {
+        console.warn('psql command not found. Please ensure PostgreSQL is installed and in PATH');
+      } else {
+        console.warn('Database initialization skipped:', initErr.message);
+      }
+    }
 
-const db = {};
-db.Sequelize = Sequelize;
-db.sequelize = sequelize;
+    await db.sequelize.authenticate();
+    console.log('DB connected');
+    await db.sequelize.sync({ alter: true }); // dev: alter true; prod: use migrations
 
-db.User = require('./user')(sequelize, Sequelize);
-db.Major = require('./major')(sequelize, Sequelize);
-db.Level = require('./level')(sequelize, Sequelize);
-db.Question = require('./question')(sequelize, Sequelize);
-db.Option = require('./option')(sequelize, Sequelize);
-db.Response = require('./response')(sequelize, Sequelize);
+    // try listening; if port is in use, try next ports up to +10
+    let port = Number(PORT);
+    for (let i = 0; i < 10; i++) {
+      try {
+        await new Promise((resolve, reject) => {
+          const srv = app.listen(port, () => {
+            console.log(`Server listening ${port}`);
+            resolve();
+          });
+          srv.on('error', (e) => reject(e));
+        });
+        break;
+      } catch (err) {
+        if (err && err.code === 'EADDRINUSE') {
+          console.warn(`Port ${port} in use, trying ${port + 1}`);
+          port++;
+          continue;
+        }
+        throw err;
+      }
+    }
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
+}
 
-// associations
-db.Level.hasMany(db.Question, { foreignKey: 'levelId' });
-db.Question.belongsTo(db.Level, { foreignKey: 'levelId' });
-
-db.Question.hasMany(db.Option, { foreignKey: 'questionId', onDelete: 'CASCADE' });
-db.Option.belongsTo(db.Question, { foreignKey: 'questionId' });
-
-db.Major.hasMany(db.Option, { foreignKey: 'majorId' }); // optional: if options link to majors
-// Responses
-db.User.hasMany(db.Response, { foreignKey: 'userId' });
-db.Response.belongsTo(db.User, { foreignKey: 'userId' });
-
-db.Question.hasMany(db.Response, { foreignKey: 'questionId' });
-db.Response.belongsTo(db.Question, { foreignKey: 'questionId' });
-
-module.exports = db;
+start();

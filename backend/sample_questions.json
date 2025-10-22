@@ -1,0 +1,46 @@
+[
+  {
+    "level": 2,
+    "question": "Which of the following activities do you enjoy most?",
+    "options": [
+      {
+        "text": "Building software or automating tasks",
+        "majors": ["Software Engineering", "Computer Science"]
+      },
+      {
+        "text": "Designing interactive user interfaces",
+        "majors": ["UI/UX Design"]
+      },
+      {
+        "text": "Analyzing and visualizing large datasets",
+        "majors": ["Data Science & Analytics"]
+      },
+      {
+        "text": "Protecting systems from hackers",
+        "majors": ["Cyber Security"]
+      }
+    ]
+  },
+  {
+    "level": 2,
+    "question": "Which skill appeals to you most?",
+    "options": [
+      {
+        "text": "Writing algorithms and solving problems",
+        "majors": ["Computer Science", "Artificial Intelligence & Machine Learning"]
+      },
+      {
+        "text": "Managing databases and system networks",
+        "majors": ["Network & System Administration"]
+      },
+      {
+        "text": "Developing hardware or embedded devices",
+        "majors": ["IoT & Embedded Systems", "Computer Engineering"]
+      },
+      {
+        "text": "Building robots or automation systems",
+        "majors": ["Robotics & Automation"]
+      }
+    ]
+  }
+]
