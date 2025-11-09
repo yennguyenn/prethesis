@@ -1,9 +1,9 @@
 export default (sequelize, DataTypes) => {
-  const Major = sequelize.define('Major', {
+  const SubMajor = sequelize.define('SubMajor', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    code: { type: DataTypes.STRING, unique: true }, // e.g. CS, SE, AI
+    code: { type: DataTypes.STRING, unique: true },
     name: { type: DataTypes.STRING, allowNull: false },
-    description: { type: DataTypes.TEXT }
+    description: { type: DataTypes.TEXT },
   });
-  return Major;
+  return SubMajor;
 };

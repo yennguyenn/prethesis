@@ -1,12 +1,14 @@
 import { Sequelize } from 'sequelize';
 import dotenv from 'dotenv';
 import configFile from '../config/config.js';
-import UserModel from './user.js';
-import MajorModel from './major.js';
-import LevelModel from './level.js';
-import QuestionModel from './question.js';
-import OptionModel from './option.js';
-import ResponseModel from './response.js';
+import User from './user.js';
+import Major from './major.js';
+import Level from './level.js';
+import Question from './question.js';
+import Option from './option.js';
+import Result from './result.js';
+import SubMajor from './submajor.js';
+import Submission from './submission.js';
 
 dotenv.config();
 const config = configFile.development;
@@ -22,14 +24,16 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.User = UserModel(sequelize, Sequelize);
-db.Major = MajorModel(sequelize, Sequelize);
-db.Level = LevelModel(sequelize, Sequelize);
-db.Question = QuestionModel(sequelize, Sequelize);
-db.Option = OptionModel(sequelize, Sequelize);
-db.Response = ResponseModel(sequelize, Sequelize);
+db.User = User(sequelize, Sequelize);
+db.Major = Major(sequelize, Sequelize);
+db.Level = Level(sequelize, Sequelize);
+db.Question = Question(sequelize, Sequelize);
+db.Option = Option(sequelize, Sequelize);
+db.Result = Result(sequelize, Sequelize);
+db.SubMajor = SubMajor(sequelize, Sequelize);
+db.Submission = Submission(sequelize, Sequelize);
 
-// associations
+// relationships
 db.Level.hasMany(db.Question, { foreignKey: 'levelId' });
 db.Question.belongsTo(db.Level, { foreignKey: 'levelId' });
 
@@ -37,11 +41,23 @@ db.Question.hasMany(db.Option, { foreignKey: 'questionId', onDelete: 'CASCADE' }
 db.Option.belongsTo(db.Question, { foreignKey: 'questionId' });
 
 db.Major.hasMany(db.Option, { foreignKey: 'majorId' }); // optional: if options link to majors
-// Responses
-db.User.hasMany(db.Response, { foreignKey: 'userId' });
-db.Response.belongsTo(db.User, { foreignKey: 'userId' });
+db.Option.belongsTo(db.Major, { foreignKey: 'majorId' });
+// SubMajors (detailed specializations)
+db.Major.hasMany(db.SubMajor, { foreignKey: 'majorId' });
+db.SubMajor.belongsTo(db.Major, { foreignKey: 'majorId' });
+// Results
+db.User.hasMany(db.Result, { foreignKey: 'userId' });
+db.Result.belongsTo(db.User, { foreignKey: 'userId' });
 
-db.Question.hasMany(db.Response, { foreignKey: 'questionId' });
-db.Response.belongsTo(db.Question, { foreignKey: 'questionId' });
+db.Question.hasMany(db.Result, { foreignKey: 'questionId' });
+db.Result.belongsTo(db.Question, { foreignKey: 'questionId' });
+
+db.Option.hasMany(db.Result, { foreignKey: 'optionId' });
+db.Result.belongsTo(db.Option, { foreignKey: 'optionId' });
+
+// Submissions (persisted aggregated results)
+db.User.hasMany(db.Submission, { foreignKey: 'userId' });
+db.Submission.belongsTo(db.User, { foreignKey: 'userId' });
+
 
 export default db;
