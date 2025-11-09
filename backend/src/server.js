@@ -1,21 +1,29 @@
 import dotenv from 'dotenv';
 import express from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import db from './models/index.js';
-import authRoutes from './routes/auth.js';
-import adminRoutes from './routes/admin.js';
-import quizRoutes from './routes/quiz.js';
+import authRoutes from './routes/authRoute.js';
+import adminRoutes from './routes/adminRoute.js';
+import quizRoutes from './routes/quizRoute.js';
+import questionRoutes from './routes/questionsRoute.js';
+import resultRoutes from './routes/resultsRoute.js';
 
 dotenv.config();
 
 const app = express();
 app.use(bodyParser.json());
-
+// Enable CORS for local dev (Vite default 5173)
+app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:5173', credentials: true }));
+//public routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/quiz', quizRoutes);
+// Prefer plural path; keep legacy singular for backward compatibility
+app.use('/api/questions', questionRoutes);
+app.use('/api/results', resultRoutes);
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 
 import { initializeDatabase } from './utils/initDb.js';
 
