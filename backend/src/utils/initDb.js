@@ -9,14 +9,17 @@ dotenv.config();
 const execP = promisify(exec);
 
 export async function initializeDatabase() {
-  // If there's no init.sql in the backend root, skip initialization
+  // Skip psql-based initialization - database should be seeded manually or via migrations
+  // To manually seed: psql -U postgres -d dss_db -f init.sql
+  // console.log('Database initialization via init.sql is disabled. Use manual seeding if needed.');
+  return;
+  
+  /* Original psql-based code (commented out):
   const initFile = path.resolve(process.cwd(), 'init.sql');
   if (!fs.existsSync(initFile)) {
-    // nothing to do
     return;
   }
 
-  // Build psql command. If DATABASE_URL is provided, pass it to psql.
   const dbUrl = process.env.DATABASE_URL;
   const cmd = dbUrl ? `psql "${dbUrl}" -f "${initFile}"` : `psql -f "${initFile}"`;
 
@@ -25,9 +28,9 @@ export async function initializeDatabase() {
     if (stdout) console.log(stdout);
     if (stderr) console.warn(stderr);
   } catch (err) {
-    // Rethrow so caller can detect ENOENT (psql missing) or other failures
     throw err;
   }
+  */
 }
 
 export default { initializeDatabase };
