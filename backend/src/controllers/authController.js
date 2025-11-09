@@ -1,21 +1,33 @@
 import db from '../models/index.js';
+import User from '../models/user.js';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import bcrypt from 'bcrypt';
 dotenv.config();
 
-async function register(req, res) {
-  const { name, email, password } = req.body;
+export async function register(req, res) {
   try {
-    let existing = await db.User.findOne({ where: { email }});
-    if (existing) return res.status(400).json({ message: 'Email exists' });
-    const user = await db.User.create({ name, email });
-    await user.setPassword(password);
-    await user.save();
-    res.json({ message: 'OK' });
+    const { name, email, password } = req.body;
+
+    if(!name || !email || !password) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+    // check name exists
+    const duplicate = await db.User.findOne({ where: { name } });
+    if (duplicate) {
+      return res.status(409).json({ message: 'Name exists' });
+    }
+    // password encryption
+    const passwordHash = await bcrypt.hash(password, 10); // salt = 10
+    // create user
+    await db.User.create({ name, email, passwordHash });
+    // return
+    return res.status(204).json({ message: 'User registered successfully' }); 
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Register error:', err);
+    return res.status(500).json({ message: 'Server error' });
   }
-};
+}
 async function login(req, res) {
   const { email, password } = req.body;
   try {
