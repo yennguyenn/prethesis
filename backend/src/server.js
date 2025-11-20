@@ -8,6 +8,7 @@ import adminRoutes from './routes/adminRoute.js';
 import quizRoutes from './routes/quizRoute.js';
 import questionRoutes from './routes/questionsRoute.js';
 import resultRoutes from './routes/resultsRoute.js';
+import majorsRoutes from './routes/majorsRoute.js';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:5173', crede
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/quiz', quizRoutes);
+app.use('/api/majors', majorsRoutes);
 // Prefer plural path; keep legacy singular for backward compatibility
 app.use('/api/questions', questionRoutes);
 app.use('/api/results', resultRoutes);
