@@ -14,8 +14,24 @@ dotenv.config();
 
 const app = express();
 app.use(bodyParser.json());
-// Enable CORS for local dev (Vite default 5173)
-app.use(cors({ origin: process.env.CORS_ORIGIN || 'http://localhost:5173', credentials: true }));
+// Enable flexible CORS for any localhost port in dev
+const corsOrigin = process.env.CORS_ORIGIN;
+app.use(cors({
+  origin: (origin, cb) => {
+    // Allow tools like Postman (no origin) and any localhost:<port>
+    if (!origin) return cb(null, true);
+    if (corsOrigin) {
+      if (origin === corsOrigin) return cb(null, true);
+      return cb(new Error('CORS blocked: origin not allowed'));
+    }
+    if (/^http:\/\/localhost:\d+$/.test(origin)) return cb(null, true);
+    return cb(new Error('CORS blocked: origin not permitted'));
+  },
+  credentials: true
+}));
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, port: process.env.PORT || 5000, time: new Date().toISOString() });
+});
 //public routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);

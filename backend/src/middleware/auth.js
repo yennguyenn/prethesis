@@ -5,13 +5,34 @@ dotenv.config();
 export function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) return res.status(401).json({ message: "Missing token" });
-  const token = authHeader.split(" ")[1];
+
+  // Expect format: "Bearer <token>"
+  const parts = authHeader.split(" ");
+  if (parts.length !== 2 || parts[0] !== "Bearer") {
+    return res.status(401).json({ message: "Malformed authorization header" });
+  }
+  const token = parts[1];
+
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     req.user = payload;
     next();
   } catch (err) {
-    return res.status(401).json({ message: "Invalid token" });
+    // Granular error messaging (avoid leaking sensitive info)
+    let message = "Invalid token";
+    if (err.name === "TokenExpiredError") message = "Token expired";
+    else if (err.name === "JsonWebTokenError") message = "Invalid token"; // keep generic
+
+    if (process.env.DEBUG_AUTH === "true") {
+      console.warn(
+        "[authMiddleware] JWT verify failed:", {
+          error: err.name,
+          message: err.message,
+          receivedHeader: authHeader?.slice(0, 40) + (authHeader?.length > 40 ? "..." : ""),
+        }
+      );
+    }
+    return res.status(401).json({ message });
   }
 }
 

@@ -43,6 +43,7 @@ export async function seedITSubmajorQuestions() {
     console.log('🎓 Creating IT major...');
     const itMajor = await db.Major.create({
       id: 1,
+      code: 'IT',
       name: 'Information Technology',
       description: 'Information Technology and Computer Science'
     });
@@ -66,6 +67,7 @@ export async function seedITSubmajorQuestions() {
     const submajorMap = {};
     for (const sm of submajors) {
       const submajor = await db.SubMajor.create({
+        code: sm.code,
         name: sm.name,
         description: sm.description,
         majorId: itMajor.id

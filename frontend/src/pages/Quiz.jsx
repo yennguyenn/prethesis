@@ -1,118 +1,303 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import API, { setAuthToken } from "../api";
 
-export default function Quiz(){
-  const [level, setLevel] = useState(1);
+export default function Quiz() {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({}); // { [questionId]: optionId }
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const loadQuestions = async (lv) => {
+  const loadQuestions = async () => {
     setLoading(true);
     setError("");
-    setAnswers({});
-    setResult(null);
     try {
       const token = localStorage.getItem("token");
       if (token) setAuthToken(token);
-      const r = await API.get(`/quiz/${lv}`);
-      // r.data is [{ id, text, options: [{id,text}] }]
+      
+      // Level 2 only - IT submajor selection
+      const r = await API.get(`/quiz/2`);
       setQuestions(r.data || []);
     } catch (e) {
-      setError(e?.response?.data?.message || e.message || "Không tải được câu hỏi");
+      setError(e?.response?.data?.message || e.message || "Failed to load questions");
     } finally {
       setLoading(false);
     }
   };
 
-  useEffect(()=> { loadQuestions(level); }, [level]);
+  useEffect(() => {
+    loadQuestions();
+  }, []);
 
-  const choose = (qId, optionId) => {
-    setAnswers(prev => ({ ...prev, [qId]: optionId }));
+  const currentQuestion = questions[currentIndex];
+  const progress = questions.length > 0 ? ((currentIndex + 1) / questions.length) * 100 : 0;
+  const isAnswered = currentQuestion && answers[currentQuestion.id] !== undefined;
+
+  const choose = (optionId) => {
+    if (!currentQuestion) return;
+    setAnswers((prev) => ({ ...prev, [currentQuestion.id]: optionId }));
+  };
+
+  const next = () => {
+    if (currentIndex < questions.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const prev = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
   };
 
   const submit = async () => {
+    // Check if all questions answered
+    const unanswered = questions.filter(q => !answers[q.id]);
+    if (unanswered.length > 0) {
+      setError(`Please answer all questions. ${unanswered.length} question(s) remaining.`);
+      return;
+    }
+
     try {
+      setSubmitting(true);
       setError("");
       const payload = {
         answers: Object.entries(answers).map(([questionId, optionId]) => ({
           questionId: Number(questionId),
           optionId: Number(optionId),
-        }))
+        })),
       };
+      
       const r = await API.post("/quiz/submit", payload);
       setResult(r.data);
-      // If logged in, also persist this result silently
+
+      // If logged in, persist result
       const token = localStorage.getItem("token");
       if (token) {
         setAuthToken(token);
-        API.post("/results/submit", { answers: payload.answers }).catch(() => {});
+        await API.post("/results/submit", { answers: payload.answers }).catch(() => {});
       }
     } catch (e) {
-      setError(e?.response?.data?.message || e.message || "Gửi bài thất bại");
+      setError(e?.response?.data?.message || e.message || "Submission failed");
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  return (
-    <div style={{ padding: 20, maxWidth: 800, margin: "0 auto" }}>
-      <h2>Bài trắc nghiệm định hướng</h2>
-
-      <div style={{ marginBottom: 16 }}>
-        <label>Chọn level: </label>
-        <select value={level} onChange={(e)=> setLevel(Number(e.target.value))}>
-          <option value={1}>Level 1 (Chọn ngành)</option>
-          <option value={2}>Level 2 (Chọn chuyên ngành)</option>
-        </select>
-        <button style={{ marginLeft: 8 }} onClick={()=> loadQuestions(level)} disabled={loading}>
-          Tải lại
-        </button>
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading questions...</p>
+        </div>
       </div>
+    );
+  }
 
-      {loading && <div>Đang tải câu hỏi…</div>}
-      {!!error && <div style={{ color: 'crimson', marginBottom: 8 }}>{error}</div>}
+  // Result display
+  if (result) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
+        <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
+          <div className="text-center mb-8">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">Assessment Complete!</h2>
+            <p className="text-gray-600">Your recommended IT specialization:</p>
+          </div>
 
-      {questions.map(q => (
-        <div key={q.id} style={{ marginBottom: 16, padding: 12, border: '1px solid #eee', borderRadius: 8 }}>
-          <div style={{ fontWeight: 600, marginBottom: 8 }}>{q.id}. {q.text}</div>
-          <div>
-            {(q.options || []).map(opt => (
-              <label key={opt.id} style={{ display: 'block', marginBottom: 6 }}>
-                <input
-                  type="radio"
-                  name={`q_${q.id}`}
-                  checked={answers[q.id] === opt.id}
-                  onChange={()=> choose(q.id, opt.id)}
-                />
-                <span style={{ marginLeft: 8 }}>{opt.text}</span>
-              </label>
-            ))}
+          <div className="bg-indigo-50 rounded-xl p-6 mb-6">
+            <h3 className="text-2xl font-bold text-indigo-900 mb-2">
+              {result.recommended?.name || "Information Technology"}
+            </h3>
+            <p className="text-gray-700 mb-4">
+              {result.recommended?.description || "General IT field"}
+            </p>
+            <div className="text-sm text-gray-600">
+              <strong>Your Score:</strong> {result.topScore || 0} points
+            </div>
+          </div>
+
+          {result.allScores && result.allScores.length > 1 && (
+            <div className="mb-6">
+              <h4 className="font-semibold text-gray-900 mb-3">All Specialization Scores:</h4>
+              <div className="space-y-2">
+                {result.allScores.map((item, idx) => (
+                  <div key={idx} className="flex items-center">
+                    <div className="flex-1">
+                      <div className="flex justify-between mb-1">
+                        <span className="text-sm font-medium text-gray-700">{item.name}</span>
+                        <span className="text-sm text-gray-600">{item.score} pts</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className="bg-indigo-600 h-2 rounded-full transition-all"
+                          style={{ width: `${(item.score / (result.topScore || 1)) * 100}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-4">
+            <button
+              onClick={() => {
+                setResult(null);
+                setAnswers({});
+                setCurrentIndex(0);
+                loadQuestions();
+              }}
+              className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
+            >
+              Retake Assessment
+            </button>
+            <button
+              onClick={() => navigate("/")}
+              className="flex-1 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Back to Home
+            </button>
           </div>
         </div>
-      ))}
+      </div>
+    );
+  }
 
-      {questions.length > 0 && (
-        <button onClick={submit} disabled={Object.keys(answers).length === 0}>
-          Nộp bài
-        </button>
-      )}
-
-      {result && (
-        <div style={{ marginTop: 24 }}>
-          <h3>Kết quả gợi ý</h3>
-          <div style={{ marginBottom: 8 }}>
-            Ngành phù hợp: {result.recommendedMajor ? `${result.recommendedMajor.name || result.recommendedMajor.code} (${result.recommendedMajor.score})` : 'Không xác định'}
+  // Quiz interface
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+      <div className="max-w-3xl mx-auto">
+        {/* Header */}
+        <div className="bg-white rounded-t-2xl shadow-lg p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold text-gray-900">IT Specialization Assessment</h2>
+            <button
+              onClick={() => navigate("/")}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
-          <div>
-            Chuyên ngành: {result.recommendedSubmajor ? `${result.recommendedSubmajor.name || result.recommendedSubmajor.code} (${result.recommendedSubmajor.score})` : 'Không xác định'}
+          
+          {/* Progress Bar */}
+          <div className="mb-2">
+            <div className="flex justify-between text-sm text-gray-600 mb-1">
+              <span>Question {currentIndex + 1} of {questions.length}</span>
+              <span>{Math.round(progress)}% Complete</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-indigo-600 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
           </div>
-          <details style={{ marginTop: 8 }}>
-            <summary>Xem chi tiết điểm</summary>
-            <pre style={{ background: '#f7f7f7', padding: 12, borderRadius: 6 }}>{JSON.stringify(result, null, 2)}</pre>
-          </details>
         </div>
-      )}
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+            <div className="flex items-center">
+              <svg className="w-5 h-5 text-red-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <span className="text-red-800">{error}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Question Card */}
+        {currentQuestion && (
+          <div className="bg-white rounded-b-2xl shadow-lg p-8 mb-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              {currentQuestion.text}
+            </h3>
+
+            <div className="space-y-3">
+              {(currentQuestion.options || []).map((opt) => (
+                <label
+                  key={opt.id}
+                  className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                    answers[currentQuestion.id] === opt.id
+                      ? "border-indigo-600 bg-indigo-50"
+                      : "border-gray-200 hover:border-indigo-300 hover:bg-gray-50"
+                  }`}
+                >
+                  <div className="flex items-center">
+                    <input
+                      type="radio"
+                      name={`q_${currentQuestion.id}`}
+                      checked={answers[currentQuestion.id] === opt.id}
+                      onChange={() => choose(opt.id)}
+                      className="w-5 h-5 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <span className="ml-3 text-gray-800">{opt.text}</span>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Navigation Buttons */}
+        <div className="flex justify-between items-center">
+          <button
+            onClick={prev}
+            disabled={currentIndex === 0}
+            className="px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
+          >
+            ← Previous
+          </button>
+
+          <div className="text-sm text-gray-600">
+            {Object.keys(answers).length} / {questions.length} answered
+          </div>
+
+          {currentIndex < questions.length - 1 ? (
+            <button
+              onClick={next}
+              disabled={!isAnswered}
+              className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md"
+            >
+              Next →
+            </button>
+          ) : (
+            <button
+              onClick={submit}
+              disabled={submitting || Object.keys(answers).length < questions.length}
+              className="px-8 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md flex items-center gap-2"
+            >
+              {submitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  Submit Assessment
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </>
+              )}
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

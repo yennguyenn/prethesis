@@ -35,39 +35,26 @@ export const submitQuiz = async (req, res) => {
       return res.status(400).json({ message: 'No answers submitted' });
     }
 
-    // load majors and submajors to understand codes
-    const majors = await db.Major.findAll({ attributes: ['id', 'code', 'name'] });
-    const submajors = await db.SubMajor.findAll({ attributes: ['id', 'code', 'name'] });
-    const majorCodes = new Set(majors.map((m) => m.code));
-    const subMajorCodes = new Set(submajors.map((s) => s.code));
+    // Load submajors (specializations) and map code->meta
+    const submajors = await db.SubMajor.findAll({ attributes: ['id', 'code', 'name', 'description'] });
+    const subMajorMeta = {};
+    for (const s of submajors) {
+      if (s.code) subMajorMeta[s.code] = { name: s.name, description: s.description };
+    }
 
-    const majorScores = {};
+    // Accumulate scores by submajor code from option.scoring JSON
     const submajorScores = {};
-    const otherScores = {};
     const invalidOptionIds = [];
 
     for (const a of answers) {
       const ansId = a?.optionId;
-      if (!ansId) {
-        invalidOptionIds.push(ansId);
-        continue;
-      }
+      if (!ansId) { invalidOptionIds.push(ansId); continue; }
       const option = await db.Option.findByPk(ansId);
-      if (!option) {
-        invalidOptionIds.push(ansId);
-        continue;
-      }
-
+      if (!option) { invalidOptionIds.push(ansId); continue; }
       const scoring = option.scoring || option.dataValues?.scoring || {};
-      for (const [key, val] of Object.entries(scoring)) {
-        const points = Number(val) || 0;
-        if (majorCodes.has(key)) {
-          majorScores[key] = (majorScores[key] || 0) + points;
-        } else if (subMajorCodes.has(key)) {
-          submajorScores[key] = (submajorScores[key] || 0) + points;
-        } else {
-          otherScores[key] = (otherScores[key] || 0) + points;
-        }
+      for (const [code, pts] of Object.entries(scoring)) {
+        const points = Number(pts) || 0;
+        submajorScores[code] = (submajorScores[code] || 0) + points;
       }
     }
 
@@ -75,24 +62,26 @@ export const submitQuiz = async (req, res) => {
       return res.status(400).json({ message: 'Invalid optionId(s) provided', invalidOptionIds });
     }
 
-    const topMajor = Object.entries(majorScores).sort((a, b) => b[1] - a[1])[0] || null;
-    const topSubmajor = Object.entries(submajorScores).sort((a, b) => b[1] - a[1])[0] || null;
+    // Build sorted scores array
+    const allScores = Object.entries(submajorScores)
+      .map(([code, score]) => ({
+        code,
+        name: subMajorMeta[code]?.name || code,
+        description: subMajorMeta[code]?.description || null,
+        score
+      }))
+      .sort((a, b) => b.score - a.score);
 
-    // Build code -> name maps for majors and submajors
-  const majorNameMap = {};
-  for (const m of majors) { if (m.code) majorNameMap[m.code] = m.name; }
-  const subMajorNameMap = {};
-  for (const s of submajors) { if (s.code) subMajorNameMap[s.code] = s.name; }
+    const recommended = allScores[0] || null;
+    const topScore = recommended ? recommended.score : 0;
 
     res.json({
       message: 'Quiz submitted successfully',
-      majorScores,
-      submajorScores,
-      otherScores,
-      majorNames: majorNameMap,
-      subMajorNames: subMajorNameMap,
-      recommendedMajor: topMajor ? { code: topMajor[0], name: majorNameMap[topMajor[0]] || null, score: topMajor[1] } : null,
-      recommendedSubmajor: topSubmajor ? { code: topSubmajor[0], name: subMajorNameMap[topSubmajor[0]] || null, score: topSubmajor[1] } : null,
+      recommended,
+      topScore,
+      allScores,
+      totalAnswered: answers.length,
+      totalSubmajors: allScores.length
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
