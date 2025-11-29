@@ -1,8 +1,24 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import API, { setAuthToken } from "../api";
-import Navbar from "../components/Navbar";
+// Navbar & Footer provided by Layout
 
 export default function Results() {
+  const SUBMAJOR_LABELS = {
+    SE: 'Software Engineering',
+    IS: 'Information Systems',
+    UIUX: 'UI/UX Design',
+    AI: 'Artificial Intelligence',
+    CS: 'Computer Science',
+    DS: 'Data Science',
+    NET: 'Computer Networks',
+    CY: 'Cybersecurity',
+    EMB: 'Embedded Systems'
+  };
+  const MAJOR_DISPLAY = {
+    IT: 'Công nghệ thông tin - IT',
+    'Information Technology': 'Công nghệ thông tin - IT'
+  };
   const [loading, setLoading] = useState(true);
   const [results, setResults] = useState([]);
   const [error, setError] = useState("");
@@ -36,8 +52,7 @@ export default function Results() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <Navbar activePage="results" />
+    <div className="">
       <div className="max-w-4xl mx-auto py-10 px-4">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">My Assessment Results</h1>
 
@@ -86,52 +101,65 @@ export default function Results() {
           <div className="space-y-6">
             {results.map((r) => {
               const d = r.details || {};
-              const explicitSub = d.recommendedSubmajor;
-              let subDisplay = "N/A";
-              if (explicitSub && (explicitSub.name || explicitSub.code)) {
-                subDisplay = `${explicitSub.name || explicitSub.code}${Number.isFinite(explicitSub.score) ? ` (${explicitSub.score})` : ""}`;
+              const recommendedMajor = d.recommendedMajor;
+              const recommendedSubmajor = d.recommendedSubmajor;
+              // Fallbacks
+              const rawMajorName = r.major_name || recommendedMajor?.name || recommendedMajor?.code || "N/A";
+              const majorName = MAJOR_DISPLAY[recommendedMajor?.code] || MAJOR_DISPLAY[rawMajorName] || rawMajorName;
+              const majorDesc = recommendedMajor?.description || "";
+              let subName = "N/A";
+              let subDesc = "";
+              if (recommendedSubmajor && (recommendedSubmajor.name || recommendedSubmajor.code)) {
+                subName = SUBMAJOR_LABELS[recommendedSubmajor.code] || recommendedSubmajor.name || recommendedSubmajor.code;
+                subDesc = recommendedSubmajor.description || "";
               } else {
                 const top = pickTop(d.submajorScores);
                 if (top) {
-                  const [code, score] = top;
-                  const name = d.subMajorNames?.[code] ?? code;
-                  subDisplay = `${name}${Number.isFinite(score) ? ` (${score})` : ""}`;
+                  const [code] = top;
+                  subName = SUBMAJOR_LABELS[code] || d.subMajorNames?.[code] || code;
                 }
               }
               return (
-                <div
-                  key={r.id}
-                  className="bg-white rounded-xl shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow"
-                >
+                <div key={r.id} className="bg-white rounded-2xl shadow-md border border-slate-200 p-6 hover:shadow-lg transition-shadow">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <div className="text-sm text-gray-500">{new Date(r.created_at).toLocaleString()}</div>
-                      <h2 className="text-xl font-semibold text-indigo-700 mt-1">Assessment #{r.id}</h2>
+                      <div className="text-xs text-slate-500">{new Date(r.created_at).toLocaleString()}</div>
+                      <h2 className="text-lg font-semibold text-slate-900 mt-1">Bài đánh giá #{r.id}</h2>
                     </div>
-                    <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-sm font-medium rounded-full">
-                      Score: {r.score}
+                    <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-full border border-emerald-200">
+                      Điểm: {r.score}
                     </span>
                   </div>
-                  <div className="grid md:grid-cols-2 gap-4 mb-4">
-                    <div className="bg-indigo-50 rounded-lg p-4">
-                      <h3 className="text-sm font-semibold text-indigo-800 mb-1">Recommended Major</h3>
-                      <p className="text-gray-800">{r.major_name || "N/A"}</p>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-violet-50 p-4">
+                      <div className="text-[11px] uppercase tracking-wide text-indigo-600 font-medium mb-1">Ngành gợi ý</div>
+                      <div className="text-base font-semibold text-indigo-900">{majorName}</div>
+                      {majorDesc && <p className="mt-1 text-xs text-slate-700">{majorDesc}</p>}
                     </div>
-                    <div className="bg-blue-50 rounded-lg p-4">
-                      <h3 className="text-sm font-semibold text-blue-800 mb-1">Recommended Submajor</h3>
-                      <p className="text-gray-800">{subDisplay}</p>
+                    <div className="rounded-xl border border-violet-100 bg-gradient-to-br from-violet-50 to-fuchsia-50 p-4">
+                      <div className="text-[11px] uppercase tracking-wide text-violet-600 font-medium mb-1">Chuyên ngành gợi ý</div>
+                      <div className="text-base font-semibold text-violet-900">
+                        {d.recommendedSubmajor?.code || d.recommendedSubmajor?.name ? (
+                          <Link to={`/careers/${d.recommendedSubmajor?.code || d.recommendedSubmajor?.name}`} className="hover:underline decoration-violet-400 underline-offset-4">
+                            {subName}
+                          </Link>
+                        ) : (
+                          subName
+                        )}
+                      </div>
+                      {subDesc && <p className="mt-1 text-xs text-slate-700">{subDesc}</p>}
+                      {d.recommendedSubmajor?.studyGroup && (
+                        <div className="mt-1 text-[11px] text-slate-600"><span className="font-semibold text-violet-700">Khối học:</span> {d.recommendedSubmajor.studyGroup}</div>
+                      )}
                     </div>
                   </div>
-                  <details className="mt-2">
-                    <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-900">View Raw Details</summary>
-                    <pre className="mt-2 text-xs bg-gray-900 text-gray-100 p-4 rounded-lg overflow-auto max-h-64">{JSON.stringify(r.details, null, 2)}</pre>
-                  </details>
                 </div>
               );
             })}
           </div>
         )}
       </div>
+      {/* Footer is global via Layout */}
     </div>
   );
 }
