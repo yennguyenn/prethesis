@@ -34,7 +34,15 @@ export default function Login() {
       {/* Solid backdrop to ensure previous page content is not visible */}
       <div className="absolute inset-0 bg-slate-900/90" aria-hidden="true" />
       <div className="relative z-10 w-full max-w-md mx-auto">
-        <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-xl shadow-xl p-8 text-white">
+        <div className="relative backdrop-blur-md bg-white/10 border border-white/20 rounded-xl shadow-xl p-8 text-white">
+          <button
+            type="button"
+            onClick={() => nav("/")}
+            aria-label="Close login"
+            className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 text-white text-xl leading-none transition-colors"
+          >
+            &times;
+          </button>
           <h2 className="text-2xl font-semibold mb-6 text-center">Login</h2>
           {error && (
             <div className="mb-4 text-sm bg-red-500/20 border border-red-500/40 text-red-200 rounded px-3 py-2">

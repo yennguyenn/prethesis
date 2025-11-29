@@ -41,3 +41,22 @@ export function adminOnly(req, res, next) {
   if (req.user.role !== "admin") return res.status(403).json({ message: "Admin only" });
   next();
 }
+
+// Optional auth: populate req.user if a valid Bearer token is provided; otherwise continue
+export function maybeAuth(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return next();
+  const parts = authHeader.split(" ");
+  if (parts.length !== 2 || parts[0] !== "Bearer") return next();
+  const token = parts[1];
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = payload;
+  } catch (err) {
+    // ignore invalid tokens (treat as guest)
+    if (process.env.DEBUG_AUTH === "true") {
+      console.warn("[maybeAuth] Ignoring invalid token:", err.name);
+    }
+  }
+  next();
+}

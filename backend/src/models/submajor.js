@@ -4,6 +4,7 @@ export default (sequelize, DataTypes) => {
     code: { type: DataTypes.STRING, unique: true },
     name: { type: DataTypes.STRING, allowNull: false },
     description: { type: DataTypes.TEXT },
+    studyGroup: { type: DataTypes.STRING },
   });
   return SubMajor;
 };

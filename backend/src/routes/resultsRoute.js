@@ -111,6 +111,27 @@ router.get("/me", authMiddleware, async (req, res) => {
   }
 });
 
+// latest orientation (major) submission only
+router.get("/orientation/latest", authMiddleware, async (req, res) => {
+  try {
+    const sub = await db.Submission.findOne({
+      where: { userId: req.user.id },
+      order: [["createdAt", "DESC"]],
+    });
+    if (!sub) return res.status(404).json({ message: "No submissions" });
+    res.json({
+      id: sub.id,
+      majorCode: sub.majorCode,
+      majorName: sub.majorName,
+      score: sub.score,
+      details: sub.details,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch orientation" });
+  }
+});
+
 // admin: stats (count per major)
 router.get("/stats", authMiddleware, adminOnly, async (req, res) => {
   // Placeholder stats using Sequelize counts on Options as proxy

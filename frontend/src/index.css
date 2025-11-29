@@ -10,6 +10,11 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #ffffff;
+    transition: background-color .3s ease, color .3s ease;
+  }
+  .dark body {
+    background-color: #0f172a; /* slate-900 */
+    color: #f1f5f9; /* slate-50 */
   }
 }
 
@@ -17,4 +22,13 @@
 @layer utilities {
   .animation-delay-2000 { animation-delay: 2s; }
   .animation-delay-4000 { animation-delay: 4s; }
+  .fade-in { animation: fade .4s ease both; }
+  .slide-up { animation: slideUp .45s ease both; }
+  .scale-in { animation: scaleIn .35s ease both; }
+  .slide-left { animation: slideLeft .45s ease both; }
+  .progress-pulse { animation: progressPulse 1.2s ease-in-out infinite; transform-origin: left center; }
+  .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+  .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 999px; }
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
 }

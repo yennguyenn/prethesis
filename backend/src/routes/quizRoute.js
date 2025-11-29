@@ -1,9 +1,12 @@
 import express from 'express';
-import { getQuiz, submitQuiz } from '../controllers/quizController.js';
+import { getQuiz, submitQuiz, submitMajorQuiz } from '../controllers/quizController.js';
+import { maybeAuth } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.get('/:level', getQuiz);
-router.post('/submit', submitQuiz);
+router.get('/:level', getQuiz); // e.g. /quiz/1 (major orientation) or /quiz/2 (IT submajors)
+// Use optional auth so we can save results if user is logged in
+router.post('/submit', maybeAuth, submitQuiz); // Level 2 specialization submit
+router.post('/major/submit', maybeAuth, submitMajorQuiz); // Level 1 major orientation submit
 
 export default router;

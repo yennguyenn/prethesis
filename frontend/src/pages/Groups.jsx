@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import Navbar from "../components/Navbar";
+// Navbar injected by Layout
 
 const groups = [
   {
@@ -58,8 +58,7 @@ const itMapping = {
 
 export default function Groups() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      <Navbar activePage="groups" />
+    <div className="">
 
       {/* Header */}
       <div className="bg-white py-12">
@@ -167,6 +166,7 @@ export default function Groups() {
           </div>
         </div>
       </div>
+      {/* Footer provided globally */}
     </div>
   );
 }

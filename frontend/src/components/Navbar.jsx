@@ -17,7 +17,7 @@ export default function Navbar({ activePage = 'home' }) {
               to='/' 
               className='text-2xl font-bold text-indigo-700 whitespace-nowrap'
             >
-              IT Career Path
+              Support Career
             </Link>
 
             {/* Menu */}

@@ -49,4 +49,36 @@ async function importQuestionsFromJson(req,res) {
   } catch (err){ res.status(500).json({ error: err.message }); }
 };
 
-export default { createMajor, listMajors, createQuestion, importQuestionsFromJson };
+// Admin user management
+async function createAdminUser(req, res) {
+  try {
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+    const exists = await db.User.findOne({ where: { email } });
+    if (exists) return res.status(409).json({ message: 'Email already exists' });
+    // Hash via model hook or manually
+    const created = await db.User.create({ name, email, passwordHash: password, role: 'admin' });
+    return res.status(201).json({ id: created.id, name: created.name, email: created.email, role: created.role });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
+
+async function setUserRole(req, res) {
+  try {
+    const { userId, role } = req.body;
+    if (!userId || !role) return res.status(400).json({ message: 'userId and role are required' });
+    if (!['admin','user'].includes(role)) return res.status(400).json({ message: 'Invalid role' });
+    const user = await db.User.findByPk(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    user.role = role;
+    await user.save();
+    return res.json({ id: user.id, name: user.name, email: user.email, role: user.role });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
+
+export default { createMajor, listMajors, createQuestion, importQuestionsFromJson, createAdminUser, setUserRole };

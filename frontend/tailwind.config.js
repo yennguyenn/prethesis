@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,jsx,ts,tsx}",
@@ -50,6 +51,11 @@ export default {
       },
       animation: {
         'blob': 'blob 7s infinite',
+        'fade': 'fade 0.4s ease both',
+        'slide-up': 'slideUp 0.45s ease both',
+        'scale-in': 'scaleIn 0.35s ease both',
+        'progress-pulse': 'progressPulse 1.2s ease-in-out infinite',
+        'slide-left': 'slideLeft 0.45s ease both'
       },
       keyframes: {
         blob: {
@@ -63,6 +69,27 @@ export default {
             transform: 'translate(-20px, 20px) scale(0.9)',
           },
         },
+        fade: {
+          '0%': { opacity: '0', transform: 'translateY(4px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(16px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
+        },
+        slideLeft: {
+          '0%': { opacity: '0', transform: 'translateX(24px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' }
+        },
+        scaleIn: {
+          '0%': { opacity: '0', transform: 'scale(.96)' },
+          '100%': { opacity: '1', transform: 'scale(1)' }
+        },
+        progressPulse: {
+          '0%': { transform: 'scaleX(0)', opacity: '.6' },
+          '50%': { transform: 'scaleX(1)', opacity: '1' },
+          '100%': { transform: 'scaleX(0)', opacity: '.6' }
+        }
       },
     },
   },
