@@ -11,5 +11,8 @@ router.post('/import-questions', auth('admin'), admin.importQuestionsFromJson);
 // Admin users management
 router.post('/users', auth('admin'), admin.createAdminUser); // create an admin account
 router.post('/users/role', auth('admin'), admin.setUserRole); // set role for existing user
+// Scoring & results management
+router.put('/options/:optionId/scoring', auth('admin'), admin.updateOptionScoring);
+router.put('/results/:resultId/score', auth('admin'), admin.updateResultScore);
 
 export default router;
