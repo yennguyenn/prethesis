@@ -81,4 +81,49 @@ async function setUserRole(req, res) {
   }
 }
 
-export default { createMajor, listMajors, createQuestion, importQuestionsFromJson, createAdminUser, setUserRole };
+// Update Option scoring (JSONB) for a given optionId
+async function updateOptionScoring(req, res) {
+  try {
+    const { optionId } = req.params;
+    const { scoring } = req.body;
+    if (!optionId) return res.status(400).json({ message: 'optionId is required' });
+    if (typeof scoring !== 'object' || scoring === null) {
+      return res.status(400).json({ message: 'scoring must be an object' });
+    }
+    const opt = await db.Option.findByPk(optionId);
+    if (!opt) return res.status(404).json({ message: 'Option not found' });
+    opt.scoring = scoring;
+    await opt.save();
+    return res.json({ id: opt.id, text: opt.text, scoring: opt.scoring });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
+
+// Update a saved Result score (admin override)
+async function updateResultScore(req, res) {
+  try {
+    const { resultId } = req.params;
+    const { score, details } = req.body; // optional: allow updating details JSON
+    if (!resultId) return res.status(400).json({ message: 'resultId is required' });
+    const result = await db.Result.findByPk(resultId);
+    if (!result) return res.status(404).json({ message: 'Result not found' });
+    if (score !== undefined) {
+      const ns = Number(score);
+      if (Number.isNaN(ns)) return res.status(400).json({ message: 'score must be a number' });
+      result.score = ns;
+    }
+    if (details !== undefined) {
+      if (typeof details !== 'object' || details === null) {
+        return res.status(400).json({ message: 'details must be an object when provided' });
+      }
+      result.details = details;
+    }
+    await result.save();
+    return res.json({ id: result.id, user_id: result.user_id, score: result.score, details: result.details });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+}
+
+export default { createMajor, listMajors, createQuestion, importQuestionsFromJson, createAdminUser, setUserRole, updateOptionScoring, updateResultScore };
