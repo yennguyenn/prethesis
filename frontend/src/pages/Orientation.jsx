@@ -59,9 +59,9 @@ export default function Orientation() {
 
   if (loading) {
     return (
-      <div className='min-h-screen bg-gradient-to-br from-slate-50 to-indigo-100 flex items-center justify-center'>
+      <div className='min-h-screen bg-gradient-to-br from-slate-50 to-primary-100 flex items-center justify-center'>
         <div className='text-center'>
-          <div className='animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600 mx-auto mb-4'></div>
+          <div className='animate-spin rounded-full h-16 w-16 border-b-2 border-primary-700 mx-auto mb-4'></div>
           <p className='text-gray-600'>Loading orientation questions...</p>
         </div>
       </div>
@@ -70,19 +70,19 @@ export default function Orientation() {
 
   if (result) {
     return (
-      <div className='min-h-screen bg-gradient-to-br from-slate-50 to-indigo-100 py-12 px-4'>
+      <div className='min-h-screen bg-gradient-to-br from-slate-50 to-primary-100 py-12 px-4'>
         <div className='max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8'>
           <div className='text-center mb-8'>
-            <div className='w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4'>
-              <svg className='w-10 h-10 text-blue-600' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+            <div className='w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+              <svg className='w-10 h-10 text-primary-700' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6v6l4 2' />
               </svg>
             </div>
             <h2 className='text-3xl font-bold text-gray-900 mb-2'>Orientation Complete</h2>
             <p className='text-gray-600'>Recommended major based on your interests:</p>
           </div>
-          <div className='bg-indigo-50 rounded-xl p-6 mb-6'>
-            <h3 className='text-2xl font-bold text-indigo-900 mb-2'>{result.recommended?.name || 'No clear major'}</h3>
+          <div className='bg-primary-100 rounded-xl p-6 mb-6'>
+            <h3 className='text-2xl font-bold text-primary-900 mb-2'>{result.recommended?.name || 'No clear major'}</h3>
             <p className='text-gray-700 mb-4'>{result.recommended?.description || 'Try retaking or refine answers.'}</p>
             <div className='text-sm text-gray-600'><strong>Your Score:</strong> {result.topScore || 0} pts</div>
           </div>
@@ -98,7 +98,7 @@ export default function Orientation() {
                         <span className='text-sm text-gray-600'>{item.score} pts</span>
                       </div>
                       <div className='w-full bg-gray-200 rounded-full h-2'>
-                        <div className='bg-indigo-600 h-2 rounded-full transition-all' style={{ width: `${(item.score / (result.topScore || 1)) * 100}%` }}></div>
+                        <div className='bg-primary-700 h-2 rounded-full transition-all' style={{ width: `${(item.score / (result.topScore || 1)) * 100}%` }}></div>
                       </div>
                     </div>
                   </div>
@@ -109,9 +109,9 @@ export default function Orientation() {
           <div className='flex flex-col sm:flex-row gap-4'>
             <button onClick={() => { setResult(null); setAnswers({}); setCurrentIndex(0); loadQuestions(); }} className='flex-1 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors'>Retake Orientation</button>
             {result.recommended?.code === 'ICT' && (
-              <button onClick={() => navigate('/quiz')} className='flex-1 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors'>Proceed to IT Specialization</button>
+              <button onClick={() => navigate('/quiz')} className='flex-1 px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 transition-colors'>Proceed to IT Specialization</button>
             )}
-            <button onClick={() => navigate('/')} className='flex-1 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors'>Home</button>
+            <button onClick={() => navigate('/')} className='flex-1 px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 transition-colors'>Home</button>
           </div>
         </div>
       </div>
@@ -119,7 +119,7 @@ export default function Orientation() {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-slate-50 to-indigo-100 py-8 px-4'>
+    <div className='min-h-screen bg-gradient-to-br from-slate-50 to-primary-100 py-8 px-4'>
       <div className='max-w-3xl mx-auto'>
         <div className='bg-white rounded-t-2xl shadow-lg p-6'>
           <div className='flex justify-between items-center mb-4'>
@@ -136,7 +136,7 @@ export default function Orientation() {
               <span>{Math.round(progress)}% Complete</span>
             </div>
             <div className='w-full bg-gray-200 rounded-full h-2'>
-              <div className='bg-indigo-600 h-2 rounded-full transition-all duration-300' style={{ width: `${progress}%` }}></div>
+              <div className='bg-primary-700 h-2 rounded-full transition-all duration-300' style={{ width: `${progress}%` }}></div>
             </div>
           </div>
         </div>
@@ -155,9 +155,9 @@ export default function Orientation() {
             <h3 className='text-xl font-semibold text-gray-900 mb-6'>{currentQuestion.text}</h3>
             <div className='space-y-3'>
               {(currentQuestion.options || []).map(opt => (
-                <label key={opt.id} className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${answers[currentQuestion.id] === opt.id ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'}`}>                  
+                <label key={opt.id} className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${answers[currentQuestion.id] === opt.id ? 'border-primary-700 bg-primary-100' : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50'}`}>                  
                   <div className='flex items-center'>
-                    <input type='radio' name={`q_${currentQuestion.id}`} checked={answers[currentQuestion.id] === opt.id} onChange={() => choose(opt.id)} className='w-5 h-5 text-indigo-600 focus:ring-indigo-500' />
+                    <input type='radio' name={`q_${currentQuestion.id}`} checked={answers[currentQuestion.id] === opt.id} onChange={() => choose(opt.id)} className='w-5 h-5 text-primary-700 focus:ring-primary-500' />
                     <span className='ml-3 text-gray-800'>{opt.text}</span>
                   </div>
                 </label>
@@ -169,9 +169,9 @@ export default function Orientation() {
           <button onClick={prev} disabled={currentIndex === 0} className='px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md'>← Previous</button>
           <div className='text-sm text-gray-600'>{Object.keys(answers).length} / {questions.length} answered</div>
           {currentIndex < questions.length - 1 ? (
-            <button onClick={next} disabled={!isAnswered} className='px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md'>Next →</button>
+            <button onClick={next} disabled={!isAnswered} className='px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md'>Next →</button>
           ) : (
-            <button onClick={submit} disabled={submitting || Object.keys(answers).length < questions.length} className='px-8 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md flex items-center gap-2'>
+            <button onClick={submit} disabled={submitting || Object.keys(answers).length < questions.length} className='px-8 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md flex items-center gap-2'>
               {submitting ? (<><div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white'></div> Submitting...</>) : (<>Submit Orientation <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' /></svg></>)}
             </button>
           )}

@@ -1,0 +1,101 @@
+@startuml
+hide circle
+hide methods
+hide stereotypes
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #FFFFFF
+skinparam class {
+  BackgroundColor #fdfdfd
+  BorderColor #999999
+}
+
+' Entities
+class Major {
+  id: bigint [PK]
+  code: varchar UNIQUE
+  name: varchar
+  description: text
+}
+
+class SubMajor {
+  id: bigint [PK]
+  code: varchar UNIQUE
+  name: varchar
+  description: text
+  studyGroup: varchar
+  exampleJobs: JSONB
+  majorId: bigint [FK -> Major.id]
+}
+
+class Level {
+  id: bigint [PK]
+  name: varchar
+}
+
+class Question {
+  id: bigint [PK]
+  text: text
+  levelId: bigint [FK -> Level.id]
+}
+
+class Option {
+  id: bigint [PK]
+  text: text
+  scoring: JSONB
+  questionId: bigint [FK -> Question.id]
+  majorId: bigint [FK -> Major.id]
+}
+
+class User {
+  id: bigint [PK]
+  name: varchar
+  email: varchar UNIQUE
+  passwordHash: varchar
+  role: enum('user','admin')
+}
+
+class Submission {
+  id: bigint [PK]
+  userId: bigint [FK -> User.id]
+  majorCode: varchar
+  majorName: varchar
+  subMajorCode: varchar
+  subMajorName: varchar
+  score: float
+  details: JSONB
+  createdAt: timestamp
+  updatedAt: timestamp
+}
+
+class "Response (Result)" as Response {
+  id: bigint [PK]
+  selectedOptionId: bigint
+  scoringSnapshot: JSONB
+  userId: bigint [FK -> User.id]
+  questionId: bigint [FK -> Question.id]
+  optionId: bigint [FK -> Option.id]
+  createdAt: timestamp
+}
+
+' Relationships
+Major "1" -- "*" SubMajor : categorizes
+Major "1" -- "*" Option : influences
+Level "1" -- "*" Question : stages
+Question "1" -- "*" Option : lists
+User "1" -- "*" Submission : produces
+User "1" -- "*" Response : answers
+Question "1" -- "*" Response : tracks
+Option "1" -- "*" Response : chosen
+
+' Notes
+note right of Option
+scoring JSON maps Major/SubMajor codes to point weights
+and is copied into Response.scoringSnapshot for audits
+end note
+
+note bottom of Submission
+details JSON stores per-major breakdown,
+sub-major recommendations, history, etc.
+end note
+
+@enduml

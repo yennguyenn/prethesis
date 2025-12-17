@@ -1,0 +1,88 @@
+@startuml
+hide circle
+hide stereotypes
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #FFFFFF
+skinparam class {
+  BackgroundColor #fdfdfd
+  BorderColor #999999
+}
+
+package "Controllers - Admin" {
+  class AdminController {
+    +createMajor()
+    +listMajors()
+    +updateMajor(id)
+    +deleteMajor(id)
+    +createQuestion()
+    +listQuestions()
+    +updateQuestion(id)
+    +deleteQuestion(id)
+    +createOption(questionId)
+    +deleteOption(optionId)
+    +listSubmissions()
+    +updateOptionScoring(optionId)
+    +updateResultScore(resultId)
+    +bootstrapFirstAdmin()
+  }
+}
+
+package "Domain (refs)" {
+  class Major {
+    +id
+    +code
+    +name
+  }
+  class SubMajor {
+    +id
+    +code
+    +name
+    +majorId
+  }
+  class Level {
+    +id
+    +name
+  }
+  class Question {
+    +id
+    +text
+    +levelId
+  }
+  class Option {
+    +id
+    +text
+    +scoring
+    +questionId
+  }
+  class User {
+    +id
+    +email
+    +role
+  }
+  class Submission {
+    +id
+    +userId
+    +details
+  }
+  class Result {
+    +id
+    +user_id
+    +details
+  }
+}
+
+AdminController ..> Major
+AdminController ..> SubMajor
+AdminController ..> Level
+AdminController ..> Question
+AdminController ..> Option
+AdminController ..> User
+AdminController ..> Submission
+AdminController ..> Result
+
+note bottom of AdminController
+CRUD nội dung; xem/chỉnh submissions & results;
+khởi tạo admin đầu tiên nếu chưa có.
+end note
+
+@enduml

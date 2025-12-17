@@ -17,9 +17,40 @@ import Orientation from "./pages/Orientation";
 import Results from "./pages/Results";
 import Careers from "./pages/Careers";
 import CareerDetail from "./pages/CareerDetail";
+import SubMajorDetail from "./pages/SubMajorDetail";
 import Groups from "./pages/Groups";
-import AdminDashboard from "./pages/Admin/AdminDashboard";
 import Layout from "./components/Layout";
+import AdminDashboard from "./pages/Admin/AdminDashboard";
+// Lightweight JWT parser to avoid external dependency
+function parseJwt(token) {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return null;
+    const payload = parts[1]
+      .replace(/-/g, '+')
+      .replace(/_/g, '/');
+    const json = decodeURIComponent(atob(payload).split('').map(function(c){
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+function AdminRoute({ children }) {
+  const token = localStorage.getItem('token');
+  if (!token) return <Login />;
+  try {
+    const payload = parseJwt(token);
+    if (payload?.role !== 'admin') {
+      return <Home />;
+    }
+  } catch {
+    return <Login />;
+  }
+  return children;
+}
 
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
@@ -33,9 +64,10 @@ createRoot(document.getElementById("root")).render(
         <Route path="/results" element={<Results />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/careers/:code" element={<CareerDetail />} />
+        <Route path="/careers/:code/:subCode" element={<SubMajorDetail />} />
         <Route path="/groups" element={<Groups />} />
+        <Route path="/admin/*" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
       </Route>
-      <Route path="/admin/*" element={<AdminDashboard />} />
     </Routes>
   </BrowserRouter>
 );

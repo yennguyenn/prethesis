@@ -6,14 +6,14 @@ const groups = [
   {
     name: "Khối A",
     subjects: ["Toán", "Lý", "Hóa"],
-    color: "bg-blue-100 text-blue-700 border-blue-300",
+    color: "bg-primary-100 text-primary-700 border-primary-300",
     description: "Phù hợp cho các ngành kỹ thuật, công nghệ thông tin, khoa học tự nhiên",
     itCareers: ["Computer Science", "Software Engineering", "AI", "Data Science", "Embedded Systems"]
   },
   {
     name: "Khối A1",
     subjects: ["Toán", "Lý", "Tiếng Anh"],
-    color: "bg-green-100 text-green-700 border-green-300",
+    color: "bg-primary-100 text-primary-700 border-primary-300",
     description: "Kết hợp kỹ thuật với ngoại ngữ, phù hợp IT quốc tế",
     itCareers: ["Software Engineering", "Mobile Development", "Cloud Computing", "DevOps"]
   },
@@ -41,7 +41,7 @@ const groups = [
   {
     name: "Khối D1",
     subjects: ["Toán", "Văn", "Tiếng Anh (chuyên)"],
-    color: "bg-indigo-100 text-indigo-700 border-indigo-300",
+    color: "bg-primary-100 text-primary-700 border-primary-300",
     description: "Chuyên sâu về ngoại ngữ và toán học",
     itCareers: ["International IT", "Localization Engineering", "Technical Translation"]
   }
@@ -72,14 +72,14 @@ export default function Groups() {
 
       {/* Info Banner */}
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
+        <div className="bg-primary-100 border-l-4 border-primary-700 p-6 rounded-lg">
           <div className="flex items-start">
-            <svg className="w-6 h-6 text-blue-500 mr-3 mt-1" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-6 h-6 text-primary-500 mr-3 mt-1" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
             </svg>
             <div>
-              <h3 className="font-semibold text-blue-900 mb-1">About Exam Groups</h3>
-              <p className="text-blue-800">
+              <h3 className="font-semibold text-primary-900 mb-1">About Exam Groups</h3>
+              <p className="text-primary-900">
                 Vietnamese university entrance exams are organized into groups (Khối) based on subject combinations. 
                 Your group determines which IT programs you can apply to.
               </p>
@@ -115,7 +115,7 @@ export default function Groups() {
                 <ul className="space-y-1">
                   {group.itCareers.map((career) => (
                     <li key={career} className="text-sm text-gray-600 flex items-center">
-                      <svg className="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                      <svg className="w-4 h-4 text-primary-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>
                       {career}
@@ -134,14 +134,14 @@ export default function Groups() {
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Most Common Groups for IT</h2>
           
           <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="text-center p-6 bg-blue-50 rounded-xl">
-              <div className="text-4xl font-bold text-blue-600 mb-2">Khối A</div>
+            <div className="text-center p-6 bg-primary-100 rounded-xl">
+              <div className="text-4xl font-bold text-primary-700 mb-2">Khối A</div>
               <p className="text-gray-700 font-medium mb-2">Best for Technical IT</p>
               <p className="text-sm text-gray-600">Strongest foundation for Computer Science, Engineering</p>
             </div>
 
-            <div className="text-center p-6 bg-green-50 rounded-xl">
-              <div className="text-4xl font-bold text-green-600 mb-2">Khối A1</div>
+            <div className="text-center p-6 bg-primary-100 rounded-xl">
+              <div className="text-4xl font-bold text-primary-700 mb-2">Khối A1</div>
               <p className="text-gray-700 font-medium mb-2">Best for Global IT</p>
               <p className="text-sm text-gray-600">Ideal for international software development</p>
             </div>
@@ -159,7 +159,7 @@ export default function Groups() {
             </p>
             <Link
               to="/quiz"
-              className="inline-block px-10 py-4 bg-indigo-600 text-white text-lg font-semibold rounded-lg hover:bg-indigo-700 transition-colors"
+              className="inline-block px-10 py-4 bg-primary-700 text-white text-lg font-semibold rounded-lg hover:bg-primary-900 transition-colors"
             >
               Take the Assessment
             </Link>

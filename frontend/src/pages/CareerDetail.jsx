@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import API from '../api';
 
 // Centralized mapping for IT submajors (codes used in Level 2 results)
 const SUBMAJORS = {
@@ -79,14 +80,135 @@ const SUBMAJORS = {
 
 export default function CareerDetail() {
   const { code } = useParams();
+  const [major, setMajor] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const renderMajorDescription = (text) => {
+    if (!text) return <p className="text-sm text-slate-700">Chưa có mô tả cho ngành này.</p>;
+    const raw = String(text).replace(/\r\n/g, '\n');
+    const blocks = raw.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
+
+    // Heuristic formatting: treat section starting with "Sinh viên" as intro to list
+    const idxSinhVien = blocks.findIndex(b => /^sinh viên/i.test(b));
+    // Detect the first concluding paragraph after the checklist intro
+    const idxKet = blocks.findIndex(b => /^(đây là ngành|ngành học này|it là ngành|nhân văn mở ra|kết luận|tổng kết)/i.test(b));
+
+    if (idxSinhVien !== -1) {
+      const head = blocks.slice(0, idxSinhVien);
+      const tailStart = idxKet !== -1 ? idxKet : blocks.length;
+      // Exclude any unusually long paragraph-like item accidentally parsed into list
+      const listItems = blocks
+        .slice(idxSinhVien + 1, tailStart)
+        .filter(li => li.split(/\s+/).length <= 20 || li.length <= 140);
+      const tail = idxKet !== -1 ? blocks.slice(idxKet) : (blocks.length > tailStart ? blocks.slice(tailStart) : []);
+
+      return (
+        <div className="space-y-5">
+          {head.map((p, i) => (
+            <p key={`p-h-${i}`} className="text-sm text-slate-700 leading-relaxed">{p}</p>
+          ))}
+          <div className="rounded-2xl border border-primary-300 bg-primary-100/60 p-4">
+            <div className="text-sm font-semibold text-primary-700 mb-3">{blocks[idxSinhVien]}</div>
+            {listItems.length > 0 && (
+              <ul className="space-y-2">
+                {listItems.map((li, i) => (
+                  <li key={`li-${i}`} className="flex items-start gap-2 text-sm text-slate-800">
+                    <span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary-700 text-white text-[10px] select-none">✓</span>
+                    <span className="leading-relaxed">{li}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+          {tail.map((p, i) => (
+            <p key={`p-t-${i}`} className="text-sm text-slate-700 leading-relaxed">{p}</p>
+          ))}
+        </div>
+      );
+    }
+
+    // Default: paragraphs
+    return (
+      <div className="space-y-4">
+        {blocks.map((p, i) => (
+          <p key={`p-${i}`} className="text-sm text-slate-700 leading-relaxed">{p}</p>
+        ))}
+      </div>
+    );
+  };
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const r = await API.get(`/majors/code/${code}`);
+        if (mounted) setMajor(r.data || null);
+      } catch (e) {
+        if (mounted) setMajor(null);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [code]);
+
   const data = SUBMAJORS[code];
 
+  if (loading) {
+    return (
+      <div className="max-w-3xl mx-auto py-16 px-4">
+        <h1 className="text-2xl font-bold mb-4">Đang tải...</h1>
+      </div>
+    );
+  }
+
+  // If backend has a major with this code, show that first
+  if (major) {
+    return (
+      <div className="min-h-screen py-12 px-4">
+        <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur rounded-3xl shadow-lg p-8 border border-slate-100">
+          <div className="mb-8">
+            <h1 className="text-3xl font-extrabold text-primary-700 mb-2">{major.name}</h1>
+            <div className="text-xs inline-block px-3 py-1 rounded-full bg-primary-100 text-primary-700 border border-primary-300">Mã: {major.code}</div>
+          </div>
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold text-slate-800">Giới thiệu</h2>
+            {renderMajorDescription(major.description)}
+          </section>
+          {Array.isArray(major.SubMajors) && major.SubMajors.length > 0 && (
+            <section className="mt-8">
+              <h2 className="text-lg font-semibold text-slate-800 mb-3">Các chuyên ngành</h2>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {major.SubMajors.map(sm => (
+                  <Link to={`/careers/${major.code}/${sm.code}`} key={sm.id} className="block p-4 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:shadow transition">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-sm font-semibold text-slate-800 group-hover:text-primary-700">{sm.name}</h3>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary-100 text-primary-700 border border-primary-300">{sm.code}</span>
+                    </div>
+                    {sm.studyGroup && <div className="text-[11px] text-slate-600 mb-1">Khối học: {sm.studyGroup}</div>}
+                    <p className="text-xs text-slate-600 leading-relaxed line-clamp-4 whitespace-pre-line">{sm.description}</p>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+          <div className="mt-10 flex gap-4">
+            <Link to="/careers" className="flex-1 text-center px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium transition">Danh sách ngành</Link>
+            <Link to="/quiz" className="flex-1 text-center px-5 py-3 rounded-xl bg-primary-700 text-white text-sm font-semibold shadow hover:shadow-md transition">Làm trắc nghiệm</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Fallback: static IT submajors detail by code
   if (!data) {
     return (
       <div className="max-w-3xl mx-auto py-16 px-4">
         <h1 className="text-2xl font-bold mb-4">Chuyên ngành không tìm thấy</h1>
         <p className="text-slate-600 mb-6">Mã chuyên ngành "{code}" không tồn tại hoặc chưa được định nghĩa.</p>
-        <Link to="/careers" className="px-5 py-2 rounded-lg bg-indigo-600 text-white font-medium hover:bg-indigo-700 transition">Quay về danh sách</Link>
+        <Link to="/careers" className="px-5 py-2 rounded-lg bg-primary-700 text-white font-medium hover:bg-primary-900 transition">Quay về danh sách</Link>
       </div>
     );
   }
@@ -95,9 +217,9 @@ export default function CareerDetail() {
     <div className="min-h-screen py-12 px-4">
       <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur rounded-3xl shadow-lg p-8 border border-slate-100">
         <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-indigo-700 mb-3">{data.name}</h1>
+          <h1 className="text-3xl font-extrabold text-primary-700 mb-3">{data.name}</h1>
           <p className="text-sm text-slate-600 leading-relaxed mb-2">{data.intro}</p>
-          <div className="text-xs inline-block px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">Khối học: {data.studyGroup}</div>
+          <div className="text-xs inline-block px-3 py-1 rounded-full bg-primary-100 text-primary-700 border border-primary-300">Khối học: {data.studyGroup}</div>
         </div>
         <div className="space-y-8">
           <section>
@@ -108,7 +230,7 @@ export default function CareerDetail() {
             <h2 className="text-lg font-semibold text-slate-800 mb-3">Kỹ năng chính</h2>
             <div className="flex flex-wrap gap-2">
               {data.skills.map(s => (
-                <span key={s} className="px-3 py-1 text-xs bg-violet-50 text-violet-700 rounded-full border border-violet-200">{s}</span>
+                <span key={s} className="px-3 py-1 text-xs bg-primary-100 text-primary-700 rounded-full border border-primary-300">{s}</span>
               ))}
             </div>
           </section>
@@ -121,7 +243,7 @@ export default function CareerDetail() {
         </div>
         <div className="mt-10 flex gap-4">
           <Link to="/careers" className="flex-1 text-center px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium transition">Danh sách chuyên ngành</Link>
-          <Link to="/quiz" className="flex-1 text-center px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-sm font-semibold shadow hover:shadow-md transition">Làm trắc nghiệm</Link>
+          <Link to="/quiz" className="flex-1 text-center px-5 py-3 rounded-xl bg-primary-700 text-white text-sm font-semibold shadow hover:shadow-md transition">Làm trắc nghiệm</Link>
         </div>
       </div>
     </div>

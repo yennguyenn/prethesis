@@ -1,30 +1,41 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import API from "../api";
 import Navbar from "../components/Navbar";
 
 export default function Home() {
+  const [majors, setMajors] = useState([]);
+  useEffect(() => {
+    (async () => {
+      try {
+        const r = await API.get("/majors");
+        setMajors(Array.isArray(r.data) ? r.data : []);
+      } catch (_) {
+        setMajors([]);
+      }
+    })();
+  }, []);
   return (
     <div className="">
 
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-indigo-700 via-violet-700 to-fuchsia-600 py-28 overflow-hidden">
+      <div className="relative bg-gradient-to-br from-primary-900 via-primary-700 to-primary-500 py-28 overflow-hidden">
         {/* Decorative Blobs */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-primary-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
         
         <div className="container mx-auto px-4 text-center relative z-10">
           <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-4">
-            DSS chọn ngành phù hợp cho bạn
+            Welcome to Support Career
           </h1>
-          <p className="text-base md:text-xl text-fuchsia-100 mb-8 max-w-3xl mx-auto">
-            Hệ thống hỗ trợ ra quyết định (Decision Support System) giúp gợi ý ngành học phù hợp dựa trên tính cách, kỹ năng và sở thích.
-            Đánh giá 2 bước: Định hướng tổng quát (Level 1) → Chuyên sâu theo ngành (Level 2). IT chỉ là một ví dụ trong 24 ngành và sẽ được mở rộng sau.
+          <p className="text-base md:text-xl text-primary-300 mb-8 max-w-3xl mx-auto">
+            Support Career accompanies you in making career decisions based on data and personal competencies
           </p>
           <Link
             to="/quiz"
-            className="inline-block px-8 py-3 bg-white text-indigo-700 text-lg font-bold rounded-xl hover:shadow-2xl transform hover:scale-105 transition-all"
+            className="inline-block px-8 py-3 bg-white text-primary-700 text-lg font-bold rounded-xl hover:shadow-2xl transform hover:scale-105 transition-all"
           >
-            Bắt đầu bài trắc nghiệm →
+            Start the assessment →
           </Link>
         </div>
       </div>
@@ -32,96 +43,103 @@ export default function Home() {
       {/* How It Works Section */}
       <div className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">Quy trình đánh giá</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">Assessment Process</h2>
           <div className="grid md:grid-cols-3 gap-12">
             <div className="text-center">
-              <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-4xl">📝</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">1. Định hướng (Level 1)</h3>
-              <p className="text-gray-600 text-sm">Trả lời 30 câu hỏi về sở thích, cách học và giá trị cá nhân để xác định nhóm ngành phù hợp trong 24 ngành.</p>
+              <h3 className="text-xl font-semibold mb-2">1. Orientation</h3>
+              <p className="text-gray-600 text-sm">Answer 60 questions about interests, learning styles, and personal values to identify suitable groups among 24 majors.</p>
             </div>
             <div className="text-center">
-              <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-4xl">🤖</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">2. Phân tích điểm</h3>
-              <p className="text-gray-600 text-sm">Thuật toán DSS tổng hợp điểm theo mã ngành và chuyên ngành, đưa ra đề xuất cá nhân hoá.</p>
+              <h3 className="text-xl font-semibold mb-2">2. Score Analysis</h3>
+              <p className="text-gray-600 text-sm">The DSS algorithm aggregates scores by major and sub-major codes to provide personalized recommendations.</p>
             </div>
             <div className="text-center">
-              <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-4xl">🎯</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">3. Kết quả & lộ trình</h3>
-              <p className="text-gray-600 text-sm">Nhận ngành/chuyên ngành đề xuất kèm mô tả, kỹ năng, lộ trình nghề nghiệp và liên kết trang chi tiết.</p>
+              <h3 className="text-xl font-semibold mb-2">3. Results</h3>
+              <p className="text-gray-600 text-sm">Receive recommended majors/sub-majors with descriptions and skills suited to those fields.</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Majors Preview (sample) */}
-      <div className="py-20 bg-gradient-to-br from-blue-50 to-indigo-100">
+      {/* Majors Preview (live from API) */}
+      <div className="py-20 bg-gradient-to-br from-primary-100 to-primary-300">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Gợi ý 24 ngành tiêu biểu</h2>
-          <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">
-            Danh sách nhiều ngành nghề: Kinh tế, Khoa học, Công nghệ, Xã hội, Nghệ thuật, Y tế,... 
-          </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
-            {[
-              { icon: "💼", name: "Kinh doanh & Quản trị" },
-              { icon: "📈", name: "Tài chính - Ngân hàng" },
-              { icon: "📊", name: "Kế toán - Kiểm toán" },
-              { icon: "📣", name: "Marketing" },
-              { icon: "🏛️", name: "Luật" },
-              { icon: "🧠", name: "Tâm lý học" },
-              { icon: "🏥", name: "Y đa khoa" },
-              { icon: "🦷", name: "Răng - Hàm - Mặt" },
-              { icon: "💊", name: "Dược" },
-              { icon: "🧪", name: "Hoá học" },
-              { icon: "🧬", name: "Sinh học" },
-              { icon: "📐", name: "Toán học" },
-              { icon: "🔭", name: "Vật lý" },
-              { icon: "🌍", name: "Địa lý" },
-              { icon: "🏗️", name: "Kỹ thuật xây dựng" },
-              { icon: "⚙️", name: "Cơ điện tử" },
-              { icon: "🚗", name: "Cơ khí - Ô tô" },
-              { icon: "🌿", name: "Nông nghiệp" },
-              { icon: "🍽️", name: "Du lịch - Nhà hàng" },
-              { icon: "🎨", name: "Thiết kế đồ hoạ" },
-              { icon: "🎭", name: "Nghệ thuật biểu diễn" },
-              { icon: "🏛️", name: "Khoa học xã hội" },
-              { icon: "🗺️", name: "Quan hệ quốc tế" },
-              { icon: "💻", name: "Công nghệ thông tin" }
-            ].map((item, index) => (
-              <div key={index} className="bg-white rounded-xl p-6 text-center hover:shadow-lg transition-shadow">
-                <div className="text-5xl mb-3">{item.icon}</div>
-                <h3 className="font-semibold text-gray-800">{item.name}</h3>
-              </div>
-            ))}
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Suggestions for 24 available majors</h2>
+          <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">A list of various fields such as: Economics, Science, Technology, Arts, ...</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-10">
+            {(majors.slice(0, 24)).map((m) => {
+              const rawCode = (m.code || '').trim();
+              const lower = rawCode.toLowerCase();
+              const initialSrc = rawCode ? `/assets/majors/${rawCode}.png` : '/assets/majors/default.svg';
+              const alts = rawCode ? [`/assets/majors/${lower}.png`,`/assets/majors/${lower}.svg`,`/assets/majors/default.svg`] : [`/assets/majors/default.svg`];
+              return (
+                <Link key={m.id} to={`/careers/${m.code}`} className="group block bg-white rounded-xl p-5 text-center hover:shadow-lg border border-slate-100 transition">
+                  <img
+                    src={initialSrc}
+                    alt={m.name}
+                    loading="lazy"
+                    className="h-12 w-12 mx-auto mb-3 object-contain"
+                    data-alts={alts.join(',')}
+                    data-idx="0"
+                    onError={(e)=>{
+                      const el = e.currentTarget;
+                      const list = (el.getAttribute('data-alts')||'').split(',').filter(Boolean);
+                      const idx = parseInt(el.getAttribute('data-idx')||'0',10);
+                      if (idx < list.length) {
+                        el.src = list[idx];
+                        el.setAttribute('data-idx', String(idx+1));
+                      } else {
+                        el.onerror = null;
+                        el.src = '/assets/majors/default.svg';
+                      }
+                    }}
+                  />
+                  <h3 className="font-semibold text-slate-900 group-hover:text-primary-700 line-clamp-2">{m.name || m.code}</h3>
+                </Link>
+              );
+            })}
+            {majors.length === 0 && (
+              Array.from({ length: 12 }).map((_,i)=> (
+                <div key={i} className="bg-white rounded-xl p-5 border border-slate-100 animate-pulse">
+                  <div className="h-8 w-8 bg-slate-200 rounded-full mx-auto mb-3" />
+                  <div className="h-3 bg-slate-200 rounded w-3/4 mx-auto mb-2" />
+                  <div className="h-2 bg-slate-100 rounded w-1/2 mx-auto" />
+                </div>
+              ))
+            )}
           </div>
           <div className="text-center">
-            <Link to="/careers" className="inline-block px-8 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors">
-              Xem ví dụ chuyên ngành CNTT
+            <Link to="/careers" className="inline-block px-8 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 transition-colors">
+              View detailed
             </Link>
           </div>
         </div>
       </div>
 
       {/* Stats Section */}
-      <div className="py-16 bg-indigo-600">
+      <div className="py-16 bg-primary-700">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8 text-center text-white">
             <div>
-              <div className="text-5xl font-bold mb-2">30+</div>
-              <div className="text-indigo-200">Câu hỏi định hướng</div>
+              <div className="text-5xl font-bold mb-2">60+</div>
+              <div className="text-primary-300">Orientation Questions</div>
             </div>
             <div>
-              <div className="text-5xl font-bold mb-2">9</div>
-              <div className="text-indigo-200">Chuyên ngành IT</div>
+              <div className="text-5xl font-bold mb-2">24</div>
+              <div className="text-primary-300">Majors</div>
             </div>
             <div>
               <div className="text-5xl font-bold mb-2">100%</div>
-              <div className="text-indigo-200">Miễn phí</div>
+              <div className="text-primary-300">Miễn phí</div>
             </div>
           </div>
         </div>
@@ -130,15 +148,15 @@ export default function Home() {
       {/* CTA Section */}
       <div className="py-20 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Sẵn sàng chọn ngành phù hợp?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Ready to choose the right major?</h2>
           <p className="text-base md:text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Hoàn thành bài trắc nghiệm để nhận gợi ý ngành/chuyên ngành sát với tính cách, kỹ năng và sở thích của bạn.
+            Complete the assessment to receive major/sub-major suggestions aligned with your personality, skills, and interests.
           </p>
           <Link
             to="/quiz"
-            className="inline-block px-8 py-3 bg-indigo-600 text-white text-lg font-semibold rounded-xl hover:bg-indigo-700 transition-colors shadow-lg"
+            className="inline-block px-8 py-3 bg-primary-700 text-white text-lg font-semibold rounded-xl hover:bg-primary-900 transition-colors shadow-lg"
           >
-            Bắt đầu ngay
+            Start now
           </Link>
         </div>
       </div>

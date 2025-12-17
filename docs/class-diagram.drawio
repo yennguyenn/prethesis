@@ -1,0 +1,102 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36" version="29.2.7">
+  <diagram id="WzCuAr6O_jmPdipvD8hK" name="Core Classes">
+    <mxGraphModel dx="1042" dy="1642" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1920" pageHeight="1080" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="User" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;startSize=30;horizontal=0;rounded=0;strokeColor=#4a5568;fillColor=#fdfdfd;swimlaneFillColor=#edf2f7;fontColor=#1a202c;stackSpacing=2;html=1;rotation=90;" value="User&#xa;────────&#xa;+id: INTEGER [PK]&#xa;+name: STRING&#xa;+email: STRING UNIQUE&#xa;+passwordHash: STRING&#xa;+role: STRING (&#39;user&#39;|&#39;admin&#39;)&#xa;────────&#xa;+setPassword(password)&#xa;+verifyPassword(password)" vertex="1">
+          <mxGeometry height="260" width="280" x="40" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Major" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;startSize=30;horizontal=0;rounded=0;strokeColor=#4a5568;fillColor=#fdfdfd;swimlaneFillColor=#edf2f7;fontColor=#1a202c;stackSpacing=2;html=1;rotation=90;" value="Major&#xa;────────&#xa;+id: INTEGER [PK]&#xa;+code: STRING UNIQUE&#xa;+name: STRING&#xa;+description: TEXT" vertex="1">
+          <mxGeometry height="210" width="240" x="360" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="SubMajor" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;startSize=30;horizontal=0;rounded=0;strokeColor=#4a5568;fillColor=#fdfdfd;swimlaneFillColor=#edf2f7;fontColor=#1a202c;stackSpacing=2;html=1;rotation=90;" value="SubMajor&#xa;────────&#xa;+id: INTEGER [PK]&#xa;+code: STRING UNIQUE&#xa;+name: STRING&#xa;+description: TEXT&#xa;+studyGroup: STRING&#xa;+exampleJobs: JSONB&#xa;+majorId: INTEGER [FK]" vertex="1">
+          <mxGeometry height="250" width="280" x="640" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Level" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;startSize=30;horizontal=0;rounded=0;strokeColor=#4a5568;fillColor=#fdfdfd;swimlaneFillColor=#edf2f7;fontColor=#1a202c;stackSpacing=2;html=1;rotation=90;" value="Level&#xa;────────&#xa;+id: INTEGER [PK]&#xa;+name: STRING" vertex="1">
+          <mxGeometry height="150" width="200" x="960" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Question" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;startSize=30;horizontal=0;rounded=0;strokeColor=#4a5568;fillColor=#fdfdfd;swimlaneFillColor=#edf2f7;fontColor=#1a202c;stackSpacing=2;html=1;rotation=90;" value="Question&#xa;────────&#xa;+id: INTEGER [PK]&#xa;+text: TEXT&#xa;+levelId: INTEGER [FK]" vertex="1">
+          <mxGeometry height="200" width="230" x="1190" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Option" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;startSize=30;horizontal=0;rounded=0;strokeColor=#4a5568;fillColor=#fdfdfd;swimlaneFillColor=#edf2f7;fontColor=#1a202c;stackSpacing=2;html=1;rotation=90;" value="Option&#xa;────────&#xa;+id: INTEGER [PK]&#xa;+text: TEXT&#xa;+scoring: JSONB&#xa;+questionId: INTEGER [FK]&#xa;+majorId: INTEGER [FK]" vertex="1">
+          <mxGeometry height="220" width="260" x="1460" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Result" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;startSize=30;horizontal=0;rounded=0;strokeColor=#4a5568;fillColor=#fdfdfd;swimlaneFillColor=#edf2f7;fontColor=#1a202c;stackSpacing=2;html=1;rotation=90;" value="Result&#xa;────────&#xa;+id: INTEGER [PK]&#xa;+userId: INTEGER [FK]&#xa;+questionId: INTEGER [FK]&#xa;+optionId: INTEGER [FK]&#xa;+selectedOptionId: INTEGER&#xa;+scoringSnapshot: JSONB" vertex="1">
+          <mxGeometry height="240" width="260" x="1190" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="Submission" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;startSize=30;horizontal=0;rounded=0;strokeColor=#4a5568;fillColor=#fdfdfd;swimlaneFillColor=#edf2f7;fontColor=#1a202c;stackSpacing=2;html=1;rotation=90;" value="Submission&#xa;────────&#xa;+id: INTEGER [PK]&#xa;+userId: INTEGER [FK]&#xa;+majorCode: STRING&#xa;+majorName: STRING&#xa;+subMajorCode: STRING&#xa;+subMajorName: STRING&#xa;+score: FLOAT&#xa;+details: JSONB&#xa;+createdAt: DATE&#xa;+updatedAt: DATE" vertex="1">
+          <mxGeometry height="280" width="310" x="640" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="AuthController" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;startSize=30;horizontal=0;rounded=0;strokeColor=#2d3748;fillColor=#fffaf0;swimlaneFillColor=#fdebd3;fontColor=#1a202c;stackSpacing=2;html=1;rotation=90;" value="AuthController&#xa;────────&#xa;+register(req,res)&#xa;+login(req,res)" vertex="1">
+          <mxGeometry height="160" width="240" x="40" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="QuizController" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;startSize=30;horizontal=0;rounded=0;strokeColor=#2d3748;fillColor=#fffaf0;swimlaneFillColor=#fdebd3;fontColor=#1a202c;stackSpacing=2;html=1;rotation=90;" value="QuizController&#xa;────────&#xa;+getQuiz(req,res)&#xa;+submitMajorQuiz(req,res)&#xa;+submitQuiz(req,res)" vertex="1">
+          <mxGeometry height="200" width="260" x="970" y="780" as="geometry" />
+        </mxCell>
+        <mxCell id="AdminController" parent="1" style="swimlane;fontStyle=1;childLayout=stackLayout;startSize=30;horizontal=0;rounded=0;strokeColor=#2d3748;fillColor=#fffaf0;swimlaneFillColor=#fdebd3;fontColor=#1a202c;stackSpacing=2;html=1;rotation=90;" value="AdminController&#xa;────────&#xa;+createMajor(req,res)&#xa;+listMajors(req,res)&#xa;+updateMajor(req,res)&#xa;+deleteMajor(req,res)&#xa;+createQuestion(req,res)&#xa;+listQuestions(req,res)&#xa;+getQuestionById(req,res)&#xa;+updateQuestion(req,res)&#xa;+deleteQuestion(req,res)&#xa;+createOption(req,res)&#xa;+deleteOption(req,res)&#xa;+importQuestionsFromJson(req,res)&#xa;+createAdminUser(req,res)&#xa;+bootstrapFirstAdmin(req,res)&#xa;+setUserRole(req,res)&#xa;+updateOptionScoring(req,res)&#xa;+updateResultScore(req,res)&#xa;+listSubmissions(req,res)" vertex="1">
+          <mxGeometry height="360" width="620" x="240" y="1250" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeMajorSub" edge="1" parent="1" source="Major" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=block;endFill=1;strokeColor=#2d3748;fontColor=#1a202c;" target="SubMajor">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="640" y="165" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edgeLevelQuestion" edge="1" parent="1" source="Level" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=block;endFill=1;strokeColor=#2d3748;fontColor=#1a202c;" target="Question">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeQuestionOption" edge="1" parent="1" source="Question" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=block;endFill=1;strokeColor=#2d3748;fontColor=#1a202c;" target="Option">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeUserSubmission" edge="1" parent="1" source="User" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=block;endFill=1;strokeColor=#2d3748;fontColor=#1a202c;" target="Submission">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeUserResult" edge="1" parent="1" source="User" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=block;endFill=1;strokeColor=#2d3748;fontColor=#1a202c;" target="Result">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeQuestionResult" edge="1" parent="1" source="Question" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=block;endFill=1;strokeColor=#2d3748;fontColor=#1a202c;" target="Result">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeOptionResult" edge="1" parent="1" source="Option" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=block;endFill=1;strokeColor=#2d3748;fontColor=#1a202c;" target="Result">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeSubmissionMajor" edge="1" parent="1" source="Submission" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;dashed=1;strokeColor=#718096;fontColor=#1a202c;" target="Major">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeSubmissionSubMajor" edge="1" parent="1" source="Submission" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;dashed=1;strokeColor=#718096;fontColor=#1a202c;" target="SubMajor">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeAuthUser" edge="1" parent="1" source="AuthController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=open;endArrow=block;endFill=1;dashed=1;strokeColor=#c05621;fontColor=#1a202c;" target="User">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeQuizQuestion" edge="1" parent="1" source="QuizController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=open;endArrow=block;endFill=1;dashed=1;strokeColor=#c05621;fontColor=#1a202c;" target="Question">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeQuizOption" edge="1" parent="1" source="QuizController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=open;endArrow=block;endFill=1;dashed=1;strokeColor=#c05621;fontColor=#1a202c;" target="Option">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeQuizSubmission" edge="1" parent="1" source="QuizController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=open;endArrow=block;endFill=1;dashed=1;strokeColor=#c05621;fontColor=#1a202c;" target="Submission">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeQuizSubMajor" edge="1" parent="1" source="QuizController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=open;endArrow=block;endFill=1;dashed=1;strokeColor=#c05621;fontColor=#1a202c;" target="SubMajor">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeAdminMajor" edge="1" parent="1" source="AdminController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=open;endArrow=block;endFill=1;dashed=1;strokeColor=#c05621;fontColor=#1a202c;" target="Major">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeAdminQuestion" edge="1" parent="1" source="AdminController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=open;endArrow=block;endFill=1;dashed=1;strokeColor=#c05621;fontColor=#1a202c;" target="Question">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeAdminOption" edge="1" parent="1" source="AdminController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=open;endArrow=block;endFill=1;dashed=1;strokeColor=#c05621;fontColor=#1a202c;" target="Option">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeAdminSubmission" edge="1" parent="1" source="AdminController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=open;endArrow=block;endFill=1;dashed=1;strokeColor=#c05621;fontColor=#1a202c;" target="Submission">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edgeAdminUser" edge="1" parent="1" source="AdminController" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=open;endArrow=block;endFill=1;dashed=1;strokeColor=#c05621;fontColor=#1a202c;" target="User">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

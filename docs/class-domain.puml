@@ -1,0 +1,84 @@
+@startuml
+hide circle
+hide stereotypes
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #FFFFFF
+skinparam class {
+  BackgroundColor #fdfdfd
+  BorderColor #999999
+}
+
+package "Domain Models" {
+  class Major {
+    +id: bigint [PK]
+    +code: varchar UNIQUE
+    +name: varchar
+    +description: text
+  }
+  class SubMajor {
+    +id: bigint [PK]
+    +code: varchar UNIQUE
+    +name: varchar
+    +description: text
+    +studyGroup: varchar
+    +majorId: bigint [FK -> Major.id]
+  }
+  class Level {
+    +id: bigint [PK]
+    +name: varchar
+  }
+  class Question {
+    +id: bigint [PK]
+    +text: text
+    +levelId: bigint [FK -> Level.id]
+  }
+  class Option {
+    +id: bigint [PK]
+    +text: text
+    +scoring: JSON
+    +questionId: bigint [FK -> Question.id]
+  }
+  class User {
+    +id: bigint [PK]
+    +name: varchar
+    +email: varchar UNIQUE
+    +passwordHash: varchar
+    +role: enum('user','admin')
+  }
+  class Submission {
+    +id: bigint [PK]
+    +userId: bigint [FK -> User.id]
+    +majorCode: varchar
+    +majorName: varchar
+    +subMajorCode: varchar
+    +subMajorName: varchar
+    +score: int
+    +details: JSON
+    +createdAt: timestamp
+  }
+  class Result {
+    +id: bigint [PK]
+    +user_id: bigint [FK -> User.id]
+    +score: int
+    +details: JSON
+    +createdAt: timestamp
+  }
+
+  Major "1" -- "*" SubMajor
+  Level "1" -- "*" Question
+  Question "1" -- "*" Option
+  User "1" -- "*" Submission
+  User "1" -- "*" Result
+}
+
+note right of Option
+scoring: JSON map code→points
+L1=Major codes (SubMajor mapped to parent Major)
+L2=SubMajor codes
+end note
+
+note bottom of Submission
+JSON breakdown: scores, recommendation, totals
+end note
+
+@enduml

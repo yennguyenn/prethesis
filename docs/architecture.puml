@@ -1,0 +1,86 @@
+@startuml
+hide circle
+hide stereotypes
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+skinparam component {
+  BackgroundColor #fdfdfd
+  BorderColor #999999
+}
+skinparam package {
+  BackgroundColor #ffffff
+  BorderColor #888888
+}
+skinparam node {
+  BackgroundColor #ffffff
+  BorderColor #666666
+}
+
+title DSS System Architecture (Frontend · Backend · Database)
+
+package "Client" {
+  actor User
+  actor Admin
+  component "React SPA\n(Vite + React Router)" as Frontend
+
+  User --> Frontend
+  Admin --> Frontend
+}
+
+package "Server" {
+  node "Node.js Runtime" as NodeRT {
+    component "Express API" as API
+    component "JWT Auth\nMiddleware" as JWT
+    component "AuthController" as AuthC
+    component "QuizController" as QuizC
+    component "ResultsController" as ResC
+    component "AdminController" as AdminC
+  }
+}
+
+database "PostgreSQL" as DB
+
+Frontend --> API : HTTPS JSON\nAxios + Bearer JWT
+API -down-> JWT : validate token\n(role, userId)
+API --> AuthC : /api/auth/*
+API --> QuizC : /api/quiz/*
+API --> ResC  : /api/results/*
+API --> AdminC: /api/admin/*
+API --> DB : SQL queries
+
+note right of Frontend
+  - Routes: /, /quiz, /results, /admin/*
+  - Stores JWT in localStorage
+  - TailwindCSS UI components
+end note
+
+note right of API
+  Express controllers & routes
+  - quiz: Level 1 by Major; Level 2 by SubMajor
+  - results: user results and admin view
+  - admin: majors, questions, options, users
+  - submajors: listing for authoring
+end note
+
+note bottom of DB
+  PostgreSQL
+  Tables: users, majors, submajors, levels,
+  questions, options, submissions, results
+end note
+
+package "Ops (optional)" {
+  node "docker-compose" as Compose
+}
+
+Compose ..> API : service: backend
+Compose ..> DB  : service: postgres
+
+legend right
+  <b>Flow</b>
+  1) User/Admin -> React SPA (browser)
+  2) SPA -> Express API over HTTPS (Axios)
+  3) API -> JWT middleware validates token
+  4) Controllers -> PostgreSQL
+end legend
+
+@enduml

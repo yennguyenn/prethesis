@@ -14,11 +14,12 @@ export default function Login() {
     setError("");
     try {
       const res = await API.post("/auth/login", form);
-      const { token } = res.data;
+      const { token, user } = res.data;
       if (token) {
         localStorage.setItem("token", token);
+        if (user) localStorage.setItem("user", JSON.stringify(user));
         setAuthToken(token);
-        nav("/quiz");
+        if (user && user.role === 'admin') nav("/admin"); else nav("/quiz");
       } else {
         setError("No token returned");
       }

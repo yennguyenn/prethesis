@@ -1,0 +1,92 @@
+// Database Diagram for DSS (Decision Support System)
+// Format: dbdiagram.io
+
+Table users {
+  id integer [primary key, increment]
+  name string [not null]
+  email string [unique, not null]
+  passwordHash string [not null]
+  role string [default: 'user', note: 'user or admin']
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table majors {
+  id integer [primary key, increment]
+  code string [unique]
+  name string [not null]
+  description text
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table submajors {
+  id integer [primary key, increment]
+  code string [unique]
+  name string [not null]
+  description text
+  studyGroup string
+  exampleJobs jsonb [note: 'array of job samples']
+  majorId integer [not null]
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table levels {
+  id integer [primary key, increment]
+  name string [note: 'Level 1, Level 2, etc']
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table questions {
+  id integer [primary key, increment]
+  text text [not null]
+  levelId integer [not null]
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table options {
+  id integer [primary key, increment]
+  text text [not null]
+  scoring jsonb [not null, note: 'Major/SubMajor codes -> point weights']
+  questionId integer [not null]
+  majorId integer [note: 'Optional: tag option to dominant major']
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table results {
+  id integer [primary key, increment]
+  selectedOptionId integer [note: 'Persisted snapshot for auditing']
+  scoringSnapshot jsonb [note: 'Copy of option scoring at submission time']
+  userId integer [not null]
+  questionId integer [not null]
+  optionId integer [not null]
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+Table submissions {
+  id integer [primary key, increment]
+  userId integer [not null]
+  majorCode string
+  majorName string
+  subMajorCode string
+  subMajorName string
+  score float
+  details jsonb [note: 'majorScores, submajorScores, recommendedMajor/SubMajor, allScores, totalAnswered']
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+// Relationships
+Ref: majors.id < submajors.majorId
+Ref: levels.id < questions.levelId
+Ref: questions.id < options.questionId
+Ref: majors.id < options.majorId
+Ref: users.id < results.userId
+Ref: users.id < submissions.userId
+Ref: questions.id < results.questionId
+Ref: options.id < results.optionId

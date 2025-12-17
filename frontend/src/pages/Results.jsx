@@ -57,12 +57,12 @@ export default function Results() {
         <h1 className="text-3xl font-bold text-gray-900 mb-6">My Assessment Results</h1>
 
         {!token && (
-          <div className="bg-white border border-indigo-200 rounded-xl p-8 shadow-sm">
-            <h2 className="text-xl font-semibold text-indigo-700 mb-3">Login Required</h2>
+          <div className="bg-white border border-primary-300 rounded-xl p-8 shadow-sm">
+            <h2 className="text-xl font-semibold text-primary-700 mb-3">Login Required</h2>
             <p className="text-gray-700 mb-6">You need to log in to view saved assessment results.</p>
             <a
               href="/login"
-              className="inline-block px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-md"
+              className="inline-block px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 transition-colors shadow-md"
             >
               Go to Login
             </a>
@@ -72,7 +72,7 @@ export default function Results() {
         {token && loading && (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-indigo-600 mx-auto mb-4" />
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-700 mx-auto mb-4" />
               <p className="text-gray-600">Loading your results...</p>
             </div>
           </div>
@@ -90,7 +90,7 @@ export default function Results() {
             <p className="text-gray-600 mb-6">You haven't completed any assessments while logged in.</p>
             <a
               href="/quiz"
-              className="inline-block px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-md"
+              className="inline-block px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 transition-colors shadow-md"
             >
               Take an Assessment
             </a>
@@ -126,21 +126,21 @@ export default function Results() {
                       <div className="text-xs text-slate-500">{new Date(r.created_at).toLocaleString()}</div>
                       <h2 className="text-lg font-semibold text-slate-900 mt-1">Bài đánh giá #{r.id}</h2>
                     </div>
-                    <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-medium rounded-full border border-emerald-200">
+                    <span className="px-3 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-full border border-primary-300">
                       Điểm: {r.score}
                     </span>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div className="rounded-xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-violet-50 p-4">
-                      <div className="text-[11px] uppercase tracking-wide text-indigo-600 font-medium mb-1">Ngành gợi ý</div>
-                      <div className="text-base font-semibold text-indigo-900">{majorName}</div>
+                    <div className="rounded-xl border border-primary-300 bg-gradient-to-br from-primary-100 to-primary-300/40 p-4">
+                      <div className="text-[11px] uppercase tracking-wide text-primary-700 font-medium mb-1">Ngành gợi ý</div>
+                      <div className="text-base font-semibold text-primary-900">{majorName}</div>
                       {majorDesc && <p className="mt-1 text-xs text-slate-700">{majorDesc}</p>}
                     </div>
-                    <div className="rounded-xl border border-violet-100 bg-gradient-to-br from-violet-50 to-fuchsia-50 p-4">
-                      <div className="text-[11px] uppercase tracking-wide text-violet-600 font-medium mb-1">Chuyên ngành gợi ý</div>
-                      <div className="text-base font-semibold text-violet-900">
+                    <div className="rounded-xl border border-primary-300 bg-gradient-to-br from-primary-100 to-primary-300/40 p-4">
+                      <div className="text-[11px] uppercase tracking-wide text-primary-700 font-medium mb-1">Chuyên ngành gợi ý</div>
+                      <div className="text-base font-semibold text-primary-900">
                         {d.recommendedSubmajor?.code || d.recommendedSubmajor?.name ? (
-                          <Link to={`/careers/${d.recommendedSubmajor?.code || d.recommendedSubmajor?.name}`} className="hover:underline decoration-violet-400 underline-offset-4">
+                          <Link to={`/careers/${d.recommendedSubmajor?.code || d.recommendedSubmajor?.name}`} className="hover:underline decoration-primary-500 underline-offset-4">
                             {subName}
                           </Link>
                         ) : (
@@ -149,7 +149,7 @@ export default function Results() {
                       </div>
                       {subDesc && <p className="mt-1 text-xs text-slate-700">{subDesc}</p>}
                       {d.recommendedSubmajor?.studyGroup && (
-                        <div className="mt-1 text-[11px] text-slate-600"><span className="font-semibold text-violet-700">Khối học:</span> {d.recommendedSubmajor.studyGroup}</div>
+                        <div className="mt-1 text-[11px] text-slate-600"><span className="font-semibold text-primary-700">Khối học:</span> {d.recommendedSubmajor.studyGroup}</div>
                       )}
                     </div>
                   </div>

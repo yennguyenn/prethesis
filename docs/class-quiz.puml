@@ -1,0 +1,70 @@
+@startuml
+hide circle
+hide stereotypes
+skinparam classAttributeIconSize 0
+skinparam backgroundColor #FFFFFF
+skinparam class {
+  BackgroundColor #fdfdfd
+  BorderColor #999999
+}
+
+package "Controllers - Quiz" {
+  class QuizController {
+    +getQuiz(level, major?)
+    +submitMajorQuiz(answers)
+    +submitQuiz(answers)
+  }
+  class ResultsController {
+    +me()
+    +orientationLatest()
+  }
+}
+
+package "Domain (refs)" {
+  class Level {
+    +id
+    +name
+  }
+  class Question {
+    +id
+    +text
+    +levelId
+  }
+  class Option {
+    +id
+    +text
+    +scoring
+    +questionId
+  }
+  class Major {
+    +code
+    +name
+  }
+  class SubMajor {
+    +code
+    +name
+    +majorId
+  }
+  class Submission {
+    +id
+    +userId
+    +details
+  }
+}
+
+QuizController ..> Level
+QuizController ..> Question
+QuizController ..> Option
+QuizController ..> Major
+QuizController ..> SubMajor
+QuizController ..> Submission
+
+ResultsController ..> Submission
+
+note right of QuizController
+- getQuiz: trả câu hỏi theo level (+lọc theo major cho L2)
+- submitMajorQuiz: cộng điểm theo Major
+- submitQuiz: cộng điểm theo SubMajor
+end note
+
+@enduml

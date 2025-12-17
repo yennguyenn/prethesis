@@ -12,6 +12,30 @@ async function listMajors(req,res) {
   res.json(majors);
 }
 
+async function updateMajor(req, res) {
+  try {
+    const { id } = req.params;
+    const { code, name, description } = req.body;
+    const major = await db.Major.findByPk(id);
+    if (!major) return res.status(404).json({ message: 'Major not found' });
+    if (code !== undefined) major.code = code;
+    if (name !== undefined) major.name = name;
+    if (description !== undefined) major.description = description;
+    await major.save();
+    res.json(major);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+}
+
+async function deleteMajor(req, res) {
+  try {
+    const { id } = req.params;
+    const major = await db.Major.findByPk(id);
+    if (!major) return res.status(404).json({ message: 'Major not found' });
+    await major.destroy();
+    res.json({ message: 'Deleted' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+}
+
 async function createQuestion(req,res) {
   
   try {
@@ -29,6 +53,95 @@ async function createQuestion(req,res) {
     const qFull = await db.Question.findByPk(q.id, { include: db.Option });
     res.json(qFull);
   } catch (err){ res.status(500).json({ error: err.message }); }
+}
+
+async function listQuestions(req, res) {
+  try {
+    const { page = 1, pageSize = 20, levelId } = req.query;
+    const where = {};
+    if (levelId) where.levelId = levelId;
+    const limit = Math.min(Number(pageSize) || 20, 100);
+    const offset = (Math.max(Number(page) || 1, 1) - 1) * limit;
+    const { rows, count } = await db.Question.findAndCountAll({
+      where,
+      include: [{ model: db.Option }],
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']]
+    });
+    res.json({ items: rows, total: count, page: Number(page) || 1, pageSize: limit });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+}
+// Get single question by id with options
+async function getQuestionById(req, res) {
+  try {
+    const { id } = req.params;
+    const q = await db.Question.findByPk(id, { include: [{ model: db.Option }] });
+    if (!q) return res.status(404).json({ message: 'Question not found' });
+    res.json(q);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+}
+
+async function updateQuestion(req, res) {
+  try {
+    const { id } = req.params;
+    const { text, levelId, options } = req.body;
+    const q = await db.Question.findByPk(id);
+    if (!q) return res.status(404).json({ message: 'Question not found' });
+    if (text !== undefined) q.text = text;
+    if (levelId !== undefined) q.levelId = levelId;
+    await q.save();
+    if (Array.isArray(options)) {
+      for (const opt of options) {
+        if (opt.id) {
+          const existing = await db.Option.findByPk(opt.id);
+          if (existing && existing.questionId === q.id) {
+            if (opt.text !== undefined) existing.text = opt.text;
+            if (opt.scoring !== undefined) existing.scoring = opt.scoring;
+            await existing.save();
+          }
+        } else {
+          await db.Option.create({ text: opt.text, scoring: opt.scoring || {}, questionId: q.id });
+        }
+      }
+    }
+    const qFull = await db.Question.findByPk(q.id, { include: db.Option });
+    res.json(qFull);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+}
+
+async function deleteQuestion(req, res) {
+  try {
+    const { id } = req.params;
+    const q = await db.Question.findByPk(id);
+    if (!q) return res.status(404).json({ message: 'Question not found' });
+    await db.Option.destroy({ where: { questionId: id } });
+    await q.destroy();
+    res.json({ message: 'Deleted' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+}
+
+// Create a new option under a question
+async function createOption(req, res) {
+  try {
+    const { questionId } = req.params;
+    const { text, scoring } = req.body;
+    const q = await db.Question.findByPk(questionId);
+    if (!q) return res.status(404).json({ message: 'Question not found' });
+    const opt = await db.Option.create({ text: text || '', scoring: scoring || {}, questionId: q.id });
+    res.status(201).json({ id: opt.id, text: opt.text, scoring: opt.scoring, questionId: q.id });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+}
+
+// Delete an option
+async function deleteOption(req, res) {
+  try {
+    const { optionId } = req.params;
+    const opt = await db.Option.findByPk(optionId);
+    if (!opt) return res.status(404).json({ message: 'Option not found' });
+    await opt.destroy();
+    res.json({ message: 'Deleted' });
+  } catch (err) { res.status(500).json({ error: err.message }); }
 }
 
 async function importQuestionsFromJson(req,res) {
@@ -64,6 +177,20 @@ async function createAdminUser(req, res) {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
+}
+
+// Bootstrap: allow creating the very first admin without auth if no admins exist
+async function bootstrapFirstAdmin(req, res) {
+  try {
+    const adminCount = await db.User.count({ where: { role: 'admin' } });
+    if (adminCount > 0) return res.status(403).json({ message: 'Bootstrap disabled: admin already exists' });
+    const { name, email, password } = req.body;
+    if (!name || !email || !password) return res.status(400).json({ message: 'Missing required fields' });
+    const exists = await db.User.findOne({ where: { email } });
+    if (exists) return res.status(409).json({ message: 'Email already exists' });
+    const created = await db.User.create({ name, email, passwordHash: password, role: 'admin' });
+    return res.status(201).json({ id: created.id, name: created.name, email: created.email, role: created.role });
+  } catch (err) { return res.status(500).json({ error: err.message }); }
 }
 
 async function setUserRole(req, res) {
@@ -127,3 +254,37 @@ async function updateResultScore(req, res) {
 }
 
 export default { createMajor, listMajors, createQuestion, importQuestionsFromJson, createAdminUser, setUserRole, updateOptionScoring, updateResultScore };
+export { updateMajor, deleteMajor, listQuestions, updateQuestion, deleteQuestion, getQuestionById };
+export { bootstrapFirstAdmin };
+export { createOption, deleteOption };
+// List all submissions (aggregated results) for admin oversight
+export async function listSubmissions(req, res) {
+  try {
+    const { page = 1, pageSize = 20, userId } = req.query;
+    const where = {};
+    if (userId) where.userId = userId;
+    const limit = Math.min(Number(pageSize) || 20, 100);
+    const offset = (Math.max(Number(page) || 1, 1) - 1) * limit;
+    const { rows, count } = await db.Submission.findAndCountAll({
+      where,
+      include: [{ model: db.User, attributes: ['id','name','email','role'] }],
+      order: [['createdAt','DESC']],
+      limit,
+      offset
+    });
+    const payload = rows.map(s => ({
+      id: s.id,
+      createdAt: s.createdAt,
+      score: s.score,
+      user: s.User ? { id: s.User.id, name: s.User.name, email: s.User.email, role: s.User.role } : null,
+      majorCode: s.majorCode,
+      majorName: s.majorName,
+      subMajorCode: s.subMajorCode,
+      subMajorName: s.subMajorName,
+      details: s.details
+    }));
+    res.json({ items: payload, total: count, page: Number(page) || 1, pageSize: limit });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}

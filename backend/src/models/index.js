@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize, DataTypes } from 'sequelize';
 import dotenv from 'dotenv';
 import configFile from '../config/config.js';
 import User from './user.js';
@@ -24,14 +24,14 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.User = User(sequelize, Sequelize);
-db.Major = Major(sequelize, Sequelize);
-db.Level = Level(sequelize, Sequelize);
-db.Question = Question(sequelize, Sequelize);
-db.Option = Option(sequelize, Sequelize);
-db.Result = Result(sequelize, Sequelize);
-db.SubMajor = SubMajor(sequelize, Sequelize);
-db.Submission = Submission(sequelize, Sequelize);
+db.User = User(sequelize, DataTypes);
+db.Major = Major(sequelize, DataTypes);
+db.Level = Level(sequelize, DataTypes);
+db.Question = Question(sequelize, DataTypes);
+db.Option = Option(sequelize, DataTypes);
+db.Result = Result(sequelize, DataTypes);
+db.SubMajor = SubMajor(sequelize, DataTypes);
+db.Submission = Submission(sequelize, DataTypes);
 
 // relationships
 db.Level.hasMany(db.Question, { foreignKey: 'levelId' });

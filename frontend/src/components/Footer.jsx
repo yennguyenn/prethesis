@@ -11,7 +11,7 @@ export default function Footer() {
             <p className="text-gray-400 text-sm">Helping students discover their perfect career direction through intelligent assessment.</p>
           </div>
           <div>
-            <h4 className="font-semibold mb-4 text-sm tracking-wide">Quick Links</h4>
+            <h4 className="font-semibold mb-4 text-sm tracking-wide">Links</h4>
             <ul className="space-y-2 text-sm">
               <li><Link to="/" className="text-gray-400 hover:text-white transition-colors">Home</Link></li>
               <li><Link to="/quiz" className="text-gray-400 hover:text-white transition-colors">Take Test</Link></li>

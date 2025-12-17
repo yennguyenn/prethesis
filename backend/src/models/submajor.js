@@ -5,6 +5,7 @@ export default (sequelize, DataTypes) => {
     name: { type: DataTypes.STRING, allowNull: false },
     description: { type: DataTypes.TEXT },
     studyGroup: { type: DataTypes.STRING },
+    exampleJobs: { type: DataTypes.JSONB }
   });
   return SubMajor;
 };

@@ -1,0 +1,133 @@
+@startuml
+skinparam backgroundColor #ffffff
+skinparam classAttributeIconSize 0
+hide empty members
+title DSS Platform Core Class Diagram
+
+class User {
+  +id: INTEGER
+  +name: STRING
+  +email: STRING
+  +passwordHash: STRING
+  +role: STRING = "user"
+  +setPassword(password)
+  +verifyPassword(password)
+}
+
+class Major {
+  +id: INTEGER
+  +code: STRING
+  +name: STRING
+  +description: TEXT
+}
+
+class SubMajor {
+  +id: INTEGER
+  +code: STRING
+  +name: STRING
+  +description: TEXT
+  +studyGroup: STRING
+  +exampleJobs: JSONB
+}
+
+class Level {
+  +id: INTEGER
+  +name: STRING
+}
+
+class Question {
+  +id: INTEGER
+  +text: TEXT
+  +levelId: INTEGER
+}
+
+class Option {
+  +id: INTEGER
+  +text: TEXT
+  +scoring: JSONB
+  +questionId: INTEGER
+  +majorId: INTEGER
+}
+
+class Result {
+  +id: INTEGER
+  +userId: INTEGER
+  +questionId: INTEGER
+  +optionId: INTEGER
+  +selectedOptionId: INTEGER
+  +scoringSnapshot: JSONB
+}
+
+class Submission {
+  +id: INTEGER
+  +userId: INTEGER
+  +majorCode: STRING
+  +majorName: STRING
+  +subMajorCode: STRING
+  +subMajorName: STRING
+  +score: FLOAT
+  +details: JSONB
+  +createdAt: DATE
+  +updatedAt: DATE
+}
+
+class AuthController <<controller>> {
+  +register(req, res)
+  +login(req, res)
+}
+
+class QuizController <<controller>> {
+  +getQuiz(req, res)
+  +submitMajorQuiz(req, res)
+  +submitQuiz(req, res)
+}
+
+class AdminController <<controller>> {
+  +createMajor(req, res)
+  +listMajors(req, res)
+  +updateMajor(req, res)
+  +deleteMajor(req, res)
+  +createQuestion(req, res)
+  +listQuestions(req, res)
+  +getQuestionById(req, res)
+  +updateQuestion(req, res)
+  +deleteQuestion(req, res)
+  +createOption(req, res)
+  +deleteOption(req, res)
+  +importQuestionsFromJson(req, res)
+  +createAdminUser(req, res)
+  +bootstrapFirstAdmin(req, res)
+  +setUserRole(req, res)
+  +updateOptionScoring(req, res)
+  +updateResultScore(req, res)
+  +listSubmissions(req, res)
+}
+
+User "1" -- "*" Result : answers
+User "1" -- "*" Submission : history
+User "1" <-- AuthController : manages
+
+Major "1" -- "*" SubMajor
+Major "1" -- "*" Option
+Level "1" -- "*" Question
+Question "1" -- "*" Option
+Question "1" -- "*" Result
+Option "1" -- "*" Result
+
+Submission "*" ..> Major : aggregates
+Submission "*" ..> SubMajor : aggregates
+Submission "*" ..> QuizController : persisted by
+
+QuizController ..> Question
+QuizController ..> Option
+QuizController ..> Major
+QuizController ..> SubMajor
+QuizController ..> Submission
+
+AdminController ..> Major
+AdminController ..> Question
+AdminController ..> Option
+AdminController ..> User
+AdminController ..> Submission
+
+@enduml

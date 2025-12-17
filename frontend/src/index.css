@@ -1,6 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+/* Tailwind v4 theme colors */
+@theme {
+  /* Blue palette */
+  --color-primary-100: #D0D7E1;
+  --color-primary-300: #9CDDDB;
+  --color-primary-500: #5790AB;
+  --color-primary-700: #064469;
+  --color-primary-900: #072D44;
+}
+
 /* Custom base overrides */
 @layer base {
   *, *::before, *::after { box-sizing: border-box; }

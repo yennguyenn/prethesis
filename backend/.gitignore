@@ -13,9 +13,6 @@ dist
 dist-ssr
 *.local
 
-# Do not track local helper scripts
-scripts/
-
 # Environment variables
 .env
 .env.local
@@ -31,3 +28,4 @@ scripts/
 *.njsproj
 *.sln
 *.sw?
+.docs/

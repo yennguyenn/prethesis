@@ -15,6 +15,26 @@ router.get("/", async (req, res) => {
 });
 
 // get single major
+// get major by code (place before :id to avoid conflicts)
+router.get("/code/:code", async (req, res) => {
+  try {
+    const { code } = req.params;
+    const major = await db.Major.findOne({
+      where: { code },
+      include: [{
+        model: db.SubMajor,
+        attributes: ['id', 'code', 'name', 'description', 'studyGroup', 'exampleJobs'],
+        separate: true,
+        order: [['name', 'ASC']]
+      }]
+    });
+    if (!major) return res.status(404).json({ message: "Not found" });
+    res.json(major);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;

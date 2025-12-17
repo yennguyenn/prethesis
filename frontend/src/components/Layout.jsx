@@ -14,10 +14,11 @@ export default function Layout() {
     : path.startsWith('/careers') ? 'careers'
     : path.startsWith('/groups') ? 'groups'
     : path.startsWith('/results') ? 'results'
+    : path.startsWith('/admin') ? 'admin'
     : undefined;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800 transition-colors">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-primary-100 to-primary-300 dark:from-slate-900 dark:to-slate-800 transition-colors">
       <Navbar activePage={activePage} />
       <main className="flex-1">
         <Outlet />

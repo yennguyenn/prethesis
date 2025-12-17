@@ -59,7 +59,7 @@ export default function Register() {
             </div>
           )}
           {success && (
-            <div className="mb-4 text-sm bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 rounded px-3 py-2">
+            <div className="mb-4 text-sm bg-primary-500/20 border border-primary-500/40 text-primary-300 rounded px-3 py-2">
               {success}
             </div>
           )}
