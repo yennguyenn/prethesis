@@ -1,0 +1,38 @@
+@startuml
+title DSS Recommendation Pipeline
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+
+actor User
+
+component "Web Interface" as Web
+component "Questionnaire \n& Scoring" as QAS
+component "Score \nAggregation" as AGG
+component "SAW Decision \nEngine" as SAW
+component "Decision Logic \n(Threshold)" as DEC
+component "Recommendation \nOutput" as OUT
+component "Admin Interface" as AdminUI
+database "PostgreSQL" as DB
+
+User --> Web
+Web --> QAS : submit answers
+QAS --> AGG : per-question scores
+AGG --> SAW : decision matrix
+SAW --> DEC : SAW scores
+DEC --> OUT : recommended major/submajor
+OUT --> DB : persist Submission (details)
+
+QAS <--> DB : read/write answers / scoring
+SAW <--> DB : read meta (majors, criteria) / persist scores
+AdminUI <--> DB : manage majors/questions/options/submajors
+
+note right of SAW
+  SAW: normalize -> weight -> sum
+  helpers: quizSawHelpers.js
+end note
+
+note left
+  Flow: User -> Web -> Scoring -> SAW -> Decision -> Output -> DB
+end note
+
+@enduml

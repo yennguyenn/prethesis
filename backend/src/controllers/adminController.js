@@ -1,85 +1,95 @@
-import db from '../models/index.js';
 
-async function createMajor(req,res) {
+import db from '../models/index.js';
+import {
+  createMajorService,
+  listMajorsService,
+  updateMajorService,
+  deleteMajorService,
+  createQuestionService,
+  listQuestionsService,
+  getQuestionByIdService
+} from '../services/adminService.js';
+
+async function createMajor(req, res) {
   try {
     const { code, name, description } = req.body;
-    const m = await db.Major.create({ code, name, description });
+    const m = await createMajorService({ code, name, description });
     res.json(m);
-  } catch (err){ res.status(500).json({ error: err.message }); }
-};
-async function listMajors(req,res) {
-  const majors = await db.Major.findAll();
-  res.json(majors);
+  } catch (err) {
+    throw err;
+  }
+}
+
+async function listMajors(req, res) {
+  try {
+    const majors = await listMajorsService();
+    res.json(majors);
+  } catch (err) {
+    throw err;
+  }
 }
 
 async function updateMajor(req, res) {
   try {
     const { id } = req.params;
     const { code, name, description } = req.body;
-    const major = await db.Major.findByPk(id);
-    if (!major) return res.status(404).json({ message: 'Major not found' });
-    if (code !== undefined) major.code = code;
-    if (name !== undefined) major.name = name;
-    if (description !== undefined) major.description = description;
-    await major.save();
+    const major = await updateMajorService(id, { code, name, description });
     res.json(major);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    if (err.message === 'Major not found') {
+      err.status = 404;
+    }
+    throw err;
+  }
 }
 
 async function deleteMajor(req, res) {
   try {
     const { id } = req.params;
-    const major = await db.Major.findByPk(id);
-    if (!major) return res.status(404).json({ message: 'Major not found' });
-    await major.destroy();
-    res.json({ message: 'Deleted' });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+    const result = await deleteMajorService(id);
+    res.json(result);
+  } catch (err) {
+    if (err.message === 'Major not found') {
+      err.status = 404;
+    }
+    throw err;
+  }
 }
 
-async function createQuestion(req,res) {
-  
+async function createQuestion(req, res) {
   try {
     const { text, level, options } = req.body;
-    if (!text || !level || !Array.isArray(options) || options.length === 0) {
-      return res.status(400).json({ error: 'Missing required fields: text, level, options[]' });
-    }
-    const lvl = Number(level) || 1;
-    const [levelRow] = await db.Level.findOrCreate({ where: { name: `Level ${lvl}` }, defaults: { name: `Level ${lvl}` } });
-    const q = await db.Question.create({ text, levelId: levelRow.id });
-    for (const opt of options) {
-      const scoring = opt.scoring || {};
-      await db.Option.create({ text: opt.text, scoring, questionId: q.id });
-    }
-    const qFull = await db.Question.findByPk(q.id, { include: db.Option });
+    const qFull = await createQuestionService({ text, level, options });
     res.json(qFull);
-  } catch (err){ res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    if (err.message && err.message.startsWith('Missing required fields')) {
+      err.status = 400;
+    }
+    throw err;
+  }
 }
 
 async function listQuestions(req, res) {
   try {
     const { page = 1, pageSize = 20, levelId } = req.query;
-    const where = {};
-    if (levelId) where.levelId = levelId;
-    const limit = Math.min(Number(pageSize) || 20, 100);
-    const offset = (Math.max(Number(page) || 1, 1) - 1) * limit;
-    const { rows, count } = await db.Question.findAndCountAll({
-      where,
-      include: [{ model: db.Option }],
-      limit,
-      offset,
-      order: [['createdAt', 'DESC']]
-    });
-    res.json({ items: rows, total: count, page: Number(page) || 1, pageSize: limit });
-  } catch (err) { res.status(500).json({ error: err.message }); }
+    const result = await listQuestionsService({ page, pageSize, levelId });
+    res.json(result);
+  } catch (err) {
+    throw err;
+  }
 }
-// Get single question by id with options
+
 async function getQuestionById(req, res) {
   try {
     const { id } = req.params;
-    const q = await db.Question.findByPk(id, { include: [{ model: db.Option }] });
-    if (!q) return res.status(404).json({ message: 'Question not found' });
+    const q = await getQuestionByIdService(id);
     res.json(q);
-  } catch (err) { res.status(500).json({ error: err.message }); }
+  } catch (err) {
+    if (err.message === 'Question not found') {
+      err.status = 404;
+    }
+    throw err;
+  }
 }
 
 async function updateQuestion(req, res) {

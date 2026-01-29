@@ -1,0 +1,137 @@
+@startuml
+title DSS Class Diagram (updated)
+skinparam classAttributeIconSize 0
+
+class User {
+  -id: INTEGER
+  -name: STRING
+  -email: STRING
+  -passwordHash: STRING
+  -role: STRING
+  
+  +setPassword(password)
+  +verifyPassword(password)
+}
+
+class Major {
+  -id: INTEGER
+  -code: STRING
+  -name: STRING
+  -description: TEXT
+  
+  +save()
+  +findByPk(id)
+}
+
+class SubMajor {
+  -id: INTEGER
+  -code: STRING
+  -name: STRING
+  -description: TEXT
+  -studyGroup: STRING
+  -exampleJobs: JSONB
+  -majorId: INTEGER
+  
+  +save()
+  +findByPk(id)
+}
+
+class Level {
+  -id: INTEGER
+  -name: STRING
+  
+  +save()
+  +findByPk(id)
+}
+
+class Question {
+  -id: INTEGER
+  -text: TEXT
+  -levelId: INTEGER
+  
+  +save()
+  +findByPk(id)
+}
+
+class Option {
+  -id: INTEGER
+  -text: TEXT
+  -scoring: JSONB
+  -questionId: INTEGER
+  -majorId: INTEGER
+  
+  +save()
+  +findByPk(id)
+}
+
+class Result {
+  -id: INTEGER
+  -selectedOptionId: INTEGER
+  -scoringSnapshot: JSONB
+  
+  +save()
+  +findByPk(id)
+}
+
+
+
+class Submission {
+  -id: INTEGER
+  -userId: INTEGER
+  -majorCode: STRING
+  -majorName: STRING
+  -subMajorCode: STRING
+  -subMajorName: STRING
+  -score: FLOAT
+  -details: JSONB
+  -createdAt: TIMESTAMP
+  -updatedAt: TIMESTAMP
+  
+  +save()
+  +findByPk(id)
+}
+
+class Criteria {
+  -id: INTEGER
+  -code: STRING
+  -name: STRING
+  -description: TEXT
+  
+  +save()
+  +findByPk(id)
+}
+
+class QuestionCriteriaMap {
+  -id: INTEGER
+  -questionId: INTEGER
+  -criteriaCode: STRING
+  -weight: FLOAT
+  
+  +save()
+  +findByPk(id)
+}
+
+' Associations '
+Level "1" -- "0..*" Question : hasMany
+Question "1" -- "0..*" Option : hasMany
+Major "1" -- "0..*" SubMajor : hasMany
+Major "1" -- "0..*" Option : hasMany
+Question "1" -- "0..*" Result : hasMany
+User "1" -- "0..*" Result : hasMany
+Option "1" -- "0..*" Result : hasMany
+User "1" -- "0..*" Response : hasMany
+Question "1" -- "0..*" Response : hasMany
+Option "1" -- "0..*" Response : hasMany
+User "1" -- "0..*" Submission : hasMany
+Question "1" -- "0..*" QuestionCriteriaMap : hasMany
+Criteria "1" -- "0..*" QuestionCriteriaMap : hasMany
+'' Response model removed from ERD (answers stored in `Submission.details` / snapshots)
+
+note bottom
+  Notes:
+  - `Option.scoring` and `Submission.details` are JSONB fields storing per-major/submajor scoring and SAW snapshots.
+  - `QuestionCriteriaMap.criteriaCode` maps to `Criteria.code` (string key).
+  - Per-question answers/audit are stored in `Submission.details` (no separate `Response` table in updated ERD).
+end note
+
+@enduml

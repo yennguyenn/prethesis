@@ -2,7 +2,7 @@ import bcrypt from 'bcrypt';
 import { DataTypes } from 'sequelize';
 
 export default (sequelize) => {
-  const User = sequelize.define('user', {
+  const User = sequelize.define('User', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: {
       type: DataTypes.STRING,
@@ -24,6 +24,8 @@ export default (sequelize) => {
       type: DataTypes.STRING,
       defaultValue: 'user', // 'admin' or 'user'
     },
+  }, {
+    tableName: 'Users',
   });
 
   // Hash password trước khi lưu nếu có thay đổi

@@ -9,6 +9,9 @@ import Option from './option.js';
 import Result from './result.js';
 import SubMajor from './submajor.js';
 import Submission from './submission.js';
+import Criteria from './criteria.js';
+import QuestionCriteriaMap from './questionCriteriaMap.js';
+import Response from './response.js';
 
 dotenv.config();
 const config = configFile.development;
@@ -32,6 +35,9 @@ db.Option = Option(sequelize, DataTypes);
 db.Result = Result(sequelize, DataTypes);
 db.SubMajor = SubMajor(sequelize, DataTypes);
 db.Submission = Submission(sequelize, DataTypes);
+db.Criteria = Criteria(sequelize, DataTypes);
+db.QuestionCriteriaMap = QuestionCriteriaMap(sequelize, DataTypes);
+db.Response = Response(sequelize, DataTypes);
 
 // relationships
 db.Level.hasMany(db.Question, { foreignKey: 'levelId' });
@@ -58,6 +64,23 @@ db.Result.belongsTo(db.Option, { foreignKey: 'optionId' });
 // Submissions (persisted aggregated results)
 db.User.hasMany(db.Submission, { foreignKey: 'userId' });
 db.Submission.belongsTo(db.User, { foreignKey: 'userId' });
+
+// Question <-> Criteria mapping via question_criteria_map (use explicit associations
+// that match existing column names to avoid Sequelize trying to alter the table)
+// Use attribute names that map to the existing fields in the DB
+db.Question.hasMany(db.QuestionCriteriaMap, { foreignKey: 'questionId', sourceKey: 'id', constraints: false });
+db.QuestionCriteriaMap.belongsTo(db.Question, { foreignKey: 'questionId', targetKey: 'id', constraints: false });
+
+db.Criteria.hasMany(db.QuestionCriteriaMap, { foreignKey: 'criteriaCode', sourceKey: 'code', constraints: false });
+db.QuestionCriteriaMap.belongsTo(db.Criteria, { foreignKey: 'criteriaCode', targetKey: 'code', constraints: false });
+
+// Responses relations (optional links)
+db.User.hasMany(db.Response, { foreignKey: 'userId' });
+db.Response.belongsTo(db.User, { foreignKey: 'userId' });
+db.Question.hasMany(db.Response, { foreignKey: 'questionId' });
+db.Response.belongsTo(db.Question, { foreignKey: 'questionId' });
+db.Option.hasMany(db.Response, { foreignKey: 'optionId' });
+db.Response.belongsTo(db.Option, { foreignKey: 'optionId' });
 
 
 export default db;

@@ -21,6 +21,7 @@ import SubMajorDetail from "./pages/SubMajorDetail";
 import Groups from "./pages/Groups";
 import Layout from "./components/Layout";
 import AdminDashboard from "./pages/Admin/AdminDashboard";
+import BootstrapAdmin from "./pages/Admin/BootstrapAdmin";
 // Lightweight JWT parser to avoid external dependency
 function parseJwt(token) {
   try {
@@ -67,6 +68,7 @@ createRoot(document.getElementById("root")).render(
         <Route path="/careers/:code/:subCode" element={<SubMajorDetail />} />
         <Route path="/groups" element={<Groups />} />
         <Route path="/admin/*" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+        <Route path="/bootstrap-admin" element={<BootstrapAdmin />} />
       </Route>
     </Routes>
   </BrowserRouter>

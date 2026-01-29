@@ -35,13 +35,18 @@ app.get('/api/health', (req, res) => {
 //public routes
 app.use('/api/auth', authRoutes);
 import adminRoutes from './routes/adminRoute.js';
+import { errorHandler } from './middleware/errorHandler.js';
 app.use('/api/admin', adminRoutes);
 app.use('/api/quiz', quizRoutes);
 app.use('/api/majors', majorsRoutes);
 app.use('/api/submajors', submajorsRoutes);
 // Prefer plural path; keep legacy singular for backward compatibility
 app.use('/api/questions', questionRoutes);
+
 app.use('/api/results', resultRoutes);
+
+// Global error handler (should be last middleware)
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
@@ -75,7 +80,7 @@ async function start() {
       );
       // Remove Submissions with non-existing userId
       await db.sequelize.query(
-        'DELETE FROM "Submissions" s WHERE s."userId" IS NOT NULL AND NOT EXISTS (SELECT 1 FROM "users" u WHERE u.id = s."userId")'
+        'DELETE FROM "Submissions" s WHERE s."userId" IS NOT NULL AND NOT EXISTS (SELECT 1 FROM "Users" u WHERE u.id = s."userId")'
       );
     } catch (cleanErr) {
       console.warn('Pre-sync cleanup warning:', cleanErr.message);

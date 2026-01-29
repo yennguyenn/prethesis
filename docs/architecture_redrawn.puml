@@ -1,0 +1,64 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+title DSS System Architecture 
+top to bottom direction
+
+package "Client" {
+  actor User
+  actor Admin
+  component "Web Interface\n(React SPA)" as Web
+  User --> Web
+  Admin --> Web
+}
+
+package "Server" {
+  node "Node.js Runtime" as NodeRT {
+    rectangle "Express API" as API {
+      component "JWT Auth\nMiddleware" as JWT
+      component "authRoute.js" as AuthR
+      component "quizRoute.js" as QuizR
+      component "resultsRoute.js" as ResultsR
+      component "adminRoute.js" as AdminR
+    }
+    rectangle "Services" as ServicesBox {
+      component "quizService.js" as QuizSvc
+      component "quizSawHelpers.js" as Saw
+    }
+  }
+}
+
+database "PostgreSQL" as DB
+
+' Layout arrows
+Web --> API : HTTPS JSON (Axios + Bearer JWT)
+API --> JWT : validate token (role, userId)
+API --> AuthR : /api/auth/*
+API --> QuizR : /api/quiz/*
+API --> ResultsR  : /api/results/*
+API --> AdminR: /api/admin/*
+component "Models (Sequelize)" as ModelsComp
+ModelsComp --> DB : ORM / SQL
+
+QuizR --> QuizSvc : invoke SAW / scoring
+QuizSvc --> Saw : normalize / calculate SAW
+QuizSvc --> ModelsComp : read majors/criteria
+
+note bottom
+Flow:
+1) User/Admin -> Web (browser)
+2) SPA -> Express API over HTTPS (Axios + JWT)
+3) API -> JWT middleware validates token
+4) Controllers -> Services -> Models -> PostgreSQL (ORM/queries)
+end note
+
+note right
+  Route mapping:
+  - authRoute.js → authController.js
+  - quizRoute.js → quizController.js
+  - resultsRoute.js → (handlers in resultsRoute.js)
+  - adminRoute.js → adminController.js
+  - SAW logic: quizService.js + quizSawHelpers.js
+end note
+
+@enduml

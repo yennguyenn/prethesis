@@ -22,9 +22,9 @@ export default function Careers() {
     <div className="">
       <div className="bg-white py-12">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4"> 24 majors available in Vietnam </h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4"> 23 majors available in Vietnam </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Overview of 24 majors currently being taught at universities and colleges in Vietnam
+            Overview of 23 majors currently being taught at universities and colleges in Vietnam
           </p>
         </div>
       </div>

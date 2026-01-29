@@ -4,12 +4,18 @@ dotenv.config();
 
 export function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json({ message: "Missing token" });
+  if (!authHeader) {
+    const err = new Error("Missing token");
+    err.status = 401;
+    throw err;
+  }
 
   // Expect format: "Bearer <token>"
   const parts = authHeader.split(" ");
   if (parts.length !== 2 || parts[0] !== "Bearer") {
-    return res.status(401).json({ message: "Malformed authorization header" });
+    const err = new Error("Malformed authorization header");
+    err.status = 401;
+    throw err;
   }
   const token = parts[1];
 
@@ -32,13 +38,23 @@ export function authMiddleware(req, res, next) {
         }
       );
     }
-    return res.status(401).json({ message });
+    const error = new Error(message);
+    error.status = 401;
+    throw error;
   }
 }
 
 export function adminOnly(req, res, next) {
-  if (!req.user) return res.status(401).json({ message: "Missing user" });
-  if (req.user.role !== "admin") return res.status(403).json({ message: "Admin only" });
+  if (!req.user) {
+    const err = new Error("Missing user");
+    err.status = 401;
+    throw err;
+  }
+  if (req.user.role !== "admin") {
+    const err = new Error("Admin only");
+    err.status = 403;
+    throw err;
+  }
   next();
 }
 

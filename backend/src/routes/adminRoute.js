@@ -3,6 +3,7 @@ import admin from '../controllers/adminController.js';
 import { updateMajor, deleteMajor, listQuestions, updateQuestion, deleteQuestion, bootstrapFirstAdmin, getQuestionById, listSubmissions } from '../controllers/adminController.js';
 import { createOption, deleteOption } from '../controllers/adminController.js';
 import { authMiddleware, adminOnly } from '../middleware/auth.js';
+import { listCriteria, getCriteria, listResponses } from '../controllers/adminDataController.js';
 
 const router = express.Router();
 
@@ -28,5 +29,10 @@ router.put('/options/:optionId/scoring', authMiddleware, adminOnly, admin.update
 router.put('/results/:resultId/score', authMiddleware, adminOnly, admin.updateResultScore);
 // Submissions listing for admin
 router.get('/submissions', authMiddleware, adminOnly, listSubmissions);
+
+// Criteria & Responses (admin)
+router.get('/criteria', authMiddleware, adminOnly, listCriteria);
+router.get('/criteria/:id', authMiddleware, adminOnly, getCriteria);
+router.get('/responses', authMiddleware, adminOnly, listResponses);
 
 export default router;

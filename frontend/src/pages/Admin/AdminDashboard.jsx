@@ -5,6 +5,8 @@ import EditQuestion from "./EditQuestion";
 import Majors from "./Majors";
 import ResultsAdmin from "./ResultsAdmin";
 import UsersAdmin from "./Users";
+import CriteriaAdmin from "./CriteriaAdmin";
+import ResponsesAdmin from "./ResponsesAdmin";
 
 export default function AdminDashboard(){
   const navigate = useNavigate();
@@ -22,6 +24,8 @@ export default function AdminDashboard(){
           <NavLink to="/admin/questions" className={({isActive})=>`px-4 py-2 rounded-lg ${isActive?'bg-primary-700 text-white':'bg-primary-100 text-primary-900 hover:bg-primary-300/40'} transition`}>Questions</NavLink>
           <NavLink to="/admin/majors" className={({isActive})=>`px-4 py-2 rounded-lg ${isActive?'bg-primary-700 text-white':'bg-primary-100 text-primary-900 hover:bg-primary-300/40'} transition`}>Majors</NavLink>
           <NavLink to="/admin/results" className={({isActive})=>`px-4 py-2 rounded-lg ${isActive?'bg-primary-700 text-white':'bg-primary-100 text-primary-900 hover:bg-primary-300/40'} transition`}>User Results</NavLink>
+          <NavLink to="/admin/criteria" className={({isActive})=>`px-4 py-2 rounded-lg ${isActive?'bg-primary-700 text-white':'bg-primary-100 text-primary-900 hover:bg-primary-300/40'} transition`}>Criteria</NavLink>
+          <NavLink to="/admin/responses" className={({isActive})=>`px-4 py-2 rounded-lg ${isActive?'bg-primary-700 text-white':'bg-primary-100 text-primary-900 hover:bg-primary-300/40'} transition`}>Responses</NavLink>
           <NavLink to="/admin/users" className={({isActive})=>`px-4 py-2 rounded-lg ${isActive?'bg-primary-700 text-white':'bg-primary-100 text-primary-900 hover:bg-primary-300/40'} transition`}>Users</NavLink>
         </nav>
         <Routes>
@@ -30,6 +34,8 @@ export default function AdminDashboard(){
         <Route path="questions/edit/:id" element={<EditQuestion />} />
         <Route path="majors" element={<Majors />} />
         <Route path="results" element={<ResultsAdmin />} />
+        <Route path="criteria" element={<CriteriaAdmin />} />
+        <Route path="responses" element={<ResponsesAdmin />} />
         <Route path="users" element={<UsersAdmin />} />
         </Routes>
       </div>

@@ -50,7 +50,7 @@ export default function Home() {
                 <span className="text-4xl">📝</span>
               </div>
               <h3 className="text-xl font-semibold mb-2">1. Orientation</h3>
-              <p className="text-gray-600 text-sm">Answer 60 questions about interests, learning styles, and personal values to identify suitable groups among 24 majors.</p>
+              <p className="text-gray-600 text-sm">Answer 60 questions about interests, learning styles, and personal values to identify suitable groups among 23 majors.</p>
             </div>
             <div className="text-center">
               <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -73,10 +73,10 @@ export default function Home() {
       {/* Majors Preview (live from API) */}
       <div className="py-20 bg-gradient-to-br from-primary-100 to-primary-300">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Suggestions for 24 available majors</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Suggestions for 23 available majors</h2>
           <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">A list of various fields such as: Economics, Science, Technology, Arts, ...</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-10">
-            {(majors.slice(0, 24)).map((m) => {
+            {(majors.slice(0, 23)).map((m) => {
               const rawCode = (m.code || '').trim();
               const lower = rawCode.toLowerCase();
               const initialSrc = rawCode ? `/assets/majors/${rawCode}.png` : '/assets/majors/default.svg';
@@ -134,7 +134,7 @@ export default function Home() {
               <div className="text-primary-300">Orientation Questions</div>
             </div>
             <div>
-              <div className="text-5xl font-bold mb-2">24</div>
+              <div className="text-5xl font-bold mb-2">23</div>
               <div className="text-primary-300">Majors</div>
             </div>
             <div>
