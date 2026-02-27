@@ -15,11 +15,11 @@ export default function BootstrapAdmin() {
     setError("");
     setSuccess("");
     try {
-      const res = await API.post("/admin/bootstrap-admin", form);
-      setSuccess("Admin created! You can now login.");
+      await API.post("/admin/bootstrap-admin", form);
+      setSuccess("Tạo quản trị viên thành công! Bạn có thể đăng nhập ngay.");
       setTimeout(() => nav("/login"), 1500);
     } catch (err) {
-      setError(err?.response?.data?.message || "Failed to create admin");
+      setError(err?.response?.data?.message || "Không thể tạo quản trị viên");
     } finally {
       setLoading(false);
     }
@@ -30,7 +30,7 @@ export default function BootstrapAdmin() {
       <div className="absolute inset-0 bg-slate-900/90" aria-hidden="true" />
       <div className="relative z-10 w-full max-w-md mx-auto">
         <div className="relative backdrop-blur-md bg-white/10 border border-white/20 rounded-xl shadow-xl p-8 text-white">
-          <h2 className="text-2xl font-semibold mb-6 text-center">Bootstrap Admin</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-center">Khởi tạo quản trị viên</h2>
           {error && (
             <div className="mb-4 text-sm bg-red-500/20 border border-red-500/40 text-red-200 rounded px-3 py-2">
               {error}
@@ -43,7 +43,7 @@ export default function BootstrapAdmin() {
           )}
           <form onSubmit={submit} className="space-y-4">
             <div>
-              <label className="block text-sm mb-1" htmlFor="name">Name</label>
+              <label className="block text-sm mb-1" htmlFor="name">Họ và tên</label>
               <input
                 id="name"
                 type="text"
@@ -51,7 +51,7 @@ export default function BootstrapAdmin() {
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 className="w-full px-3 py-2 rounded-lg bg-white/15 border border-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400 placeholder:text-slate-300 text-white"
-                placeholder="Admin Name"
+                placeholder="Tên quản trị viên"
               />
             </div>
             <div>
@@ -63,11 +63,11 @@ export default function BootstrapAdmin() {
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="w-full px-3 py-2 rounded-lg bg-white/15 border border-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400 placeholder:text-slate-300 text-white"
-                placeholder="admin@example.com"
+                placeholder="admin@vidu.com"
               />
             </div>
             <div>
-              <label className="block text-sm mb-1" htmlFor="password">Password</label>
+              <label className="block text-sm mb-1" htmlFor="password">Mật khẩu</label>
               <input
                 id="password"
                 type="password"
@@ -83,7 +83,7 @@ export default function BootstrapAdmin() {
               disabled={loading}
               className="w-full py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
             >
-              {loading ? "Loading..." : "Create Admin"}
+              {loading ? "Đang xử lý..." : "Tạo quản trị viên"}
             </button>
           </form>
         </div>

@@ -5,76 +5,76 @@ import API from '../api';
 // Centralized mapping for IT submajors (codes used in Level 2 results)
 const SUBMAJORS = {
   SE: {
-    name: 'Software Engineering',
+    name: 'Kỹ thuật phần mềm',
     intro: 'Thiết kế, xây dựng, kiểm thử và duy trì phần mềm với trọng tâm vào chất lượng và khả năng mở rộng.',
-    description: 'Software Engineering tập trung vào quy trình phát triển phần mềm chuyên nghiệp: phân tích yêu cầu, thiết kế hệ thống, lập trình, kiểm thử, triển khai và vận hành (DevOps). Kỹ sư phần mềm cần phối hợp đa nhóm, bảo đảm hiệu năng, bảo mật và tính dễ bảo trì.',
-    skills: ['Programming', 'System Design', 'Testing/QA', 'DevOps', 'Version Control', 'Agile/Scrum'],
+    description: 'Kỹ thuật phần mềm tập trung vào quy trình phát triển phần mềm chuyên nghiệp: phân tích yêu cầu, thiết kế hệ thống, lập trình, kiểm thử, triển khai và vận hành (DevOps). Kỹ sư phần mềm cần phối hợp đa nhóm, bảo đảm hiệu năng, bảo mật và tính dễ bảo trì.',
+    skills: ['Lập trình', 'Thiết kế hệ thống', 'Kiểm thử/QA', 'DevOps', 'Quản lý phiên bản', 'Agile/Scrum'],
     studyGroup: 'Toán, Tin, Công nghệ',
-    careers: ['Software Developer', 'Backend Engineer', 'Full‑Stack Engineer', 'QA Engineer', 'DevOps Engineer', 'Technical Lead']
+    careers: ['Lập trình viên phần mềm', 'Kỹ sư Backend', 'Kỹ sư Full‑Stack', 'Kỹ sư QA', 'Kỹ sư DevOps', 'Trưởng nhóm kỹ thuật']
   },
   IS: {
-    name: 'Information Systems',
+    name: 'Hệ thống thông tin',
     intro: 'Kết nối công nghệ thông tin với nghiệp vụ, tối ưu hoá quy trình và dữ liệu doanh nghiệp.',
-    description: 'Information Systems tập trung khai thác, tổ chức và quản trị dữ liệu phục vụ ra quyết định. Vai trò bao gồm phân tích nghiệp vụ, quản lý hệ thống ERP/CRM, thiết kế luồng thông tin và bảo đảm tính nhất quán dữ liệu.',
-    skills: ['Business Analysis', 'Database', 'Process Modeling', 'Reporting', 'Project Management'],
+    description: 'Hệ thống thông tin tập trung khai thác, tổ chức và quản trị dữ liệu phục vụ ra quyết định. Vai trò bao gồm phân tích nghiệp vụ, quản lý hệ thống ERP/CRM, thiết kế luồng thông tin và bảo đảm tính nhất quán dữ liệu.',
+    skills: ['Phân tích nghiệp vụ', 'Cơ sở dữ liệu', 'Mô hình hoá quy trình', 'Báo cáo', 'Quản lý dự án'],
     studyGroup: 'Toán, Kinh tế, Tin',
-    careers: ['Business Analyst', 'System Analyst', 'IT Coordinator', 'ERP Specialist', 'Product Owner']
+    careers: ['Chuyên viên phân tích nghiệp vụ', 'Chuyên viên phân tích hệ thống', 'Điều phối CNTT', 'Chuyên viên ERP', 'Chủ sản phẩm (Product Owner)']
   },
   UIUX: {
-    name: 'UI/UX Design',
+    name: 'Thiết kế UI/UX',
     intro: 'Thiết kế giao diện và trải nghiệm người dùng trực quan, thân thiện, nhất quán.',
-    description: 'UI/UX Design chú trọng nghiên cứu người dùng, luồng tương tác, bố cục trực quan và ngôn ngữ thiết kế. Kết hợp mỹ thuật với tâm lý hành vi để tạo sản phẩm số dễ dùng và hấp dẫn.',
-    skills: ['Wireframing', 'Prototyping', 'User Research', 'Visual Design', 'Accessibility'],
+    description: 'Thiết kế UI/UX chú trọng nghiên cứu người dùng, luồng tương tác, bố cục trực quan và ngôn ngữ thiết kế. Kết hợp mỹ thuật với tâm lý hành vi để tạo sản phẩm số dễ dùng và hấp dẫn.',
+    skills: ['Phác thảo khung (Wireframe)', 'Tạo mẫu (Prototype)', 'Nghiên cứu người dùng', 'Thiết kế thị giác', 'Khả năng tiếp cận'],
     studyGroup: 'Mỹ thuật, Tin, Truyền thông',
-    careers: ['UI Designer', 'UX Researcher', 'Product Designer', 'Interaction Designer']
+    careers: ['Thiết kế UI', 'Nghiên cứu UX', 'Thiết kế sản phẩm', 'Thiết kế tương tác']
   },
   CS: {
-    name: 'Computer Science',
+    name: 'Khoa học máy tính',
     intro: 'Nền tảng lý thuyết tính toán, thuật toán và cấu trúc dữ liệu phục vụ đổi mới lâu dài.',
-    description: 'Computer Science đào sâu thuật toán, độ phức tạp, lập trình hệ thống, compiler, và mô hình tính toán. Thích hợp cho nghiên cứu, tối ưu và phát triển công nghệ lõi.',
-    skills: ['Algorithms', 'Data Structures', 'Discrete Math', 'Complexity', 'Problem Solving'],
+    description: 'Khoa học máy tính đào sâu thuật toán, độ phức tạp, lập trình hệ thống, trình biên dịch (compiler) và mô hình tính toán. Thích hợp cho nghiên cứu, tối ưu và phát triển công nghệ lõi.',
+    skills: ['Thuật toán', 'Cấu trúc dữ liệu', 'Toán rời rạc', 'Độ phức tạp', 'Giải quyết vấn đề'],
     studyGroup: 'Toán, Lý, Tin',
-    careers: ['Algorithm Engineer', 'Research Engineer', 'Systems Developer', 'Academic Researcher']
+    careers: ['Kỹ sư thuật toán', 'Kỹ sư nghiên cứu', 'Lập trình hệ thống', 'Nghiên cứu viên học thuật']
   },
   AI: {
-    name: 'Artificial Intelligence',
+    name: 'Trí tuệ nhân tạo',
     intro: 'Phát triển hệ thống thông minh: học máy, học sâu, xử lý ngôn ngữ và thị giác máy.',
     description: 'AI kết hợp thống kê, tối ưu hoá và lập trình để xây dựng mô hình dự đoán, nhận dạng và tự động hoá. Ứng dụng trong y tế, tài chính, robot và sản phẩm số thông minh.',
-    skills: ['Machine Learning', 'Deep Learning', 'Python', 'Data Processing', 'Model Evaluation'],
+    skills: ['Học máy', 'Học sâu', 'Python', 'Xử lý dữ liệu', 'Đánh giá mô hình'],
     studyGroup: 'Toán, Tin, Lý',
-    careers: ['ML Engineer', 'AI Researcher', 'Data Scientist', 'NLP Engineer', 'Computer Vision Engineer']
+    careers: ['Kỹ sư ML', 'Nghiên cứu AI', 'Nhà khoa học dữ liệu', 'Kỹ sư NLP', 'Kỹ sư thị giác máy tính']
   },
   DS: {
-    name: 'Data Science',
+    name: 'Khoa học dữ liệu',
     intro: 'Phân tích dữ liệu, mô hình thống kê và trực quan hoá để hỗ trợ quyết định.',
-    description: 'Data Science sử dụng thống kê, xử lý dữ liệu lớn và học máy mức ứng dụng để khai thác insight. Tập trung chất lượng dữ liệu, storytelling và tối ưu hiệu suất mô hình.',
-    skills: ['Statistics', 'SQL', 'Python/R', 'Data Visualization', 'Feature Engineering'],
+    description: 'Khoa học dữ liệu sử dụng thống kê, xử lý dữ liệu lớn và học máy mức ứng dụng để khai thác insight. Tập trung chất lượng dữ liệu, diễn giải (storytelling) và tối ưu hiệu suất mô hình.',
+    skills: ['Thống kê', 'SQL', 'Python/R', 'Trực quan hoá dữ liệu', 'Kỹ thuật đặc trưng'],
     studyGroup: 'Toán, Thống kê, Tin',
-    careers: ['Data Scientist', 'Data Analyst', 'BI Developer', 'Analytics Engineer']
+    careers: ['Nhà khoa học dữ liệu', 'Chuyên viên phân tích dữ liệu', 'Lập trình BI', 'Kỹ sư phân tích']
   },
   NET: {
-    name: 'Computer Networks',
+    name: 'Mạng máy tính',
     intro: 'Thiết kế, quản trị hạ tầng mạng và kết nối an toàn, tin cậy.',
-    description: 'Computer Networks bao gồm kiến trúc mạng, giao thức, định tuyến, ảo hoá và hạ tầng cloud. Đảm bảo thông suốt, hiệu năng và bảo mật truyền thông dữ liệu.',
-    skills: ['TCP/IP', 'Routing/Switching', 'Network Security', 'Cloud Basics', 'Linux'],
+    description: 'Mạng máy tính bao gồm kiến trúc mạng, giao thức, định tuyến, ảo hoá và hạ tầng cloud. Đảm bảo thông suốt, hiệu năng và bảo mật truyền thông dữ liệu.',
+    skills: ['TCP/IP', 'Định tuyến/Chuyển mạch', 'Bảo mật mạng', 'Kiến thức Cloud cơ bản', 'Linux'],
     studyGroup: 'Toán, Lý, Tin',
-    careers: ['Network Engineer', 'Infrastructure Engineer', 'Cloud Networking Specialist']
+    careers: ['Kỹ sư mạng', 'Kỹ sư hạ tầng', 'Chuyên gia mạng Cloud']
   },
   CY: {
-    name: 'Cybersecurity',
+    name: 'An ninh mạng',
     intro: 'Phòng thủ và kiểm thử an ninh hệ thống, bảo vệ dữ liệu và quyền riêng tư.',
-    description: 'Cybersecurity gồm đánh giá lỗ hổng, giám sát sự kiện, ứng phó sự cố và xây dựng chính sách bảo mật. Kết hợp tư duy tấn công & phòng thủ.',
-    skills: ['Threat Analysis', 'Pen Testing', 'Encryption', 'Incident Response', 'SIEM'],
+    description: 'An ninh mạng gồm đánh giá lỗ hổng, giám sát sự kiện, ứng phó sự cố và xây dựng chính sách bảo mật. Kết hợp tư duy tấn công & phòng thủ.',
+    skills: ['Phân tích mối đe doạ', 'Kiểm thử xâm nhập', 'Mã hoá', 'Ứng phó sự cố', 'SIEM'],
     studyGroup: 'Toán, Tin, An ninh',
-    careers: ['Security Analyst', 'Penetration Tester', 'SOC Engineer', 'Security Consultant']
+    careers: ['Chuyên viên an ninh', 'Chuyên viên kiểm thử xâm nhập', 'Kỹ sư SOC', 'Tư vấn bảo mật']
   },
   EMB: {
-    name: 'Embedded Systems',
+    name: 'Hệ thống nhúng',
     intro: 'Kết hợp phần cứng và phần mềm mức thấp cho thiết bị thông minh & IoT.',
-    description: 'Embedded Systems tập trung vi điều khiển, cảm biến, firmware, giao tiếp ngoại vi và tối ưu dung lượng/hiệu năng hệ thống nhúng.',
-    skills: ['C/C++', 'Microcontrollers', 'Electronics', 'RTOS', 'Serial Protocols'],
+    description: 'Hệ thống nhúng tập trung vi điều khiển, cảm biến, firmware, giao tiếp ngoại vi và tối ưu dung lượng/hiệu năng hệ thống nhúng.',
+    skills: ['C/C++', 'Vi điều khiển', 'Điện tử', 'RTOS', 'Giao thức truyền thông nối tiếp'],
     studyGroup: 'Điện tử, Lý, Tin',
-    careers: ['Embedded Engineer', 'Firmware Developer', 'IoT Engineer', 'Hardware Integration Specialist']
+    careers: ['Kỹ sư nhúng', 'Lập trình firmware', 'Kỹ sư IoT', 'Chuyên viên tích hợp phần cứng']
   }
 };
 

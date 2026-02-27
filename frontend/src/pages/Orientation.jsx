@@ -22,7 +22,7 @@ export default function Orientation() {
       const r = await API.get('/quiz/1'); // Level 1 questions
       setQuestions(r.data || []);
     } catch (e) {
-      setError(e?.response?.data?.message || 'Failed to load orientation questions');
+      setError(e?.response?.data?.message || 'Không thể tải câu hỏi định hướng');
     } finally { setLoading(false); }
   }
 
@@ -40,7 +40,7 @@ export default function Orientation() {
   async function submit() {
     const unanswered = questions.filter(q => !answers[q.id]);
     if (unanswered.length) {
-      setError(`Please answer all questions. ${unanswered.length} remaining.`);
+      setError(`Vui lòng trả lời tất cả câu hỏi. Còn ${unanswered.length} câu chưa trả lời.`);
       return;
     }
     setSubmitting(true); setError('');
@@ -50,10 +50,10 @@ export default function Orientation() {
       setResult(r.data);
       // Optionally inform user if not saved due to not logged in
       if (!localStorage.getItem('token') && r.data?.recommended) {
-        setError('Login to save your orientation result and unlock specialization tracking.');
+        setError('Hãy đăng nhập để lưu kết quả định hướng và mở khóa theo dõi chuyên ngành.');
       }
     } catch (e) {
-      setError(e?.response?.data?.message || 'Submission failed');
+      setError(e?.response?.data?.message || 'Gửi bài thất bại');
     } finally { setSubmitting(false); }
   }
 
@@ -62,7 +62,7 @@ export default function Orientation() {
       <div className='min-h-screen bg-gradient-to-br from-slate-50 to-primary-100 flex items-center justify-center'>
         <div className='text-center'>
           <div className='animate-spin rounded-full h-16 w-16 border-b-2 border-primary-700 mx-auto mb-4'></div>
-          <p className='text-gray-600'>Loading orientation questions...</p>
+          <p className='text-gray-600'>Đang tải câu hỏi định hướng...</p>
         </div>
       </div>
     );
@@ -78,24 +78,24 @@ export default function Orientation() {
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6v6l4 2' />
               </svg>
             </div>
-            <h2 className='text-3xl font-bold text-gray-900 mb-2'>Orientation Complete</h2>
-            <p className='text-gray-600'>Recommended major based on your interests:</p>
+            <h2 className='text-3xl font-bold text-gray-900 mb-2'>Hoàn thành định hướng</h2>
+            <p className='text-gray-600'>Ngành phù hợp dựa trên sở thích của bạn:</p>
           </div>
           <div className='bg-primary-100 rounded-xl p-6 mb-6'>
-            <h3 className='text-2xl font-bold text-primary-900 mb-2'>{result.recommended?.name || 'No clear major'}</h3>
-            <p className='text-gray-700 mb-4'>{result.recommended?.description || 'Try retaking or refine answers.'}</p>
-            <div className='text-sm text-gray-600'><strong>Your Score:</strong> {result.topScore || 0} pts</div>
+            <h3 className='text-2xl font-bold text-primary-900 mb-2'>{result.recommended?.name || 'Chưa xác định rõ ngành phù hợp'}</h3>
+            <p className='text-gray-700 mb-4'>{result.recommended?.description || 'Hãy thử làm lại hoặc điều chỉnh câu trả lời.'}</p>
+            <div className='text-sm text-gray-600'><strong>Điểm:</strong> {result.topScore || 0} điểm</div>
           </div>
           {result.allScores && result.allScores.length > 1 && (
             <div className='mb-6'>
-              <h4 className='font-semibold text-gray-900 mb-3'>All Major Scores:</h4>
+              <h4 className='font-semibold text-gray-900 mb-3'>Điểm tất cả ngành:</h4>
               <div className='space-y-2 max-h-64 overflow-auto pr-2'>
                 {result.allScores.map((item, idx) => (
                   <div key={idx} className='flex items-center'>
                     <div className='flex-1'>
                       <div className='flex justify-between mb-1'>
                         <span className='text-sm font-medium text-gray-700'>{item.name}</span>
-                        <span className='text-sm text-gray-600'>{item.score} pts</span>
+                        <span className='text-sm text-gray-600'>{item.score} điểm</span>
                       </div>
                       <div className='w-full bg-gray-200 rounded-full h-2'>
                         <div className='bg-primary-700 h-2 rounded-full transition-all' style={{ width: `${(item.score / (result.topScore || 1)) * 100}%` }}></div>
@@ -107,11 +107,11 @@ export default function Orientation() {
             </div>
           )}
           <div className='flex flex-col sm:flex-row gap-4'>
-            <button onClick={() => { setResult(null); setAnswers({}); setCurrentIndex(0); loadQuestions(); }} className='flex-1 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors'>Retake Orientation</button>
+            <button onClick={() => { setResult(null); setAnswers({}); setCurrentIndex(0); loadQuestions(); }} className='flex-1 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors'>Làm lại phần định hướng</button>
             {result.recommended?.code === 'ICT' && (
-              <button onClick={() => navigate('/quiz')} className='flex-1 px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 transition-colors'>Proceed to IT Specialization</button>
+              <button onClick={() => navigate('/quiz')} className='flex-1 px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 transition-colors'>Tiếp tục chọn chuyên ngành IT</button>
             )}
-            <button onClick={() => navigate('/')} className='flex-1 px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 transition-colors'>Home</button>
+            <button onClick={() => navigate('/')} className='flex-1 px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 transition-colors'>Trang chủ</button>
           </div>
         </div>
       </div>
@@ -123,7 +123,7 @@ export default function Orientation() {
       <div className='max-w-3xl mx-auto'>
         <div className='bg-white rounded-t-2xl shadow-lg p-6'>
           <div className='flex justify-between items-center mb-4'>
-            <h2 className='text-2xl font-bold text-gray-900'>Major Orientation Assessment</h2>
+            <h2 className='text-2xl font-bold text-gray-900'>Bài đánh giá định hướng ngành</h2>
             <button onClick={() => navigate('/')} className='text-gray-600 hover:text-gray-900'>
               <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
@@ -132,8 +132,8 @@ export default function Orientation() {
           </div>
           <div className='mb-2'>
             <div className='flex justify-between text-sm text-gray-600 mb-1'>
-              <span>Question {currentIndex + 1} of {questions.length}</span>
-              <span>{Math.round(progress)}% Complete</span>
+              <span>Câu hỏi {currentIndex + 1} / {questions.length}</span>
+              <span>{Math.round(progress)}% hoàn thành</span>
             </div>
             <div className='w-full bg-gray-200 rounded-full h-2'>
               <div className='bg-primary-700 h-2 rounded-full transition-all duration-300' style={{ width: `${progress}%` }}></div>
@@ -166,13 +166,13 @@ export default function Orientation() {
           </div>
         )}
         <div className='flex justify-between items-center'>
-          <button onClick={prev} disabled={currentIndex === 0} className='px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md'>← Previous</button>
-          <div className='text-sm text-gray-600'>{Object.keys(answers).length} / {questions.length} answered</div>
+          <button onClick={prev} disabled={currentIndex === 0} className='px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md'>← Trước</button>
+          <div className='text-sm text-gray-600'>{Object.keys(answers).length} / {questions.length} đã trả lời</div>
           {currentIndex < questions.length - 1 ? (
-            <button onClick={next} disabled={!isAnswered} className='px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md'>Next →</button>
+            <button onClick={next} disabled={!isAnswered} className='px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md'>Tiếp →</button>
           ) : (
             <button onClick={submit} disabled={submitting || Object.keys(answers).length < questions.length} className='px-8 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md flex items-center gap-2'>
-              {submitting ? (<><div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white'></div> Submitting...</>) : (<>Submit Orientation <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' /></svg></>)}
+              {submitting ? (<><div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white'></div> Đang gửi...</>) : (<>Gửi bài định hướng <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' /></svg></>)}
             </button>
           )}
         </div>

@@ -32,49 +32,49 @@ export default function EditQuestion(){
 
   const save = async () => {
     await API.put(`/admin/questions/${id}`, { text, levelId, options });
-    alert("Saved");
+    alert("Đã lưu");
     navigate(-1);
   };
 
-  if (!question) return <div>Loading...</div>;
+  if (!question) return <div>Đang tải...</div>;
   return (
     <div className="max-w-3xl mx-auto p-6">
-      <h3 className="text-xl font-semibold mb-4">Edit Question #{id}</h3>
+      <h3 className="text-xl font-semibold mb-4">Sửa câu hỏi #{id}</h3>
       <div className="space-y-4 bg-white border border-slate-200 rounded-xl p-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Text</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Nội dung</label>
           <input className="w-full border border-slate-300 rounded-lg px-3 py-2" value={text} onChange={e=>setText(e.target.value)} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">LevelId</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Mức (LevelId)</label>
           <input className="w-32 border border-slate-300 rounded-lg px-3 py-2" type="number" value={levelId} onChange={e=>setLevelId(Number(e.target.value))} />
         </div>
         <div>
           <div className="flex items-center justify-between mb-2">
-            <h4 className="text-sm font-semibold">Options</h4>
-            <button className="px-3 py-1 rounded bg-primary-700 text-white text-sm" onClick={()=>setOptions(opts=>[...opts, { text: '', scoring: {} }])}>Add option</button>
+            <h4 className="text-sm font-semibold">Lựa chọn</h4>
+            <button className="px-3 py-1 rounded bg-primary-700 text-white text-sm" onClick={()=>setOptions(opts=>[...opts, { text: '', scoring: {} }])}>Thêm lựa chọn</button>
           </div>
           <div className="space-y-3">
             {options.map((o, idx) => (
               <div key={o.id || idx} className="rounded-lg border border-slate-200 p-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <input className="flex-1 border border-slate-300 rounded-lg px-3 py-2" placeholder="Answer text" value={o.text} onChange={e=>{ const c=[...options]; c[idx].text=e.target.value; setOptions(c); }} />
+                  <input className="flex-1 border border-slate-300 rounded-lg px-3 py-2" placeholder="Nội dung đáp án" value={o.text} onChange={e=>{ const c=[...options]; c[idx].text=e.target.value; setOptions(c); }} />
                   <button className="px-2 py-1 rounded bg-red-100 text-red-700 text-xs border border-red-300" onClick={async()=>{
-                    if (!confirm('Delete this option?')) return;
+                    if (!confirm('Xóa lựa chọn này?')) return;
                     // If option has id, delete from backend too
                     if (o.id) {
                       try { await API.delete(`/admin/options/${o.id}`); } catch {}
                     }
                     setOptions(opts=>opts.filter((_,i)=>i!==idx));
-                  }}>Remove</button>
+                  }}>Xóa</button>
                 </div>
                 {Number(levelId) === 1 ? (
                   <div className="space-y-2">
-                    <div className="text-xs text-slate-600 mb-1">Scoring (Level 1 uses Major codes only)</div>
+                    <div className="text-xs text-slate-600 mb-1">Chấm điểm (Mức 1 chỉ dùng mã Ngành)</div>
                     {/* Existing entries */}
                     <div className="space-y-2">
                       {Object.entries(o.scoring || {}).length === 0 && (
-                        <div className="text-xs text-slate-500">No scores yet.</div>
+                        <div className="text-xs text-slate-500">Chưa có điểm.</div>
                       )}
                       {Object.entries(o.scoring || {}).map(([code, pts]) => {
                         const isMajor = majorCodeSet.has(code);
@@ -106,12 +106,12 @@ export default function EditQuestion(){
                                   }}
                                   defaultValue=""
                                 >
-                                  <option value="" disabled>Select Major</option>
+                                  <option value="" disabled>Chọn Ngành</option>
                                   {(majors||[]).map(m => (
                                     <option key={m.code} value={m.code}>{m.code}</option>
                                   ))}
                                 </select>
-                                <span className="text-xs text-amber-800">(convert {Number(pts)||0})</span>
+                                <span className="text-xs text-amber-800">(chuyển {Number(pts)||0})</span>
                               </>
                             )}
                             <button className="ml-auto text-xs text-red-700 border border-red-300 bg-red-100 hover:bg-red-200 px-2 py-1 rounded"
@@ -122,7 +122,7 @@ export default function EditQuestion(){
                                 c[idx].scoring = next;
                                 setOptions(c);
                               }}
-                            >Remove</button>
+                            >Xóa</button>
                           </div>
                         );
                       })}
@@ -139,21 +139,21 @@ export default function EditQuestion(){
                         setOptions(c);
                         e.target.value = "";
                       }}>
-                        <option value="" disabled>Add Major code…</option>
+                        <option value="" disabled>Thêm mã Ngành…</option>
                         {(majors||[]).map(m => (
                           <option key={m.code} value={m.code}>{m.code}</option>
                         ))}
                       </select>
-                      <span className="text-xs text-slate-500">Enter points in the field above after adding.</span>
+                      <span className="text-xs text-slate-500">Nhập điểm ở ô phía trên sau khi thêm.</span>
                     </div>
                     {/* Warning if non-major codes present */}
                     {Object.keys(o.scoring||{}).some(k=>!majorCodeSet.has(k)) && (
-                      <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded p-2">Detected non-Major codes. Please convert them to Major codes for Level 1.</div>
+                      <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded p-2">Phát hiện mã không thuộc Ngành. Vui lòng chuyển chúng về mã Ngành cho Mức 1.</div>
                     )}
                   </div>
                 ) : (
                   <>
-                    <label className="block text-xs text-slate-600 mb-1">Scoring (JSON: {`{"SE":2,"AI":1}`})</label>
+                    <label className="block text-xs text-slate-600 mb-1">Chấm điểm (JSON: {`{"SE":2,"AI":1}`})</label>
                     <textarea className={`w-full rounded-lg px-3 py-2 text-sm border ${jsonErrors[idx] ? 'border-red-400 focus:ring-red-200' : 'border-slate-300 focus:ring-primary-200'}`} rows={3} value={JSON.stringify(o.scoring || {})}
                       onChange={e=>{
                         const v = e.target.value;
@@ -186,8 +186,8 @@ export default function EditQuestion(){
               }
             }
             await save();
-          }}>Save</button>
-          <button className="px-4 py-2 rounded border border-slate-300" onClick={()=>navigate(-1)}>Back</button>
+          }}>Lưu</button>
+          <button className="px-4 py-2 rounded border border-slate-300" onClick={()=>navigate(-1)}>Quay lại</button>
         </div>
       </div>
     </div>

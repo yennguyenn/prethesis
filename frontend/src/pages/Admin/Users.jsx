@@ -18,7 +18,7 @@ export default function UsersAdmin() {
     setMessage("");
     setError("");
     if (!createForm.name || !createForm.email || !createForm.password) {
-      setError("Please fill all fields");
+      setError("Vui lòng nhập đầy đủ thông tin");
       return;
     }
     setBusy(true);
@@ -28,10 +28,10 @@ export default function UsersAdmin() {
         email: createForm.email,
         password: createForm.password,
       });
-      setMessage(`Admin created: ${res.data?.email || createForm.email}`);
+      setMessage(`Đã tạo quản trị viên: ${res.data?.email || createForm.email}`);
       setCreateForm({ name: "", email: "", password: "" });
     } catch (err) {
-      setError(err?.response?.data?.message || err.message || "Create admin failed");
+      setError(err?.response?.data?.message || err.message || "Tạo quản trị viên thất bại");
     } finally {
       setBusy(false);
     }
@@ -43,16 +43,16 @@ export default function UsersAdmin() {
     setError("");
     const id = Number(promoteForm.userId);
     if (!id) {
-      setError("Please enter a valid numeric userId");
+      setError("Vui lòng nhập mã người dùng hợp lệ (dạng số)");
       return;
     }
     setBusy(true);
     try {
       const res = await API.post("/admin/users/role", { userId: id, role: "admin" });
-      setMessage(`User #${res.data?.id || id} promoted to admin`);
+      setMessage(`Đã nâng quyền người dùng #${res.data?.id || id} lên admin`);
       setPromoteForm({ userId: "" });
     } catch (err) {
-      setError(err?.response?.data?.message || err.message || "Promote failed");
+      setError(err?.response?.data?.message || err.message || "Nâng quyền thất bại");
     } finally {
       setBusy(false);
     }
@@ -62,8 +62,8 @@ export default function UsersAdmin() {
     <div className="space-y-6">
       <div className="rounded-3xl bg-white/90 backdrop-blur-sm border border-slate-100 shadow-xl p-6">
         <div className="mb-4">
-          <h3 className="text-xl font-bold text-primary-900">Create Admin Account</h3>
-          <p className="text-sm text-slate-600">Requires current user to be an admin.</p>
+          <h3 className="text-xl font-bold text-primary-900">Tạo tài khoản quản trị</h3>
+          <p className="text-sm text-slate-600">Yêu cầu tài khoản hiện tại là admin.</p>
         </div>
         {message && (
           <div className="mb-3 text-sm text-green-700 bg-green-50 border border-green-200 rounded-xl p-3">{message}</div>
@@ -74,7 +74,7 @@ export default function UsersAdmin() {
         <form onSubmit={createAdmin} className="grid md:grid-cols-3 gap-3">
           <input
             className="border border-slate-300 rounded-lg px-3 py-2"
-            placeholder="Name"
+            placeholder="Họ và tên"
             value={createForm.name}
             onChange={(e) => setCreateForm((f) => ({ ...f, name: e.target.value }))}
           />
@@ -87,7 +87,7 @@ export default function UsersAdmin() {
           />
           <input
             className="border border-slate-300 rounded-lg px-3 py-2"
-            placeholder="Password"
+            placeholder="Mật khẩu"
             type="password"
             value={createForm.password}
             onChange={(e) => setCreateForm((f) => ({ ...f, password: e.target.value }))}
@@ -98,7 +98,7 @@ export default function UsersAdmin() {
               disabled={busy}
               className="px-5 py-2 rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 text-white font-semibold shadow-md hover:shadow-lg disabled:opacity-50"
             >
-              {busy ? "Working..." : "Create Admin"}
+              {busy ? "Đang xử lý..." : "Tạo quản trị"}
             </button>
           </div>
         </form>
@@ -106,13 +106,13 @@ export default function UsersAdmin() {
 
       <div className="rounded-3xl bg-white/90 backdrop-blur-sm border border-slate-100 shadow-xl p-6">
         <div className="mb-2">
-          <h3 className="text-xl font-bold text-primary-900">Promote Existing User</h3>
-          <p className="text-sm text-slate-600">Enter userId to set role = admin.</p>
+          <h3 className="text-xl font-bold text-primary-900">Nâng quyền người dùng hiện có</h3>
+          <p className="text-sm text-slate-600">Nhập mã người dùng (userId) để đặt role = admin.</p>
         </div>
         <form onSubmit={promoteUser} className="flex items-center gap-3">
           <input
             className="border border-slate-300 rounded-lg px-3 py-2 w-40"
-            placeholder="userId"
+            placeholder="Mã người dùng"
             value={promoteForm.userId}
             onChange={(e) => setPromoteForm({ userId: e.target.value })}
           />
@@ -121,11 +121,11 @@ export default function UsersAdmin() {
             disabled={busy}
             className="px-4 py-2 rounded-xl bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50"
           >
-            Promote
+            Nâng quyền
           </button>
         </form>
         <div className="mt-3 text-xs text-slate-600">
-          Tip: You need the numeric ID of the user. If you don’t have a list UI yet, you can get it from your DB or add a dedicated list endpoint later.
+          Gợi ý: Bạn cần ID dạng số của người dùng. Nếu chưa có UI danh sách, có thể lấy trong DB hoặc bổ sung endpoint danh sách sau.
         </div>
       </div>
     </div>

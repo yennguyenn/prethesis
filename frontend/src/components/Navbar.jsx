@@ -35,14 +35,14 @@ export default function Navbar({ activePage = 'home' }) {
             {/* Menu */}
             <div className='flex items-center gap-8'>
               {[
-                { to: '/', label: 'Home', key: 'home' },
-                { to: '/quiz', label: 'Career Test', key: 'quiz' },
-                { to: '/careers', label: 'Careers', key: 'careers' },
-                { to: '/groups', label: 'Groups', key: 'groups' },
+                { to: '/', label: 'Trang chủ', key: 'home' },
+                { to: '/quiz', label: 'Trắc nghiệm nghề nghiệp', key: 'quiz' },
+                { to: '/careers', label: 'Ngành học', key: 'careers' },
+                { to: '/groups', label: 'Khối thi', key: 'groups' },
                 // Show Results in main nav only if logged in
-                ...(token ? [{ to: '/results', label: 'My Results', key: 'results' }] : []),
+                ...(token ? [{ to: '/results', label: 'Kết quả của tôi', key: 'results' }] : []),
                 // Admin entry visible only for admin users
-                ...(isAdmin ? [{ to: '/admin', label: 'Admin', key: 'admin' }] : []),
+                ...(isAdmin ? [{ to: '/admin', label: 'Quản trị', key: 'admin' }] : []),
               ].map(item => (
                 <Link
                   key={item.key}
@@ -71,7 +71,7 @@ export default function Navbar({ activePage = 'home' }) {
                 }}
                 className='text-gray-600 hover:text-red-600 font-medium'
               >
-                Logout
+                Đăng xuất
               </button>
             ) : (
               <>
@@ -79,13 +79,13 @@ export default function Navbar({ activePage = 'home' }) {
                   to='/login' 
                   className='text-gray-700 hover:text-primary-700 font-medium'
                 >
-                  Log In
+                  Đăng nhập
                 </Link>
                 <Link 
                   to='/quiz' 
                   className='px-6 py-3 bg-white text-primary-700 font-semibold rounded-full border-2 border-primary-700 hover:bg-primary-700 hover:text-white shadow-md'
                 >
-                  Take the free test
+                  Làm trắc nghiệm miễn phí
                 </Link>
               </>
             )}

@@ -14,11 +14,11 @@ export default function Register() {
     setError("");
     setSuccess("");
     if (!form.name || !form.email || !form.password) {
-      setError("All fields are required");
+      setError("Vui lòng nhập đầy đủ thông tin");
       return;
     }
     if (form.password !== form.confirm) {
-      setError("Passwords do not match");
+      setError("Mật khẩu không khớp");
       return;
     }
     setLoading(true);
@@ -26,13 +26,13 @@ export default function Register() {
       const payload = { name: form.name, email: form.email, password: form.password };
       const res = await API.post("/auth/register", payload);
       if (res.status === 204 || res.status === 200) {
-        setSuccess("Registered successfully. You can login now.");
+        setSuccess("Đăng ký thành công. Bạn có thể đăng nhập ngay.");
         setTimeout(() => nav("/login"), 1200);
       } else {
-        setError(res?.data?.message || "Unexpected response");
+        setError(res?.data?.message || "Phản hồi không hợp lệ");
       }
     } catch (err) {
-      const msg = err?.response?.data?.message || "Register failed";
+      const msg = err?.response?.data?.message || "Đăng ký thất bại";
       setError(msg);
     } finally {
       setLoading(false);
@@ -47,12 +47,12 @@ export default function Register() {
           <button
             type="button"
             onClick={() => nav("/")}
-            aria-label="Close register"
+            aria-label="Đóng đăng ký"
             className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 text-white text-xl leading-none transition-colors"
           >
             &times;
           </button>
-          <h2 className="text-2xl font-semibold mb-6 text-center">Register</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-center">Đăng ký</h2>
           {error && (
             <div className="mb-4 text-sm bg-red-500/20 border border-red-500/40 text-red-200 rounded px-3 py-2">
               {error}
@@ -65,7 +65,7 @@ export default function Register() {
           )}
           <form onSubmit={submit} className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm mb-1">Name</label>
+              <label htmlFor="name" className="block text-sm mb-1">Họ và tên</label>
               <input
                 id="name"
                 type="text"
@@ -73,7 +73,7 @@ export default function Register() {
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 className="w-full px-3 py-2 rounded-lg bg-white/15 border border-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400 placeholder:text-slate-300 text-white"
-                placeholder="Your name"
+                placeholder="Nhập họ và tên"
               />
             </div>
             <div>
@@ -85,11 +85,11 @@ export default function Register() {
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="w-full px-3 py-2 rounded-lg bg-white/15 border border-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400 placeholder:text-slate-300 text-white"
-                placeholder="you@example.com"
+                placeholder="ban@vidu.com"
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm mb-1">Password</label>
+              <label htmlFor="password" className="block text-sm mb-1">Mật khẩu</label>
               <input
                 id="password"
                 type="password"
@@ -101,7 +101,7 @@ export default function Register() {
               />
             </div>
             <div>
-              <label htmlFor="confirm" className="block text-sm mb-1">Confirm Password</label>
+              <label htmlFor="confirm" className="block text-sm mb-1">Xác nhận mật khẩu</label>
               <input
                 id="confirm"
                 type="password"
@@ -109,7 +109,7 @@ export default function Register() {
                 value={form.confirm}
                 onChange={(e) => setForm({ ...form, confirm: e.target.value })}
                 className="w-full px-3 py-2 rounded-lg bg-white/15 border border-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400 placeholder:text-slate-300 text-white"
-                placeholder="Repeat password"
+                placeholder="Nhập lại mật khẩu"
               />
             </div>
             <button
@@ -117,13 +117,13 @@ export default function Register() {
               disabled={loading}
               className="w-full py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
             >
-              {loading ? "Creating account..." : "Create Account"}
+              {loading ? "Đang tạo tài khoản..." : "Tạo tài khoản"}
             </button>
           </form>
           <div className="text-center mt-5 text-sm">
-            Already have an account?{' '}
+            Đã có tài khoản?{' '}
             <Link to="/login" className="text-cyan-300 hover:text-cyan-200 underline underline-offset-4">
-              Login
+              Đăng nhập
             </Link>
           </div>
         </div>

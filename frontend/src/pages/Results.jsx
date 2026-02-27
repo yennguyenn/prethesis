@@ -5,15 +5,15 @@ import API, { setAuthToken } from "../api";
 
 export default function Results() {
   const SUBMAJOR_LABELS = {
-    SE: 'Software Engineering',
-    IS: 'Information Systems',
-    UIUX: 'UI/UX Design',
-    AI: 'Artificial Intelligence',
-    CS: 'Computer Science',
-    DS: 'Data Science',
-    NET: 'Computer Networks',
-    CY: 'Cybersecurity',
-    EMB: 'Embedded Systems'
+    SE: 'Kỹ thuật phần mềm',
+    IS: 'Hệ thống thông tin',
+    UIUX: 'Thiết kế UI/UX',
+    AI: 'Trí tuệ nhân tạo',
+    CS: 'Khoa học máy tính',
+    DS: 'Khoa học dữ liệu',
+    NET: 'Mạng máy tính',
+    CY: 'An ninh mạng',
+    EMB: 'Hệ thống nhúng'
   };
   const MAJOR_DISPLAY = {
     IT: 'Công nghệ thông tin - IT',
@@ -34,10 +34,10 @@ export default function Results() {
       .then((r) => setResults(r.data || []))
       .catch((e) => {
         if (e?.response?.status === 401) {
-          setError("Your session is invalid or expired. Please log in again.");
+          setError("Phiên đăng nhập không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.");
           localStorage.removeItem("token");
         } else {
-          setError(e?.response?.data?.message || "Failed to load results");
+          setError(e?.response?.data?.message || "Không thể tải kết quả");
         }
       })
       .finally(() => setLoading(false));
@@ -54,17 +54,17 @@ export default function Results() {
   return (
     <div className="">
       <div className="max-w-4xl mx-auto py-10 px-4">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">My Assessment Results</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">Kết quả đánh giá của tôi</h1>
 
         {!token && (
           <div className="bg-white border border-primary-300 rounded-xl p-8 shadow-sm">
-            <h2 className="text-xl font-semibold text-primary-700 mb-3">Login Required</h2>
-            <p className="text-gray-700 mb-6">You need to log in to view saved assessment results.</p>
+            <h2 className="text-xl font-semibold text-primary-700 mb-3">Yêu cầu đăng nhập</h2>
+            <p className="text-gray-700 mb-6">Bạn cần đăng nhập để xem kết quả đánh giá đã lưu.</p>
             <a
               href="/login"
               className="inline-block px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 transition-colors shadow-md"
             >
-              Go to Login
+              Đi tới trang đăng nhập
             </a>
           </div>
         )}
@@ -73,7 +73,7 @@ export default function Results() {
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-700 mx-auto mb-4" />
-              <p className="text-gray-600">Loading your results...</p>
+              <p className="text-gray-600">Đang tải kết quả...</p>
             </div>
           </div>
         )}
@@ -86,13 +86,13 @@ export default function Results() {
 
         {token && !loading && !error && results.length === 0 && (
           <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">No Results Yet</h2>
-            <p className="text-gray-600 mb-6">You haven't completed any assessments while logged in.</p>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">Chưa có kết quả</h2>
+            <p className="text-gray-600 mb-6">Bạn chưa hoàn thành bài đánh giá nào khi đang đăng nhập.</p>
             <a
               href="/quiz"
               className="inline-block px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 transition-colors shadow-md"
             >
-              Take an Assessment
+              Làm bài đánh giá
             </a>
           </div>
         )}
@@ -104,10 +104,10 @@ export default function Results() {
               const recommendedMajor = d.recommendedMajor;
               const recommendedSubmajor = d.recommendedSubmajor;
               // Fallbacks
-              const rawMajorName = r.major_name || recommendedMajor?.name || recommendedMajor?.code || "N/A";
+              const rawMajorName = r.major_name || recommendedMajor?.name || recommendedMajor?.code || "Không có dữ liệu";
               const majorName = MAJOR_DISPLAY[recommendedMajor?.code] || MAJOR_DISPLAY[rawMajorName] || rawMajorName;
               const majorDesc = recommendedMajor?.description || "";
-              let subName = "N/A";
+              let subName = "Không có dữ liệu";
               let subDesc = "";
               if (recommendedSubmajor && (recommendedSubmajor.name || recommendedSubmajor.code)) {
                 subName = SUBMAJOR_LABELS[recommendedSubmajor.code] || recommendedSubmajor.name || recommendedSubmajor.code;

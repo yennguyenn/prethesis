@@ -36,13 +36,13 @@ export default function SubMajorDetail() {
         if (!mounted) return;
         // Optional: verify belongs to majorCode if provided
         if (r.data?.Major?.code && majorCode && r.data.Major.code !== majorCode) {
-          setError('The sub-major does not belong to the selected major.');
+          setError('Chuyên ngành này không thuộc ngành đã chọn.');
           setData(null);
         } else {
           setData(r.data);
         }
       } catch (e) {
-        setError('Sub-major not found.');
+        setError('Không tìm thấy chuyên ngành.');
       } finally {
         if (mounted) setLoading(false);
       }
@@ -50,12 +50,12 @@ export default function SubMajorDetail() {
     return () => { mounted = false; };
   }, [majorCode, subCode]);
 
-  if (loading) return <div className="max-w-3xl mx-auto py-16 px-4"><h1 className="text-2xl font-bold">Loading...</h1></div>;
+  if (loading) return <div className="max-w-3xl mx-auto py-16 px-4"><h1 className="text-2xl font-bold">Đang tải...</h1></div>;
   if (error) return (
     <div className="max-w-3xl mx-auto py-16 px-4">
-      <h1 className="text-2xl font-bold mb-2">Error</h1>
+      <h1 className="text-2xl font-bold mb-2">Lỗi</h1>
       <p className="text-slate-600 mb-6">{error}</p>
-      <Link to="/careers" className="px-5 py-2 rounded-lg bg-primary-700 text-white font-medium hover:bg-primary-900 transition">Back to majors list</Link>
+      <Link to="/careers" className="px-5 py-2 rounded-lg bg-primary-700 text-white font-medium hover:bg-primary-900 transition">Quay về danh sách ngành</Link>
     </div>
   );
   if (!data) return null;
@@ -66,25 +66,25 @@ export default function SubMajorDetail() {
         <div className="mb-8">
           <h1 className="text-3xl font-extrabold text-primary-700 mb-2">{data.name}</h1>
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs inline-block px-3 py-1 rounded-full bg-primary-100 text-primary-700 border border-primary-300">Code: {data.code}</span>
+            <span className="text-xs inline-block px-3 py-1 rounded-full bg-primary-100 text-primary-700 border border-primary-300">Mã: {data.code}</span>
             {data.Major && (
               <Link to={`/careers/${data.Major.code}`} className="text-xs inline-block px-3 py-1 rounded-full bg-primary-100 text-primary-700 border border-primary-300 hover:bg-primary-300/30">
-                Major: {data.Major.name}
+                Ngành: {data.Major.name}
               </Link>
             )}
           </div>
         </div>
         {data.studyGroup && (
-          <div className="mb-5 text-[13px] text-slate-700">Suitable study group: <span className="font-medium">{data.studyGroup}</span></div>
+          <div className="mb-5 text-[13px] text-slate-700">Khối học phù hợp: <span className="font-medium">{data.studyGroup}</span></div>
         )}
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-slate-800">Description</h2>
-          <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{data.description || 'No description available for this sub-major.'}</p>
+          <h2 className="text-lg font-semibold text-slate-800">Mô tả</h2>
+          <p className="text-sm text-slate-700 leading-relaxed whitespace-pre-line">{data.description || 'Chưa có mô tả cho chuyên ngành này.'}</p>
         </section>
         {renderJobs(data.exampleJobs)}
         <div className="mt-10 flex gap-4">
-          <Link to="/careers" className="flex-1 text-center px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium transition">Majors list</Link>
-          {data.Major && <Link to={`/careers/${data.Major.code}`} className="flex-1 text-center px-5 py-3 rounded-xl bg-primary-700 text-white text-sm font-semibold shadow hover:shadow-md transition">View major {data.Major.name}</Link>}
+          <Link to="/careers" className="flex-1 text-center px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium transition">Danh sách ngành</Link>
+          {data.Major && <Link to={`/careers/${data.Major.code}`} className="flex-1 text-center px-5 py-3 rounded-xl bg-primary-700 text-white text-sm font-semibold shadow hover:shadow-md transition">Xem ngành {data.Major.name}</Link>}
         </div>
       </div>
     </div>

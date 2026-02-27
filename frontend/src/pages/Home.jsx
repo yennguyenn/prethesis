@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API from "../api";
-import Navbar from "../components/Navbar";
 
 export default function Home() {
   const [majors, setMajors] = useState([]);
@@ -26,16 +25,16 @@ export default function Home() {
         
         <div className="container mx-auto px-4 text-center relative z-10">
           <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-4">
-            Welcome to Support Career
+            Chào mừng bạn đến với Support Career
           </h1>
           <p className="text-base md:text-xl text-primary-300 mb-8 max-w-3xl mx-auto">
-            Support Career accompanies you in making career decisions based on data and personal competencies
+            Support Career đồng hành cùng bạn hỗ trợ đưa ra quyết định lựa chọn ngành nghề dựa trên bộ câu hỏi phân tích sở thích, năng lực và tính cách
           </p>
           <Link
             to="/quiz"
             className="inline-block px-8 py-3 bg-white text-primary-700 text-lg font-bold rounded-xl hover:shadow-2xl transform hover:scale-105 transition-all"
           >
-            Start the assessment →
+            Bắt đầu làm bài đánh giá →
           </Link>
         </div>
       </div>
@@ -43,28 +42,28 @@ export default function Home() {
       {/* How It Works Section */}
       <div className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">Assessment Process</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-12">Quy trình đánh giá</h2>
           <div className="grid md:grid-cols-3 gap-12">
             <div className="text-center">
               <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-4xl">📝</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">1. Orientation</h3>
-              <p className="text-gray-600 text-sm">Answer 60 questions about interests, learning styles, and personal values to identify suitable groups among 23 majors.</p>
+              <h3 className="text-xl font-semibold mb-2">1. Định hướng</h3>
+              <p className="text-gray-600 text-sm">Trả lời 60 câu hỏi về sở thích, phong cách học tập và giá trị cá nhân để xác định nhóm phù hợp trong 23 ngành học.</p>
             </div>
             <div className="text-center">
               <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-4xl">🤖</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">2. Score Analysis</h3>
-              <p className="text-gray-600 text-sm">The DSS algorithm aggregates scores by major and sub-major codes to provide personalized recommendations.</p>
+              <h3 className="text-xl font-semibold mb-2">2. Phân tích điểm</h3>
+              <p className="text-gray-600 text-sm">Thuật toán DSS tổng hợp điểm theo mã ngành và mã chuyên ngành để đưa ra gợi ý cá nhân hóa.</p>
             </div>
             <div className="text-center">
               <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <span className="text-4xl">🎯</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">3. Results</h3>
-              <p className="text-gray-600 text-sm">Receive recommended majors/sub-majors with descriptions and skills suited to those fields.</p>
+              <h3 className="text-xl font-semibold mb-2">3. Kết quả</h3>
+              <p className="text-gray-600 text-sm">Nhận gợi ý ngành/chuyên ngành kèm mô tả và kỹ năng phù hợp với lĩnh vực đó.</p>
             </div>
           </div>
         </div>
@@ -73,8 +72,8 @@ export default function Home() {
       {/* Majors Preview (live from API) */}
       <div className="py-20 bg-gradient-to-br from-primary-100 to-primary-300">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Suggestions for 23 available majors</h2>
-          <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">A list of various fields such as: Economics, Science, Technology, Arts, ...</p>
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-gray-900 mb-4">Gợi ý 23 ngành học hiện có</h2>
+          <p className="text-center text-gray-600 mb-12 max-w-3xl mx-auto">Danh sách đa dạng lĩnh vực ngành học như: Kinh tế, Khoa học, Công nghệ, Nghệ thuật, ...</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6 mb-10">
             {(majors.slice(0, 23)).map((m) => {
               const rawCode = (m.code || '').trim();
@@ -119,7 +118,7 @@ export default function Home() {
           </div>
           <div className="text-center">
             <Link to="/careers" className="inline-block px-8 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 transition-colors">
-              View detailed
+              Xem chi tiết
             </Link>
           </div>
         </div>
@@ -131,11 +130,11 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8 text-center text-white">
             <div>
               <div className="text-5xl font-bold mb-2">60+</div>
-              <div className="text-primary-300">Orientation Questions</div>
+              <div className="text-primary-300">Câu hỏi định hướng</div>
             </div>
             <div>
               <div className="text-5xl font-bold mb-2">23</div>
-              <div className="text-primary-300">Majors</div>
+              <div className="text-primary-300">Ngành học</div>
             </div>
             <div>
               <div className="text-5xl font-bold mb-2">100%</div>
@@ -148,15 +147,15 @@ export default function Home() {
       {/* CTA Section */}
       <div className="py-20 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Ready to choose the right major?</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Sẵn sàng chọn đúng ngành học?</h2>
           <p className="text-base md:text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Complete the assessment to receive major/sub-major suggestions aligned with your personality, skills, and interests.
+            Hoàn thành bài đánh giá để nhận gợi ý ngành/chuyên ngành phù hợp với tính cách, kỹ năng và sở thích của bạn.
           </p>
           <Link
             to="/quiz"
             className="inline-block px-8 py-3 bg-primary-700 text-white text-lg font-semibold rounded-xl hover:bg-primary-900 transition-colors shadow-lg"
           >
-            Start now
+            Bắt đầu ngay
           </Link>
         </div>
       </div>

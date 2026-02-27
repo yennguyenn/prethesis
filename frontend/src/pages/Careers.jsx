@@ -22,9 +22,9 @@ export default function Careers() {
     <div className="">
       <div className="bg-white py-12">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4"> 23 majors available in Vietnam </h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4"> 23 ngành học của Việt Nam </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Overview of 23 majors currently being taught at universities and colleges in Vietnam
+            Tổng quan 23 ngành học hiện đang được đào tạo tại các trường đại học và cao đẳng ở Việt Nam
           </p>
         </div>
       </div>
@@ -64,7 +64,7 @@ export default function Careers() {
               </div>
               <div className="flex justify-between items-center">
                 <Link to={`/careers/${m.code}`} className="inline-flex items-center gap-1 text-sm font-medium text-primary-700 hover:text-primary-900">
-                  More details
+                  Xem chi tiết
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
                 </Link>
                 {/* Admin inline actions removed per request */}

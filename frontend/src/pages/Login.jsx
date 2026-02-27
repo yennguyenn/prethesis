@@ -19,12 +19,13 @@ export default function Login() {
         localStorage.setItem("token", token);
         if (user) localStorage.setItem("user", JSON.stringify(user));
         setAuthToken(token);
-        if (user && user.role === 'admin') nav("/admin"); else nav("/quiz");
+        if (user?.role === "admin") nav("/admin");
+        else nav("/quiz");
       } else {
-        setError("No token returned");
+        setError("Không nhận được token");
       }
     } catch (err) {
-      setError(err?.response?.data?.message || "Login failed");
+      setError(err?.response?.data?.message || "Đăng nhập thất bại");
     } finally {
       setLoading(false);
     }
@@ -39,12 +40,12 @@ export default function Login() {
           <button
             type="button"
             onClick={() => nav("/")}
-            aria-label="Close login"
+            aria-label="Đóng đăng nhập"
             className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 text-white text-xl leading-none transition-colors"
           >
             &times;
           </button>
-          <h2 className="text-2xl font-semibold mb-6 text-center">Login</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-center">Đăng nhập</h2>
           {error && (
             <div className="mb-4 text-sm bg-red-500/20 border border-red-500/40 text-red-200 rounded px-3 py-2">
               {error}
@@ -61,11 +62,11 @@ export default function Login() {
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
                 className="w-full px-3 py-2 rounded-lg bg-white/15 border border-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400 placeholder:text-slate-300 text-white"
-                placeholder="you@example.com"
+                placeholder="ban@vidu.com"
               />
             </div>
             <div>
-              <label className="block text-sm mb-1" htmlFor="password">Password</label>
+              <label className="block text-sm mb-1" htmlFor="password">Mật khẩu</label>
               <input
                 id="password"
                 type="password"
@@ -82,13 +83,13 @@ export default function Login() {
               disabled={loading}
               className="w-full py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
             >
-              {loading ? "Loading..." : "Login"}
+              {loading ? "Đang xử lý..." : "Đăng nhập"}
             </button>
           </form>
           <div className="text-center mt-5 text-sm">
-            Don't have an account?{' '}
+            Chưa có tài khoản?{' '}
             <Link to="/register" className="text-cyan-300 hover:text-cyan-200 underline underline-offset-4">
-              Register
+              Đăng ký
             </Link>
           </div>
         </div>

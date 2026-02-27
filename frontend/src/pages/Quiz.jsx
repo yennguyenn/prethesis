@@ -6,21 +6,21 @@ import API, { setAuthToken } from "../api";
 export default function Quiz() {
   // Mapping sub-major code -> full name
   const SUBMAJOR_LABELS = {
-    SE: 'Software Engineering',
-    IS: 'Information Systems',
-    UIUX: 'UI/UX Design',
-    AI: 'Artificial Intelligence',
-    CS: 'Computer Science',
-    DS: 'Data Science',
-    NET: 'Computer Networks',
-    CY: 'Cybersecurity',
-    EMB: 'Embedded Systems'
+    SE: 'Kỹ thuật phần mềm',
+    IS: 'Hệ thống thông tin',
+    UIUX: 'Thiết kế UI/UX',
+    AI: 'Trí tuệ nhân tạo',
+    CS: 'Khoa học máy tính',
+    DS: 'Khoa học dữ liệu',
+    NET: 'Mạng máy tính',
+    CY: 'An ninh mạng',
+    EMB: 'Hệ thống nhúng'
   };
   // Display standardized IT major
     // Normalize certain major names (optional)
     const MAJOR_NORMALIZE = {
-      IT: 'Information Technology',
-      'Information Technology': 'Information Technology'
+      IT: 'Công nghệ thông tin - IT',
+      'Information Technology': 'Công nghệ thông tin - IT'
     };
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -53,7 +53,7 @@ export default function Quiz() {
         setQuestions(resAll.data || []);
       }
     } catch (e) {
-      setError(e?.response?.data?.message || e.message || "Failed to load questions");
+      setError(e?.response?.data?.message || e.message || "Không thể tải câu hỏi");
     } finally {
       setLoading(false);
     }
@@ -136,7 +136,7 @@ export default function Quiz() {
       <div className="min-h-screen bg-gradient-to-br from-primary-100 to-primary-300 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-700 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading questions...</p>
+          <p className="text-gray-600">Đang tải câu hỏi...</p>
         </div>
       </div>
     );
@@ -149,7 +149,7 @@ export default function Quiz() {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary-100 to-primary-300/40">
         <div className="text-center">
           <div className="animate-spin rounded-full h-14 w-14 border-4 border-primary-300 border-t-primary-700 mx-auto mb-4"></div>
-          <p className="text-sm text-slate-600">Loading questions...</p>
+          <p className="text-sm text-slate-600">Đang tải câu hỏi...</p>
         </div>
       </div>
     );
@@ -164,8 +164,8 @@ export default function Quiz() {
       <div className="min-h-screen bg-gradient-to-tr from-slate-50 via-primary-100 to-primary-300 py-10 px-4">
         <div className="max-w-3xl mx-auto bg-white/90 backdrop-blur-sm border border-slate-100 rounded-3xl shadow-xl p-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">Orientation Results</h2>
-            <p className="mt-2 text-slate-600 text-sm">The most suitable major for you based on 30 questions.</p>
+            <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">Kết quả định hướng</h2>
+            <p className="mt-2 text-slate-600 text-sm">Ngành phù hợp nhất dựa trên 30 câu hỏi.</p>
           </div>
           {/* Top 3 majors recommendation */}
           <div className="grid gap-4 mb-6">
@@ -185,7 +185,7 @@ export default function Quiz() {
                     <button
                       onClick={async()=>{ setSelectedMajor(m.code); setLevel(2); await loadQuestions(2, m.code); }}
                       className="shrink-0 px-4 py-2 rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 text-white text-sm font-semibold shadow hover:shadow-md transition"
-                    >Làm Level 2</button>
+                    >Làm Mức 2</button>
                   </div>
                 </div>
               );
@@ -204,8 +204,8 @@ export default function Quiz() {
             </div>
           )}
           <div className="flex gap-4">
-            <button onClick={()=>{ setMajorResult(null); loadQuestions(1); }} className="flex-1 px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium transition">Do it again</button>
-            <button onClick={async()=>{ const first = top3[0]; if(first){ setSelectedMajor(first.code); setLevel(2); await loadQuestions(2, first.code);} }} className="flex-1 px-5 py-3 rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 text-white font-semibold shadow hover:shadow-md transition">Continue to Level 2 (Top 1)</button>
+            <button onClick={()=>{ setMajorResult(null); loadQuestions(1); }} className="flex-1 px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium transition">Làm lại</button>
+            <button onClick={async()=>{ const first = top3[0]; if(first){ setSelectedMajor(first.code); setLevel(2); await loadQuestions(2, first.code);} }} className="flex-1 px-5 py-3 rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 text-white font-semibold shadow hover:shadow-md transition">Tiếp tục Mức 2 (Gợi ý #1)</button>
           </div>
         </div>
       </div>
@@ -218,18 +218,18 @@ export default function Quiz() {
       <div className="min-h-screen bg-gradient-to-tr from-slate-50 via-primary-100 to-primary-300 py-10 px-4">
         <div className="max-w-3xl mx-auto bg-white/90 backdrop-blur-sm border border-slate-100 rounded-3xl shadow-xl p-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">Sub-major Results {selectedMajor || ''}</h2>
-            <p className="mt-2 text-slate-600 text-sm">Most suitable sub-major based on Level 2 assessment.</p>
+            <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">Kết quả chuyên ngành {selectedMajor || ''}</h2>
+            <p className="mt-2 text-slate-600 text-sm">Chuyên ngành phù hợp nhất dựa trên bài đánh giá Mức 2.</p>
           </div>
           <div className="bg-gradient-to-br from-primary-100 to-primary-300/40 border border-primary-300 rounded-2xl p-6 mb-6">
             <div className="grid gap-4">
               <div className="rounded-xl bg-white/80 border border-primary-300 p-4">
-                <p className="text-xs uppercase tracking-wide text-primary-700 font-medium mb-1">Recommended Major</p>
+                <p className="text-xs uppercase tracking-wide text-primary-700 font-medium mb-1">Ngành gợi ý</p>
                 <h3 className="text-lg font-semibold text-primary-900 mb-1">{MAJOR_NORMALIZE[subResult.recommendedMajor?.code] || MAJOR_NORMALIZE[subResult.recommendedMajor?.name] || subResult.recommendedMajor?.name}</h3>
                 <p className="text-xs text-slate-700 mb-2 leading-relaxed">{subResult.recommendedMajor?.description}</p>
               </div>
               <div className="rounded-xl bg-white/80 border border-primary-300 p-4">
-                <p className="text-xs uppercase tracking-wide text-primary-700 font-medium mb-1">Recommended Sub-major</p>
+                <p className="text-xs uppercase tracking-wide text-primary-700 font-medium mb-1">Chuyên ngành gợi ý</p>
                 <h3 className="text-lg font-semibold text-primary-900 mb-1">
                   <Link to={`/careers/${subResult.recommendedSubmajor?.code}`} className="hover:underline decoration-primary-500 underline-offset-4">
                     {SUBMAJOR_LABELS[subResult.recommendedSubmajor?.code] || subResult.recommendedSubmajor?.name || subResult.recommended?.name}
@@ -237,9 +237,9 @@ export default function Quiz() {
                 </h3>
                 <p className="text-xs text-slate-700 mb-2 leading-relaxed">{subResult.recommendedSubmajor?.description || subResult.recommended?.description}</p>
                 {subResult.recommendedSubmajor?.studyGroup && (
-                  <div className="mt-1 text-[11px] text-slate-600"><span className="font-semibold text-primary-700">Study group:</span> {subResult.recommendedSubmajor.studyGroup}</div>
+                  <div className="mt-1 text-[11px] text-slate-600"><span className="font-semibold text-primary-700">Khối học:</span> {subResult.recommendedSubmajor.studyGroup}</div>
                 )}
-                <div className="text-[11px] text-primary-700 font-medium">Score: {subResult.topScore}</div>
+                <div className="text-[11px] text-primary-700 font-medium">Điểm: {subResult.topScore}</div>
               </div>
             </div>
           </div>
@@ -264,7 +264,7 @@ export default function Quiz() {
             </div>
           )}
           <div className="flex gap-4">
-            <button onClick={()=>{ setSubResult(null); setMajorResult(null); setLevel(1); loadQuestions(1); }} className="flex-1 px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium transition">Do it again</button>
+            <button onClick={()=>{ setSubResult(null); setMajorResult(null); setLevel(1); loadQuestions(1); }} className="flex-1 px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium transition">Làm lại</button>
             <button onClick={()=>navigate('/')} className="flex-1 px-5 py-3 rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 text-white font-semibold shadow hover:shadow-md transition">Về trang chủ</button>
           </div>
         </div>
@@ -278,15 +278,15 @@ export default function Quiz() {
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
         {level === 2 && majorResult && (
           <aside className="lg:w-80 w-full backdrop-blur-xl bg-white/70 border border-white/40 shadow-xl rounded-3xl p-6 h-fit sticky top-8">
-            <h3 className="text-sm font-semibold text-slate-700 mb-3">Level 1 Results</h3>
+            <h3 className="text-sm font-semibold text-slate-700 mb-3">Kết quả Mức 1</h3>
             <div className="rounded-xl bg-gradient-to-br from-primary-100 to-primary-300/40 p-4 border border-primary-300">
-              <p className="text-xs uppercase tracking-wide text-primary-700 font-medium mb-1">Top Majors</p>
+              <p className="text-xs uppercase tracking-wide text-primary-700 font-medium mb-1">Ngành nổi bật</p>
               <p className="font-semibold text-primary-900 mb-1 leading-tight text-sm">{majorResult.recommendedMajor?.name || majorResult.recommended?.name}</p>
               <p className="text-[11px] text-slate-600 line-clamp-5">{majorResult.recommendedMajor?.description || majorResult.recommended?.description}</p>
-              <div className="mt-2 text-[11px] text-primary-700 font-medium">Score: {majorResult.topScore}</div>
+              <div className="mt-2 text-[11px] text-primary-700 font-medium">Điểm: {majorResult.topScore}</div>
             </div>
             <details className="text-xs mt-5">
-              <summary className="cursor-pointer select-none mb-2 text-slate-600 font-medium">Scores for all majors</summary>
+              <summary className="cursor-pointer select-none mb-2 text-slate-600 font-medium">Điểm của tất cả ngành</summary>
               <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
                 {majorResult.allScores.map((m,i)=>(
                   <div key={i} className="flex flex-col">
@@ -298,7 +298,7 @@ export default function Quiz() {
                 ))}
               </div>
             </details>
-            <button onClick={()=>{ setLevel(1); setMajorResult(null); loadQuestions(1); }} className="mt-6 w-full text-center px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 transition">Do it again</button>
+            <button onClick={()=>{ setLevel(1); setMajorResult(null); loadQuestions(1); }} className="mt-6 w-full text-center px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 transition">Làm lại</button>
           </aside>
         )}
 
@@ -310,15 +310,15 @@ export default function Quiz() {
             <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div>
                 <h2 className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">
-                  {level === 1 ? 'Major Orientation' : 'IT Sub-major'}
+                  {level === 1 ? 'Định hướng ngành' : 'Chuyên ngành IT'}
                 </h2>
                 <p className="mt-2 text-sm text-slate-600 max-w-prose">
-                  {level === 1 ? 'Answer 30 questions to identify suitable major groups.' : 'Continue to select a detailed IT sub-major.'}
+                  {level === 1 ? 'Trả lời 30 câu hỏi để xác định nhóm ngành phù hợp.' : 'Tiếp tục để chọn chuyên ngành IT phù hợp.'}
                 </p>
               </div>
               <div className="flex items-center gap-4">
                 <div className="flex flex-col items-center">
-                  <span className="text-xs uppercase tracking-wide text-slate-500">Progress</span>
+                  <span className="text-xs uppercase tracking-wide text-slate-500">Tiến độ</span>
                   <span className="font-semibold text-slate-800">{Math.round(progress)}%</span>
                 </div>
                 <div className="w-40 h-2 rounded-full bg-slate-200 overflow-hidden">
@@ -332,7 +332,7 @@ export default function Quiz() {
                     localStorage.setItem('theme', isDark ? 'dark' : 'light');
                   }}
                   className="relative inline-flex items-center justify-center px-3 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition group"
-                  title="Dark mode"
+                  title="Chế độ tối"
                 >
                   <svg className="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m6.364 1.636l-.707.707M21 12h-1M17.657 17.657l-.707-.707M12 20v1M6.343 17.657l.707-.707M4 12h1M6.343 6.343l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
@@ -345,9 +345,9 @@ export default function Quiz() {
               </div>
             </div>
             <div className="mt-6 flex items-center gap-3 text-xs font-medium text-slate-600">
-              <div className={`px-3 py-1 rounded-full border ${level===1?'bg-primary-700 text-white border-primary-700':'bg-white'} shadow-sm`}>Step 1</div>
+              <div className={`px-3 py-1 rounded-full border ${level===1?'bg-primary-700 text-white border-primary-700':'bg-white'} shadow-sm`}>Bước 1</div>
               <span className="text-slate-400">→</span>
-              <div className={`px-3 py-1 rounded-full border ${level===2?'bg-primary-500 text-white border-primary-500':'bg-white'} shadow-sm`}>Step 2</div>
+              <div className={`px-3 py-1 rounded-full border ${level===2?'bg-primary-500 text-white border-primary-500':'bg-white'} shadow-sm`}>Bước 2</div>
             </div>
           </div>
 
@@ -401,16 +401,16 @@ export default function Quiz() {
               className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white border border-slate-200 text-slate-700 font-medium shadow-sm hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-              Previous
+              Trước
             </button>
-            <div className="text-xs text-slate-500 font-medium">Answered {Object.keys(answers).length}/{questions.length}</div>
+            <div className="text-xs text-slate-500 font-medium">Đã trả lời {Object.keys(answers).length}/{questions.length}</div>
             {currentIndex < questions.length - 1 ? (
               <button
                 onClick={next}
                 disabled={!isAnswered}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 text-white font-semibold shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed transition focus:outline-none focus:ring-2 focus:ring-primary-300"
               >
-                Next
+                Tiếp
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
               </button>
             ) : (
@@ -420,7 +420,7 @@ export default function Quiz() {
                 className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-primary-500 to-primary-700 text-white font-semibold shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed transition focus:outline-none focus:ring-2 focus:ring-primary-300"
               >
                 {submitting && <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>}
-                {submitting ? 'Submitting...' : (level===1 ? 'Complete level 1' : 'Complete level 2')}
+                {submitting ? 'Đang gửi...' : (level===1 ? 'Hoàn thành Mức 1' : 'Hoàn thành Mức 2')}
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
               </button>
             )}
