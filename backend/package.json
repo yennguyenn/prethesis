@@ -8,7 +8,8 @@
     "dev": "nodemon src/server.js",
     "seed": "node src/seed/seed_quiz.js",
     "db:sync": "node src/utils/initDb.js",
-    "initdb": "npm run db:sync && npm run seed"
+    "initdb": "npm run db:sync && npm run seed",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -22,6 +23,7 @@
     "sequelize": "^6.37.7"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^2.0.22"
   }
 }
