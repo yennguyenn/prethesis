@@ -39,7 +39,7 @@ export default function EditQuestion(){
   if (!question) return <div>Đang tải...</div>;
   return (
     <div className="max-w-3xl mx-auto p-6">
-      <h3 className="text-xl font-semibold mb-4">Sửa câu hỏi #{id}</h3>
+      <h3 className="text-xl font-semibold mb-4" style={{ color: "#8b5cf6" }}>Sửa câu hỏi #{id}</h3>
       <div className="space-y-4 bg-white border border-slate-200 rounded-xl p-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 mb-1">Nội dung</label>
@@ -52,14 +52,14 @@ export default function EditQuestion(){
         <div>
           <div className="flex items-center justify-between mb-2">
             <h4 className="text-sm font-semibold">Lựa chọn</h4>
-            <button className="px-3 py-1 rounded bg-primary-700 text-white text-sm" onClick={()=>setOptions(opts=>[...opts, { text: '', scoring: {} }])}>Thêm lựa chọn</button>
+            <button className="px-3 py-1 rounded text-white text-sm" style={{ background: "#8b5cf6" }} onClick={()=>setOptions(opts=>[...opts, { text: '', scoring: {} }])}>Thêm lựa chọn</button>
           </div>
           <div className="space-y-3">
             {options.map((o, idx) => (
               <div key={o.id || idx} className="rounded-lg border border-slate-200 p-3">
                 <div className="flex items-center gap-2 mb-2">
                   <input className="flex-1 border border-slate-300 rounded-lg px-3 py-2" placeholder="Nội dung đáp án" value={o.text} onChange={e=>{ const c=[...options]; c[idx].text=e.target.value; setOptions(c); }} />
-                  <button className="px-2 py-1 rounded bg-red-100 text-red-700 text-xs border border-red-300" onClick={async()=>{
+                  <button className="px-2 py-1 rounded text-white text-xs" style={{ background: "#ef4444" }} onClick={async()=>{
                     if (!confirm('Xóa lựa chọn này?')) return;
                     // If option has id, delete from backend too
                     if (o.id) {
@@ -114,7 +114,7 @@ export default function EditQuestion(){
                                 <span className="text-xs text-amber-800">(chuyển {Number(pts)||0})</span>
                               </>
                             )}
-                            <button className="ml-auto text-xs text-red-700 border border-red-300 bg-red-100 hover:bg-red-200 px-2 py-1 rounded"
+                            <button className="ml-auto text-xs text-white px-2 py-1 rounded" style={{ background: "#ef4444" }}
                               onClick={()=>{
                                 const c=[...options];
                                 const next = { ...(c[idx].scoring||{}) };
@@ -174,7 +174,7 @@ export default function EditQuestion(){
           </div>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 rounded bg-primary-700 text-white disabled:opacity-50" disabled={Object.values(jsonErrors).some(Boolean)} onClick={async()=>{
+          <button className="px-4 py-2 rounded text-white disabled:opacity-50" style={{ background: "#8b5cf6" }} disabled={Object.values(jsonErrors).some(Boolean)} onClick={async()=>{
             // Create any new options without id in backend before saving question updates
             for (let i=0;i<options.length;i++) {
               const o = options[i];

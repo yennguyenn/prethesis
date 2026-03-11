@@ -26,11 +26,11 @@ export default function BootstrapAdmin() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative isolate">
+    <div className="min-h-screen w-full flex items-center justify-center relative isolate" style={{ background: "#0f172a" }}>
       <div className="absolute inset-0 bg-slate-900/90" aria-hidden="true" />
       <div className="relative z-10 w-full max-w-md mx-auto">
         <div className="relative backdrop-blur-md bg-white/10 border border-white/20 rounded-xl shadow-xl p-8 text-white">
-          <h2 className="text-2xl font-semibold mb-6 text-center">Khởi tạo quản trị viên</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-center" style={{ color: "#8b5cf6" }}>Khởi tạo quản trị viên</h2>
           {error && (
             <div className="mb-4 text-sm bg-red-500/20 border border-red-500/40 text-red-200 rounded px-3 py-2">
               {error}
@@ -81,7 +81,8 @@ export default function BootstrapAdmin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+              className="w-full py-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-white"
+              style={{ background: "#3b82f6" }}
             >
               {loading ? "Đang xử lý..." : "Tạo quản trị viên"}
             </button>

@@ -21,7 +21,7 @@ export default function ResponsesAdmin(){
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Phản hồi ({data.total})</h3>
+        <h3 className="text-lg font-semibold" style={{ color: "#8b5cf6" }}>Phản hồi ({data.total})</h3>
       </div>
       {data.items.length === 0 && <div className="text-sm text-slate-500">Chưa có phản hồi.</div>}
       {data.items.map(r => (
