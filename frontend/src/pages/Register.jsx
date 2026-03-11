@@ -52,7 +52,7 @@ export default function Register() {
           >
             &times;
           </button>
-          <h2 className="text-2xl font-semibold mb-6 text-center">Đăng ký</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-center" style={{ color: "#8b5cf6" }}>Đăng ký</h2>
           {error && (
             <div className="mb-4 text-sm bg-red-500/20 border border-red-500/40 text-red-200 rounded px-3 py-2">
               {error}
@@ -115,7 +115,8 @@ export default function Register() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors"
+              className="w-full py-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-white"
+              style={{ background: "#3b82f6" }}
             >
               {loading ? "Đang tạo tài khoản..." : "Tạo tài khoản"}
             </button>

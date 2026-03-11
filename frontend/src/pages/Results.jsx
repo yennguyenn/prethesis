@@ -54,11 +54,11 @@ export default function Results() {
   return (
     <div className="">
       <div className="max-w-4xl mx-auto py-10 px-4">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Kết quả đánh giá của tôi</h1>
+        <h1 className="text-3xl font-bold mb-6" style={{ color: "#8b5cf6" }}>Kết quả đánh giá của tôi</h1>
 
         {!token && (
           <div className="bg-white border border-primary-300 rounded-xl p-8 shadow-sm">
-            <h2 className="text-xl font-semibold text-primary-700 mb-3">Yêu cầu đăng nhập</h2>
+            <h2 className="text-xl font-semibold mb-3" style={{ color: "#8b5cf6" }}>Yêu cầu đăng nhập</h2>
             <p className="text-gray-700 mb-6">Bạn cần đăng nhập để xem kết quả đánh giá đã lưu.</p>
             <a
               href="/login"
@@ -86,7 +86,7 @@ export default function Results() {
 
         {token && !loading && !error && results.length === 0 && (
           <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">Chưa có kết quả</h2>
+            <h2 className="text-xl font-semibold mb-2" style={{ color: "#8b5cf6" }}>Chưa có kết quả</h2>
             <p className="text-gray-600 mb-6">Bạn chưa hoàn thành bài đánh giá nào khi đang đăng nhập.</p>
             <a
               href="/quiz"
@@ -124,7 +124,7 @@ export default function Results() {
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <div className="text-xs text-slate-500">{new Date(r.created_at).toLocaleString()}</div>
-                      <h2 className="text-lg font-semibold text-slate-900 mt-1">Bài đánh giá #{r.id}</h2>
+                      <h2 className="text-lg font-semibold mt-1" style={{ color: "#8b5cf6" }}>Bài đánh giá #{r.id}</h2>
                     </div>
                     <span className="px-3 py-1 bg-primary-100 text-primary-700 text-xs font-medium rounded-full border border-primary-300">
                       Điểm: {r.score}

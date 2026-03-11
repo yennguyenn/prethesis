@@ -22,6 +22,18 @@ export default function Quiz() {
       IT: 'Công nghệ thông tin - IT',
       'Information Technology': 'Công nghệ thông tin - IT'
     };
+
+  // Pre-selected option IDs that maximise CIT's SAW score at Level 1
+  // (mirrors the scenario in backend/tests/quizService.saw.test.js)
+  const CIT_DEMO_ANSWERS = {
+    1: 4,   2: 6,   3: 12,  4: 15,  5: 17,
+    6: 23,  7: 25,  8: 29,  9: 36,  10: 37,
+    11: 44, 12: 48, 13: 51, 14: 55, 15: 60,
+    16: 61, 17: 66, 18: 71, 19: 76, 20: 78,
+    21: 82, 22: 86, 23: 90, 24: 94, 25: 97,
+    26: 102,27: 105,28: 110,29: 113,30: 117,
+  };
+
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [questions, setQuestions] = useState([]);
@@ -34,7 +46,12 @@ export default function Quiz() {
   const [level, setLevel] = useState(1);
   const [majors, setMajors] = useState([]); // for descriptions and mapping
   const [selectedMajor, setSelectedMajor] = useState(null); // code of chosen major for Level 2
-  // Admin inline controls removed per request
+
+  // Detect admin role from persisted user object
+  const isAdmin = (() => {
+    try { return JSON.parse(localStorage.getItem('user') || '{}')?.role === 'admin'; }
+    catch { return false; }
+  })();
 
   const loadQuestions = async (targetLevel = level, majorCode) => {
     setLoading(true);
@@ -47,11 +64,6 @@ export default function Quiz() {
       setQuestions(res.data || []);
       setCurrentIndex(0);
       setAnswers({});
-      // If Level 2 returned empty, fallback to all Level 2 (no major filter)
-      if (targetLevel === 2 && majorCode && (!Array.isArray(res.data) || res.data.length === 0)) {
-        const resAll = await API.get(`/quiz/${targetLevel}`);
-        setQuestions(resAll.data || []);
-      }
     } catch (e) {
       setError(e?.response?.data?.message || e.message || "Không thể tải câu hỏi");
     } finally {
@@ -73,7 +85,18 @@ export default function Quiz() {
 
   const currentQuestion = questions[currentIndex];
   const progress = questions.length ? ((currentIndex + 1) / questions.length) * 100 : 0;
-  const isAnswered = currentQuestion && answers[currentQuestion.id] !== undefined;
+  const isAnswered = currentQuestion && answers[currentQuestion.id] !== undefined && answers[currentQuestion.id] !== '';
+
+  const fillDemoAnswers = () => {
+    const mapped = {};
+    for (const q of questions) {
+      if (CIT_DEMO_ANSWERS[q.id] !== undefined) {
+        mapped[q.id] = CIT_DEMO_ANSWERS[q.id];
+      }
+    }
+    setAnswers(mapped);
+    setCurrentIndex(questions.length - 1);
+  };
 
   const choose = (optionId) => {
     if (!currentQuestion) return;
@@ -93,7 +116,10 @@ export default function Quiz() {
     }
     setSubmitting(true);
     setError("");
-    const payload = { answers: Object.entries(answers).map(([qid, oid]) => ({ questionId: Number(qid), optionId: Number(oid) })) };
+    const payload = { answers: Object.entries(answers).map(([qid, val]) => ({
+      questionId: Number(qid),
+      ...(typeof val === 'string' ? { text: val } : { optionId: Number(val) })
+    })) };
     try {
       if (level === 1) {
         const r = await API.post('/quiz/major/submit', payload);
@@ -104,7 +130,7 @@ export default function Quiz() {
         const top = scores[0];
         const second = scores[1];
         const gap = top && second ? (top.score - second.score) : (top ? top.score : 0);
-        const CONFIDENCE_GAP = 3; // threshold to move to Level 2
+        const CONFIDENCE_GAP = 0.05; // threshold to move to Level 2 (SAW scores are 0-1)
         if (top && gap >= CONFIDENCE_GAP) {
           setSelectedMajor(top.code);
           setLevel(2);
@@ -164,7 +190,7 @@ export default function Quiz() {
       <div className="min-h-screen bg-gradient-to-tr from-slate-50 via-primary-100 to-primary-300 py-10 px-4">
         <div className="max-w-3xl mx-auto bg-white/90 backdrop-blur-sm border border-slate-100 rounded-3xl shadow-xl p-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">Kết quả định hướng</h2>
+            <h2 className="text-3xl font-extrabold" style={{ color: "#8b5cf6" }}>Kết quả định hướng</h2>
             <p className="mt-2 text-slate-600 text-sm">Ngành phù hợp nhất dựa trên 30 câu hỏi.</p>
           </div>
           {/* Top 3 majors recommendation */}
@@ -178,13 +204,14 @@ export default function Quiz() {
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="text-xs text-slate-500 mb-1">Gợi ý #{i+1}</div>
-                      <h3 className="text-lg font-semibold text-primary-900 mb-1">{name}</h3>
+                      <h3 className="text-lg font-semibold mb-1" style={{ color: "#8b5cf6" }}>{name}</h3>
                       <p className="text-sm text-slate-700 mb-2 leading-relaxed line-clamp-3">{desc}</p>
                       <div className="text-xs text-primary-700 font-medium">Điểm: {m.score}</div>
                     </div>
                     <button
                       onClick={async()=>{ setSelectedMajor(m.code); setLevel(2); await loadQuestions(2, m.code); }}
-                      className="shrink-0 px-4 py-2 rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 text-white text-sm font-semibold shadow hover:shadow-md transition"
+                      className="shrink-0 px-4 py-2 rounded-xl text-white text-sm font-semibold shadow transition"
+                      style={{ background: "#8b5cf6" }}
                     >Làm Mức 2</button>
                   </div>
                 </div>
@@ -205,7 +232,7 @@ export default function Quiz() {
           )}
           <div className="flex gap-4">
             <button onClick={()=>{ setMajorResult(null); loadQuestions(1); }} className="flex-1 px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium transition">Làm lại</button>
-            <button onClick={async()=>{ const first = top3[0]; if(first){ setSelectedMajor(first.code); setLevel(2); await loadQuestions(2, first.code);} }} className="flex-1 px-5 py-3 rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 text-white font-semibold shadow hover:shadow-md transition">Tiếp tục Mức 2 (Gợi ý #1)</button>
+            <button onClick={async()=>{ const first = top3[0]; if(first){ setSelectedMajor(first.code); setLevel(2); await loadQuestions(2, first.code);} }} className="flex-1 px-5 py-3 rounded-xl text-white font-semibold shadow transition" style={{ background: "#8b5cf6" }}>Tiếp tục Mức 2 (Gợi ý #1)</button>
           </div>
         </div>
       </div>
@@ -218,19 +245,19 @@ export default function Quiz() {
       <div className="min-h-screen bg-gradient-to-tr from-slate-50 via-primary-100 to-primary-300 py-10 px-4">
         <div className="max-w-3xl mx-auto bg-white/90 backdrop-blur-sm border border-slate-100 rounded-3xl shadow-xl p-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">Kết quả chuyên ngành {selectedMajor || ''}</h2>
+            <h2 className="text-3xl font-extrabold" style={{ color: "#8b5cf6" }}>Kết quả chuyên ngành {selectedMajor || ''}</h2>
             <p className="mt-2 text-slate-600 text-sm">Chuyên ngành phù hợp nhất dựa trên bài đánh giá Mức 2.</p>
           </div>
           <div className="bg-gradient-to-br from-primary-100 to-primary-300/40 border border-primary-300 rounded-2xl p-6 mb-6">
             <div className="grid gap-4">
               <div className="rounded-xl bg-white/80 border border-primary-300 p-4">
                 <p className="text-xs uppercase tracking-wide text-primary-700 font-medium mb-1">Ngành gợi ý</p>
-                <h3 className="text-lg font-semibold text-primary-900 mb-1">{MAJOR_NORMALIZE[subResult.recommendedMajor?.code] || MAJOR_NORMALIZE[subResult.recommendedMajor?.name] || subResult.recommendedMajor?.name}</h3>
+                <h3 className="text-lg font-semibold mb-1" style={{ color: "#8b5cf6" }}>{MAJOR_NORMALIZE[subResult.recommendedMajor?.code] || MAJOR_NORMALIZE[subResult.recommendedMajor?.name] || subResult.recommendedMajor?.name}</h3>
                 <p className="text-xs text-slate-700 mb-2 leading-relaxed">{subResult.recommendedMajor?.description}</p>
               </div>
               <div className="rounded-xl bg-white/80 border border-primary-300 p-4">
                 <p className="text-xs uppercase tracking-wide text-primary-700 font-medium mb-1">Chuyên ngành gợi ý</p>
-                <h3 className="text-lg font-semibold text-primary-900 mb-1">
+                <h3 className="text-lg font-semibold mb-1" style={{ color: "#8b5cf6" }}>
                   <Link to={`/careers/${subResult.recommendedSubmajor?.code}`} className="hover:underline decoration-primary-500 underline-offset-4">
                     {SUBMAJOR_LABELS[subResult.recommendedSubmajor?.code] || subResult.recommendedSubmajor?.name || subResult.recommended?.name}
                   </Link>
@@ -265,7 +292,7 @@ export default function Quiz() {
           )}
           <div className="flex gap-4">
             <button onClick={()=>{ setSubResult(null); setMajorResult(null); setLevel(1); loadQuestions(1); }} className="flex-1 px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium transition">Làm lại</button>
-            <button onClick={()=>navigate('/')} className="flex-1 px-5 py-3 rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 text-white font-semibold shadow hover:shadow-md transition">Về trang chủ</button>
+            <button onClick={()=>navigate('/')} className="flex-1 px-5 py-3 rounded-xl text-white font-semibold shadow transition" style={{ background: "#3b82f6" }}>Ữ trang chủ</button>
           </div>
         </div>
       </div>
@@ -278,12 +305,12 @@ export default function Quiz() {
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
         {level === 2 && majorResult && (
           <aside className="lg:w-80 w-full backdrop-blur-xl bg-white/70 border border-white/40 shadow-xl rounded-3xl p-6 h-fit sticky top-8">
-            <h3 className="text-sm font-semibold text-slate-700 mb-3">Kết quả Mức 1</h3>
-            <div className="rounded-xl bg-gradient-to-br from-primary-100 to-primary-300/40 p-4 border border-primary-300">
-              <p className="text-xs uppercase tracking-wide text-primary-700 font-medium mb-1">Ngành nổi bật</p>
-              <p className="font-semibold text-primary-900 mb-1 leading-tight text-sm">{majorResult.recommendedMajor?.name || majorResult.recommended?.name}</p>
-              <p className="text-[11px] text-slate-600 line-clamp-5">{majorResult.recommendedMajor?.description || majorResult.recommended?.description}</p>
-              <div className="mt-2 text-[11px] text-primary-700 font-medium">Điểm: {majorResult.topScore}</div>
+            <h3 className="text-sm font-semibold mb-3" style={{ color: "#8b5cf6" }}>Kết quả Mức 1</h3>
+            <div style={{ borderRadius: 12, background: 'linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)', padding: 16, border: '1.5px solid #c4b5fd' }}>
+              <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#7c3aed', fontWeight: 600, marginBottom: 4 }}>Ngành nổi bật</p>
+              <p style={{ fontWeight: 700, color: '#4c1d95', marginBottom: 4, fontSize: 13, lineHeight: 1.4 }}>{majorResult.recommendedMajor?.name || majorResult.recommended?.name}</p>
+              <p style={{ fontSize: 11, color: '#475569', display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{majorResult.recommendedMajor?.description || majorResult.recommended?.description}</p>
+              <div style={{ marginTop: 8, fontSize: 11, color: '#7c3aed', fontWeight: 700 }}>Điểm: {majorResult.topScore}</div>
             </div>
             <details className="text-xs mt-5">
               <summary className="cursor-pointer select-none mb-2 text-slate-600 font-medium">Điểm của tất cả ngành</summary>
@@ -292,7 +319,7 @@ export default function Quiz() {
                   <div key={i} className="flex flex-col">
                     <div className="flex justify-between text-[11px] mb-1"><span className="font-medium text-slate-700 truncate" title={m.name}>{m.name}</span><span className="text-slate-500">{m.score}</span></div>
                     <div className="w-full h-1.5 bg-slate-200 rounded">
-                      <div className="h-1.5 rounded bg-gradient-to-r from-primary-500 to-primary-700" style={{width:`${(m.score/(majorResult.topScore||1))*100}%`}}></div>
+                      <div className="h-1.5 rounded" style={{width:`${(m.score/(majorResult.topScore||1))*100}%`, background:'linear-gradient(90deg,#8b5cf6,#6d28d9)'}}></div>
                     </div>
                   </div>
                 ))}
@@ -305,11 +332,9 @@ export default function Quiz() {
         <div className="flex-1 space-y-6">
           {/* Header */}
           <div className="relative overflow-hidden rounded-3xl bg-white shadow-xl border border-slate-100 p-6 lg:p-8">
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-primary-300 to-primary-500 opacity-40 rounded-full blur-3xl" />
-            <div className="absolute -bottom-12 -left-12 w-52 h-52 bg-gradient-to-tr from-primary-100 to-primary-300 opacity-50 rounded-full blur-3xl" />
             <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
               <div>
-                <h2 className="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary-700 to-primary-500">
+                <h2 className="text-3xl font-extrabold tracking-tight" style={{ color: "#8b5cf6" }}>
                   {level === 1 ? 'Định hướng ngành' : 'Chuyên ngành IT'}
                 </h2>
                 <p className="mt-2 text-sm text-slate-600 max-w-prose">
@@ -317,27 +342,16 @@ export default function Quiz() {
                 </p>
               </div>
               <div className="flex items-center gap-4">
-                <div className="flex flex-col items-center">
-                  <span className="text-xs uppercase tracking-wide text-slate-500">Tiến độ</span>
-                  <span className="font-semibold text-slate-800">{Math.round(progress)}%</span>
-                </div>
-                <div className="w-40 h-2 rounded-full bg-slate-200 overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-primary-500 to-primary-700 transition-all duration-500" style={{width:`${progress}%`}}></div>
-                </div>
-                {/* Dark mode toggle */}
-                <button
-                  onClick={() => {
-                    const root = document.documentElement;
-                    const isDark = root.classList.toggle('dark');
-                    localStorage.setItem('theme', isDark ? 'dark' : 'light');
-                  }}
-                  className="relative inline-flex items-center justify-center px-3 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition group"
-                  title="Chế độ tối"
-                >
-                  <svg className="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m6.364 1.636l-.707.707M21 12h-1M17.657 17.657l-.707-.707M12 20v1M6.343 17.657l.707-.707M4 12h1M6.343 6.343l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
-                  </svg>
-                </button>
+                {isAdmin && level === 1 && (
+                  <button
+                    onClick={fillDemoAnswers}
+                    title="[Admin] Tự động chọn đáp án kịch bản CIT điểm cao nhất"
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 transition"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    Demo CIT
+                  </button>
+                )}
                 <button onClick={()=>navigate('/')} className="inline-flex items-center justify-center px-3 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                   <span className="sr-only">Đóng</span>
@@ -345,9 +359,9 @@ export default function Quiz() {
               </div>
             </div>
             <div className="mt-6 flex items-center gap-3 text-xs font-medium text-slate-600">
-              <div className={`px-3 py-1 rounded-full border ${level===1?'bg-primary-700 text-white border-primary-700':'bg-white'} shadow-sm`}>Bước 1</div>
+              <div className={`px-3 py-1 rounded-full border ${level===1?'text-white border-transparent':'bg-white border-slate-300'} shadow-sm`} style={level===1?{background:'#8b5cf6'}:{}}>Bước 1</div>
               <span className="text-slate-400">→</span>
-              <div className={`px-3 py-1 rounded-full border ${level===2?'bg-primary-500 text-white border-primary-500':'bg-white'} shadow-sm`}>Bước 2</div>
+              <div className={`px-3 py-1 rounded-full border ${level===2?'text-white border-transparent':'bg-white border-slate-300'} shadow-sm`} style={level===2?{background:'#8b5cf6'}:{}}>Bước 2</div>
             </div>
           </div>
 
@@ -361,36 +375,55 @@ export default function Quiz() {
           {currentQuestion && (
             <div key={currentQuestion.id} className="rounded-3xl bg-white/80 backdrop-blur-sm border border-slate-100 shadow-lg p-6 md:p-8 fade-in dark:bg-slate-800/70 dark:border-slate-700">
               <div className="flex items-start justify-between gap-4 mb-6">
-                <h3 className="text-xl md:text-2xl font-semibold text-slate-800 leading-relaxed">{currentQuestion.text}</h3>
+                <h3 className="text-xl md:text-2xl font-semibold leading-relaxed" style={{ color: "#8b5cf6" }}>{currentQuestion.text}</h3>
                 {/* Admin actions removed */}
               </div>
-              <div className="grid gap-4">
-                {(currentQuestion.options || []).map((opt, idx) => {
-                  const active = answers[currentQuestion.id] === opt.id;
-                  return (
-                    <label
-                      key={opt.id}
-                      className={`group relative flex items-center gap-4 rounded-2xl border px-5 py-4 cursor-pointer transition-all ${active ? 'border-primary-500 bg-gradient-to-r from-primary-100 to-primary-300/40 shadow-md ring-2 ring-primary-300 dark:from-slate-700 dark:to-slate-600' : 'border-slate-200 hover:border-primary-300 hover:bg-primary-100/40 dark:border-slate-600 dark:hover:border-primary-500 dark:hover:bg-slate-700/40'} `}
-                    >
-                      <input
-                        type="radio"
-                        name={`q_${currentQuestion.id}`}
-                        checked={active}
-                        onChange={() => choose(opt.id)}
-                        className="sr-only"
-                      />
-                      <span className={`flex h-6 w-6 items-center justify-center rounded-full border text-xs font-semibold ${active ? 'bg-primary-700 text-white border-primary-700' : 'bg-white text-slate-500 border-slate-300 group-hover:border-primary-500 group-hover:text-primary-700 dark:bg-slate-700 dark:border-slate-500 dark:group-hover:border-primary-500'}`}>{String.fromCharCode(65+idx)}</span>
-                      <span className={`text-sm md:text-base font-medium ${active ? 'text-primary-900 dark:text-primary-300' : 'text-slate-700 dark:text-slate-300'}`}>{opt.text}</span>
-                      {/* Admin option scoring edit removed */}
-                      {active && (
-                        <span className="absolute right-5 top-1/2 -translate-y-1/2 text-primary-700">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                        </span>
-                      )}
-                    </label>
-                  );
-                })}
-              </div>
+              {currentQuestion.options && currentQuestion.options.length > 0 ? (
+                <div className="grid gap-4">
+                  {currentQuestion.options.map((opt, idx) => {
+                    const active = answers[currentQuestion.id] === opt.id;
+                    return (
+                      <label
+                        key={opt.id}
+                        className={`group relative flex items-center gap-4 rounded-2xl border px-5 py-4 cursor-pointer transition-all ${active ? 'shadow-md' : 'border-slate-200 hover:border-[#c4b5fd] hover:bg-[#f5f3ff]'}`}
+                        style={active ? { borderColor: '#8b5cf6', background: 'rgba(139,92,246,0.08)', boxShadow: '0 0 0 2px rgba(139,92,246,0.25)' } : {}}
+                      >
+                        <input
+                          type="radio"
+                          name={`q_${currentQuestion.id}`}
+                          checked={active}
+                          onChange={() => choose(opt.id)}
+                          className="sr-only"
+                        />
+                        <span
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border text-xs font-semibold ${active ? 'text-white' : 'bg-white text-slate-500 border-slate-300 group-hover:border-[#8b5cf6] group-hover:text-[#8b5cf6]'}`}
+                          style={active ? { background: '#8b5cf6', borderColor: '#8b5cf6' } : {}}
+                        >{String.fromCharCode(65+idx)}</span>
+                        <span className={`text-sm md:text-base font-medium ${active ? '' : 'text-slate-700'}`} style={active ? { color: '#6d28d9' } : {}}>{opt.text}</span>
+                        {active && (
+                          <span className="absolute right-5 top-1/2 -translate-y-1/2" style={{ color: '#8b5cf6' }}>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                          </span>
+                        )}
+                      </label>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="mt-2">
+                  <textarea
+                    value={answers[currentQuestion.id] || ''}
+                    onChange={e => setAnswers(prev => ({ ...prev, [currentQuestion.id]: e.target.value }))}
+                    placeholder="Nhập câu trả lời của bạn..."
+                    rows={4}
+                    className="w-full rounded-2xl border border-slate-200 px-5 py-4 text-sm text-slate-700 leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-400 resize-none transition dark:bg-slate-700/80 dark:border-slate-600 dark:text-slate-200 dark:placeholder-slate-400"
+                  />
+                  <p className="text-xs text-slate-400 mt-2 flex items-center gap-1.5">
+                    <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Hãy mô tả ngắn gọn — hệ thống phân tích từ khóa trong câu trả lời của bạn.
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
@@ -408,7 +441,8 @@ export default function Quiz() {
               <button
                 onClick={next}
                 disabled={!isAnswered}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-primary-700 to-primary-500 text-white font-semibold shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed transition focus:outline-none focus:ring-2 focus:ring-primary-300"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed transition focus:outline-none"
+                style={{ background: "#8b5cf6" }}
               >
                 Tiếp
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
@@ -417,7 +451,8 @@ export default function Quiz() {
               <button
                 onClick={submit}
                 disabled={submitting || Object.keys(answers).length < questions.length}
-                className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-primary-500 to-primary-700 text-white font-semibold shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed transition focus:outline-none focus:ring-2 focus:ring-primary-300"
+                className="inline-flex items-center gap-2 px-7 py-3 rounded-xl text-white font-semibold shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed transition focus:outline-none"
+                style={{ background: "#8b5cf6" }}
               >
                 {submitting && <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>}
                 {submitting ? 'Đang gửi...' : (level===1 ? 'Hoàn thành Mức 1' : 'Hoàn thành Mức 2')}

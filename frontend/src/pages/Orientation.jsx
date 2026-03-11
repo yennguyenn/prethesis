@@ -78,11 +78,11 @@ export default function Orientation() {
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6v6l4 2' />
               </svg>
             </div>
-            <h2 className='text-3xl font-bold text-gray-900 mb-2'>Hoàn thành định hướng</h2>
+            <h2 className='text-3xl font-bold mb-2' style={{ color: "#8b5cf6" }}>Hoàn thành định hướng</h2>
             <p className='text-gray-600'>Ngành phù hợp dựa trên sở thích của bạn:</p>
           </div>
           <div className='bg-primary-100 rounded-xl p-6 mb-6'>
-            <h3 className='text-2xl font-bold text-primary-900 mb-2'>{result.recommended?.name || 'Chưa xác định rõ ngành phù hợp'}</h3>
+            <h3 className='text-2xl font-bold mb-2' style={{ color: "#8b5cf6" }}>{result.recommended?.name || 'Chưa xác định rõ ngành phù hợp'}</h3>
             <p className='text-gray-700 mb-4'>{result.recommended?.description || 'Hãy thử làm lại hoặc điều chỉnh câu trả lời.'}</p>
             <div className='text-sm text-gray-600'><strong>Điểm:</strong> {result.topScore || 0} điểm</div>
           </div>
@@ -109,9 +109,9 @@ export default function Orientation() {
           <div className='flex flex-col sm:flex-row gap-4'>
             <button onClick={() => { setResult(null); setAnswers({}); setCurrentIndex(0); loadQuestions(); }} className='flex-1 px-6 py-3 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors'>Làm lại phần định hướng</button>
             {result.recommended?.code === 'ICT' && (
-              <button onClick={() => navigate('/quiz')} className='flex-1 px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 transition-colors'>Tiếp tục chọn chuyên ngành IT</button>
+              <button onClick={() => navigate('/quiz')} className='flex-1 px-6 py-3 text-white font-semibold rounded-lg transition-colors' style={{ background: "#3b82f6" }}>Tiếp tục chọn chuyên ngành IT</button>
             )}
-            <button onClick={() => navigate('/')} className='flex-1 px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 transition-colors'>Trang chủ</button>
+            <button onClick={() => navigate('/')} className='flex-1 px-6 py-3 text-white font-semibold rounded-lg transition-colors' style={{ background: "#3b82f6" }}>Trang chủ</button>
           </div>
         </div>
       </div>
@@ -123,7 +123,7 @@ export default function Orientation() {
       <div className='max-w-3xl mx-auto'>
         <div className='bg-white rounded-t-2xl shadow-lg p-6'>
           <div className='flex justify-between items-center mb-4'>
-            <h2 className='text-2xl font-bold text-gray-900'>Bài đánh giá định hướng ngành</h2>
+            <h2 className='text-2xl font-bold' style={{ color: "#8b5cf6" }}>Bài đánh giá định hướng ngành</h2>
             <button onClick={() => navigate('/')} className='text-gray-600 hover:text-gray-900'>
               <svg className='w-6 h-6' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M6 18L18 6M6 6l12 12' />
@@ -152,12 +152,12 @@ export default function Orientation() {
         )}
         {currentQuestion && (
           <div className='bg-white rounded-b-2xl shadow-lg p-8 mb-6'>
-            <h3 className='text-xl font-semibold text-gray-900 mb-6'>{currentQuestion.text}</h3>
+            <h3 className='text-xl font-semibold mb-6' style={{ color: "#8b5cf6" }}>{currentQuestion.text}</h3>
             <div className='space-y-3'>
               {(currentQuestion.options || []).map(opt => (
-                <label key={opt.id} className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${answers[currentQuestion.id] === opt.id ? 'border-primary-700 bg-primary-100' : 'border-gray-200 hover:border-primary-300 hover:bg-gray-50'}`}>                  
+                <label key={opt.id} className={`block p-4 border-2 rounded-lg cursor-pointer transition-all ${answers[currentQuestion.id] === opt.id ? '' : 'border-gray-200 hover:border-[#c4b5fd] hover:bg-[#f5f3ff]'}`} style={answers[currentQuestion.id] === opt.id ? { borderColor: '#8b5cf6', background: 'rgba(139,92,246,0.08)' } : {}}>                  
                   <div className='flex items-center'>
-                    <input type='radio' name={`q_${currentQuestion.id}`} checked={answers[currentQuestion.id] === opt.id} onChange={() => choose(opt.id)} className='w-5 h-5 text-primary-700 focus:ring-primary-500' />
+                    <input type='radio' name={`q_${currentQuestion.id}`} checked={answers[currentQuestion.id] === opt.id} onChange={() => choose(opt.id)} className='w-5 h-5 focus:ring-[#8b5cf6]' style={{ accentColor: '#8b5cf6' }} />
                     <span className='ml-3 text-gray-800'>{opt.text}</span>
                   </div>
                 </label>
@@ -169,9 +169,9 @@ export default function Orientation() {
           <button onClick={prev} disabled={currentIndex === 0} className='px-6 py-3 bg-white text-gray-700 font-semibold rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md'>← Trước</button>
           <div className='text-sm text-gray-600'>{Object.keys(answers).length} / {questions.length} đã trả lời</div>
           {currentIndex < questions.length - 1 ? (
-            <button onClick={next} disabled={!isAnswered} className='px-6 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md'>Tiếp →</button>
+            <button onClick={next} disabled={!isAnswered} className='px-6 py-3 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md' style={{ background: "#8b5cf6" }}>Tiếp →</button>
           ) : (
-            <button onClick={submit} disabled={submitting || Object.keys(answers).length < questions.length} className='px-8 py-3 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md flex items-center gap-2'>
+            <button onClick={submit} disabled={submitting || Object.keys(answers).length < questions.length} className='px-8 py-3 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-md flex items-center gap-2' style={{ background: "#22c55e" }}>
               {submitting ? (<><div className='animate-spin rounded-full h-5 w-5 border-b-2 border-white'></div> Đang gửi...</>) : (<>Gửi bài định hướng <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M5 13l4 4L19 7' /></svg></>)}
             </button>
           )}
