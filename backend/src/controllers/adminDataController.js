@@ -2,7 +2,13 @@ import db from '../models/index.js';
 
 export async function listCriteria(req, res) {
   try {
-    const items = await db.Criteria.findAll({ order: [['id','ASC']] });
+    const items = await db.Criteria.findAll({
+      order: [['id', 'ASC']],
+      include: [{
+        model: db.QuestionCriteriaMap,
+        include: [{ model: db.Question, attributes: ['id', 'text'] }]
+      }]
+    });
     res.json(items);
   } catch (err) { res.status(500).json({ error: err.message }); }
 }
