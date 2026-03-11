@@ -5,11 +5,44 @@ import {
   getCriteria,
   getQuestionToCriteriaMap,
   normalizeDecisionMatrix,
-  calculateSAWScores
+  calculateSAWScores,
+  scoreSubjectiveAnswer
 } from './quizSawHelpers.js';
 
+const BASE_SAW_WEIGHTS = { C1: 0.25, C2: 0.3, C3: 0.2, C4: 0.15, C5: 0.1 };
+
+const buildEmptyScores = (CRITERIA) => {
+  if (!Array.isArray(CRITERIA) || CRITERIA.length === 0) {
+    return { C1: 0, C2: 0, C3: 0, C4: 0, C5: 0 };
+  }
+  return CRITERIA.reduce((acc, crit) => {
+    acc[crit.key] = 0;
+    return acc;
+  }, {});
+};
+
+const getWeightsForCriteria = (CRITERIA) => {
+  if (!Array.isArray(CRITERIA) || CRITERIA.length === 0) return { ...BASE_SAW_WEIGHTS };
+
+  const weightsFromDb = CRITERIA.map(c => ({ key: c.key, weight: Number(c.weight) })).filter(c => c.weight > 0);
+  const totalDbWeight = weightsFromDb.reduce((sum, c) => sum + c.weight, 0);
+
+  if (totalDbWeight > 0) {
+    // Normalize DB weights to sum = 1
+    return weightsFromDb.reduce((acc, c) => {
+      acc[c.key] = c.weight / totalDbWeight;
+      return acc;
+    }, {});
+  }
+
+  const defaultWeight = 1 / CRITERIA.length;
+  return CRITERIA.reduce((acc, crit) => {
+    acc[crit.key] = BASE_SAW_WEIGHTS[crit.key] ?? defaultWeight;
+    return acc;
+  }, {});
+};
+
 export const getQuizService = async (level, majorCode) => {
-  // ...existing logic from getQuiz...
   let levelId = Number(level);
   if (Number.isNaN(levelId)) {
     const levelRowByName = await db.Level.findOne({ where: { name: `Level ${level}` } });
@@ -17,64 +50,124 @@ export const getQuizService = async (level, majorCode) => {
     levelId = levelRowByName.id;
   }
 
+  // Helper: fetch questions by raw id list with their options
+  const fetchByIds = async (ids) => {
+    if (!ids || ids.length === 0) return [];
+    const options = await db.Option.findAll({
+      where: { questionId: ids },
+      order: [['id', 'ASC']],
+    });
+    const optionsByQuestionId = {};
+    for (const o of options) {
+      const qId = o.questionId;
+      if (!optionsByQuestionId[qId]) optionsByQuestionId[qId] = [];
+      optionsByQuestionId[qId].push({ id: o.id, text: o.text });
+    }
+    return ids.map(id => ({ id, options: optionsByQuestionId[id] || [] }));
+  };
+
+  // Primary: query by level_id column (model uses snake_case field)
   let questions = await db.Question.findAll({
-    where: { levelId },
+    where: { level_id: levelId },
     include: [{ model: db.Option }],
     order: [['id', 'ASC']],
+    limit: levelId === 2 ? 50 : 30,
   });
 
-  if (String(level) === '2' && majorCode) {
-    try {
-      const subList = await db.SubMajor.findAll({ where: {}, attributes: ['code', 'majorId'] });
-      const majors = await db.Major.findAll({ attributes: ['id', 'code'] });
-      const majorIdByCode = {}; majors.forEach(m => { if (m.code) majorIdByCode[m.code] = m.id; });
-      const targetMajorId = majorIdByCode[majorCode] || null;
-      const subCodes = new Set();
-      subList.forEach(s => { if (s.majorId === targetMajorId && s.code) subCodes.add(s.code); });
-
-      questions = questions.filter(q => {
-        const opts = q.Options || [];
-        return opts.some(o => {
-          const scoring = o.scoring || o.dataValues?.scoring || {};
-          if (scoring[majorCode] != null) return true;
-          return Object.keys(scoring).some(k => subCodes.has(k));
-        });
-      });
-    } catch (_) { /* ignore filtering errors */ }
+  if (questions && questions.length > 0) {
+    return questions.map((q) => ({
+      id: q.id,
+      text: q.text,
+      options: (q.Options || []).map((o) => ({ id: o.id, text: o.text })),
+    }));
   }
 
-  return questions.map((q) => ({
-    id: q.id,
-    text: q.text,
-    options: (q.Options || []).map((o) => ({ id: o.id, text: o.text })),
-  }));
+  // Fallback A: raw SQL with level_id
+  let questionRows = [];
+  try {
+    questionRows = await db.sequelize.query(
+      'SELECT id, text FROM questions WHERE level_id = :levelId ORDER BY id ASC LIMIT 30',
+      { replacements: { levelId }, type: db.Sequelize.QueryTypes.SELECT }
+    );
+  } catch (_) { /* ignore */ }
+
+  if (questionRows && questionRows.length > 0) {
+    const byId = await fetchByIds(questionRows.map(q => q.id));
+    const optMap = Object.fromEntries(byId.map(r => [r.id, r.options]));
+    return questionRows.map(q => ({ id: q.id, text: q.text, options: optMap[q.id] || [] }));
+  }
+
+  // Fallback B: when requesting Level 2 but no level_id=2 rows exist,
+  // serve the second batch of level_id=1 questions (Q31-Q60) which are
+  // the CIT / IT-specialisation questions.
+  if (levelId === 2) {
+    try {
+      questionRows = await db.sequelize.query(
+        'SELECT id, text FROM questions WHERE level_id = 1 ORDER BY id ASC LIMIT 30 OFFSET 30',
+        { type: db.Sequelize.QueryTypes.SELECT }
+      );
+    } catch (_) { /* ignore */ }
+
+    if (questionRows && questionRows.length > 0) {
+      const byId = await fetchByIds(questionRows.map(q => q.id));
+      const optMap = Object.fromEntries(byId.map(r => [r.id, r.options]));
+      return questionRows.map(q => ({ id: q.id, text: q.text, options: optMap[q.id] || [] }));
+    }
+  }
+
+  return [];
 };
 
 export const submitQuizService = async (answers, user) => {
-  // ...existing logic from submitQuiz...
   if (!answers || !Array.isArray(answers) || answers.length === 0) {
     throw new Error('No answers submitted');
   }
-
-  const submajors = await db.SubMajor.findAll({ attributes: ['id', 'code', 'name', 'description', 'studyGroup'] });
+  const { majorMeta, majorIdToCode } = await getMajorsMeta();
+  const submajors = await db.SubMajor.findAll({ attributes: ['id', 'code', 'name', 'description', 'studyGroup', 'majorId'] });
   const subMajorMeta = {};
+  const subToMajorCode = {};
   for (const s of submajors) {
     if (s.code) subMajorMeta[s.code] = { name: s.name, description: s.description, studyGroup: s.studyGroup };
+    if (s.code && s.majorId) {
+      const parentCode = majorIdToCode[s.majorId];
+      if (parentCode) subToMajorCode[s.code] = parentCode;
+    }
   }
 
-  const submajorScores = {};
+  const CRITERIA = await getCriteria(2);  // Level 2: dùng CCIT1-CCIT4
+  const questionToCriteria = await getQuestionToCriteriaMap();
+  const emptyScoresTemplate = buildEmptyScores(CRITERIA);
+
+  const decisionMatrix = {};
   const invalidOptionIds = [];
 
   for (const a of answers) {
-    const ansId = a?.optionId;
-    if (!ansId) { invalidOptionIds.push(ansId); continue; }
-    const option = await db.Option.findByPk(ansId);
-    if (!option) { invalidOptionIds.push(ansId); continue; }
-    const scoring = option.scoring || option.dataValues?.scoring || {};
-    for (const [code, pts] of Object.entries(scoring)) {
-      if (!subMajorMeta[code]) continue;
-      const points = Number(pts) || 0;
-      submajorScores[code] = (submajorScores[code] || 0) + points;
+    const optId = a?.optionId;
+    const freeText = a?.text;
+    const qId = a?.questionId;
+    if (!qId) { invalidOptionIds.push(optId); continue; }
+    const { code: mappedCode, weight: mappedWeight } = questionToCriteria[qId] || {};
+    const critKey = mappedCode || CRITERIA[0]?.key || 'C1';
+    const critWeight = Number(mappedWeight) || 1;
+
+    if (optId) {
+      const option = await db.Option.findByPk(optId);
+      if (!option) { invalidOptionIds.push(optId); continue; }
+      const scoring = option.scoring || option.dataValues?.scoring || {};
+      for (const [code, pts] of Object.entries(scoring)) {
+        if (!subMajorMeta[code]) continue;
+        if (!decisionMatrix[code]) decisionMatrix[code] = { ...emptyScoresTemplate };
+        decisionMatrix[code][critKey] += (Number(pts) || 0) * critWeight;
+      }
+    } else if (freeText) {
+      const keywordScores = await scoreSubjectiveAnswer(2, qId, freeText);
+      for (const [code, pts] of Object.entries(keywordScores)) {
+        if (!subMajorMeta[code]) continue;
+        if (!decisionMatrix[code]) decisionMatrix[code] = { ...emptyScoresTemplate };
+        decisionMatrix[code][critKey] += (Number(pts) || 0) * critWeight;
+      }
+    } else {
+      invalidOptionIds.push(optId);
     }
   }
 
@@ -84,38 +177,62 @@ export const submitQuizService = async (answers, user) => {
     throw err;
   }
 
-  const allScores = Object.entries(submajorScores)
+  const normalizedMatrix = normalizeDecisionMatrix(decisionMatrix, CRITERIA);
+  const weights = getWeightsForCriteria(CRITERIA);
+  const sawScores = calculateSAWScores(normalizedMatrix, CRITERIA, weights);
+
+  const allScores = Object.entries(sawScores)
     .map(([code, score]) => ({
       code,
       name: subMajorMeta[code]?.name || code,
       description: subMajorMeta[code]?.description || null,
-      score
+      studyGroup: subMajorMeta[code]?.studyGroup || null,
+      score: Number(score.toFixed(4)),
+      raw: decisionMatrix[code] || {},
+      normalized: normalizedMatrix[code] || {},
     }))
+    .filter(r => r.score > 0)
     .sort((a, b) => b.score - a.score);
 
   const recommended = allScores[0] || null;
   const topScore = recommended ? recommended.score : 0;
 
   let recommendedMajor = null;
-  try {
-    const it = await db.Major.findOne({ where: { code: 'IT' } });
-    if (it) recommendedMajor = { code: it.code, name: it.name, description: it.description };
-  } catch (_) { /* ignore */ }
+  if (recommended) {
+    const parentMajorCode = subToMajorCode[recommended.code];
+    if (parentMajorCode && majorMeta[parentMajorCode]) {
+      recommendedMajor = {
+        code: parentMajorCode,
+        name: majorMeta[parentMajorCode]?.name,
+        description: majorMeta[parentMajorCode]?.description,
+      };
+    }
+  }
+  if (!recommendedMajor) {
+    try {
+      const it = await db.Major.findOne({ where: { code: 'IT' } });
+      if (it) recommendedMajor = { code: it.code, name: it.name, description: it.description };
+    } catch (_) { /* ignore */ }
+  }
 
   if (user && recommended) {
     try {
       await db.Submission.create({
         userId: user.id,
-        majorCode: null,
-        majorName: null,
+        majorCode: recommendedMajor?.code || null,
+        majorName: recommendedMajor?.name || null,
         subMajorCode: recommended.code || null,
         subMajorName: recommended.name || null,
         score: topScore,
         details: {
-          submajorScores,
+          decisionMatrix,
+          normalizedMatrix,
+          sawScores,
+          weights,
+          criteria: CRITERIA,
           recommendedSubmajor: recommended,
           allScores,
-          totalAnswered: answers.length
+          totalAnswered: answers.length,
         }
       });
     } catch (e) {
@@ -127,7 +244,7 @@ export const submitQuizService = async (answers, user) => {
     code: recommended.code,
     name: recommended.name,
     description: recommended.description,
-    studyGroup: subMajorMeta[recommended.code]?.studyGroup || null
+    studyGroup: recommended.studyGroup || subMajorMeta[recommended.code]?.studyGroup || null
   } : null;
 
   return {
@@ -136,7 +253,9 @@ export const submitQuizService = async (answers, user) => {
     topScore,
     allScores,
     totalAnswered: answers.length,
-    totalSubmajors: allScores.length
+    totalSubmajors: allScores.length,
+    weights,
+    criteria: CRITERIA,
   };
 };
 
@@ -150,20 +269,34 @@ export const submitMajorQuizService = async (answers, user) => {
   // Step 1: Load meta
   const { majorMeta, majorIdToCode } = await getMajorsMeta();
   const subToMajorCode = await getSubToMajorCode(majorIdToCode);
-  const CRITERIA = await getCriteria();
+  const CRITERIA = await getCriteria(1);  // Level 1: dùng C1-C5
   const questionToCriteria = await getQuestionToCriteriaMap();
+  const emptyScoresTemplate = buildEmptyScores(CRITERIA);
 
   // Step 2: Build decision matrix
   const decisionMatrix = {};
   const invalidOptionIds = [];
   for (const a of answers) {
     const optId = a?.optionId;
+    const freeText = a?.text;
     const qId = a?.questionId;
-    if (!optId || !qId) { invalidOptionIds.push(optId); continue; }
-    const option = await db.Option.findByPk(optId);
-    if (!option) { invalidOptionIds.push(optId); continue; }
-    const scoring = option.scoring || option.dataValues?.scoring || {};
-    for (const [code, pts] of Object.entries(scoring)) {
+    if (!qId) { invalidOptionIds.push(optId); continue; }
+    let scoring = null;
+    if (optId) {
+      const option = await db.Option.findByPk(optId);
+      if (!option) { invalidOptionIds.push(optId); continue; }
+      scoring = option.scoring || option.dataValues?.scoring || {};
+    } else if (freeText) {
+      scoring = await scoreSubjectiveAnswer(1, qId, freeText);
+    } else {
+      invalidOptionIds.push(optId);
+      continue;
+    }
+
+    const { code: mappedCode, weight: mappedWeight } = questionToCriteria[qId] || {};
+    const crit = mappedCode || CRITERIA[0]?.key || 'C1';
+    const critWeight = Number(mappedWeight) || 1;
+    for (const [code, pts] of Object.entries(scoring || {})) {
       let majorCode = null;
       if (majorMeta[code]) {
         majorCode = code;
@@ -172,9 +305,8 @@ export const submitMajorQuizService = async (answers, user) => {
       } else {
         continue;
       }
-      if (!decisionMatrix[majorCode]) decisionMatrix[majorCode] = { C1: 0, C2: 0, C3: 0, C4: 0, C5: 0 };
-      const crit = questionToCriteria[qId] || CRITERIA[0]?.key || 'C1';
-      decisionMatrix[majorCode][crit] += Number(pts) || 0;
+      if (!decisionMatrix[majorCode]) decisionMatrix[majorCode] = { ...emptyScoresTemplate };
+      decisionMatrix[majorCode][crit] += (Number(pts) || 0) * critWeight;
     }
   }
   if (invalidOptionIds.length > 0) {
@@ -185,7 +317,7 @@ export const submitMajorQuizService = async (answers, user) => {
 
   // Step 3: Normalize and calculate SAW
   const normalizedMatrix = normalizeDecisionMatrix(decisionMatrix, CRITERIA);
-  const weights = { C1: 0.25, C2: 0.3, C3: 0.2, C4: 0.15, C5: 0.1 };
+  const weights = getWeightsForCriteria(CRITERIA);
   const sawScores = calculateSAWScores(normalizedMatrix, CRITERIA, weights);
 
   // Step 4: Rank majors by SAW score

@@ -1,6 +1,35 @@
 // Helper functions for submitMajorQuizService (SAW method)
 import db from '../models/index.js';
 
+// Subjective keyword rules are stored in the `keyword_rules` DB table.
+// Use getKeywordRules(level, questionId) to fetch them at runtime.
+
+export async function getKeywordRules(level, questionId) {
+  const rows = await db.sequelize.query(
+    'SELECT keywords, scores FROM keyword_rules WHERE level = :level AND question_id = :questionId',
+    { replacements: { level, questionId }, type: db.Sequelize.QueryTypes.SELECT }
+  );
+  return rows; // [{ keywords: string[], scores: { SE: 3, ... } }]
+}
+
+export async function scoreSubjectiveAnswer(level, questionId, answerText) {
+  if (!answerText || !questionId) return {};
+  const rules = await getKeywordRules(level, questionId);
+  if (!rules || rules.length === 0) return {};
+  const text = String(answerText).toLowerCase();
+  const scores = {};
+  for (const rule of rules) {
+    const kw = Array.isArray(rule.keywords) ? rule.keywords : [];
+    const hit = kw.some(k => text.includes(String(k).toLowerCase()));
+    if (!hit) continue;
+    const ruleScores = rule.scores || {};
+    for (const [code, pts] of Object.entries(ruleScores)) {
+      scores[code] = (scores[code] || 0) + (Number(pts) || 0);
+    }
+  }
+  return scores;
+}
+
 export async function getMajorsMeta() {
   const majors = await db.Major.findAll({ attributes: ['id', 'code', 'name', 'description'] });
   const majorMeta = {};
@@ -23,22 +52,49 @@ export async function getSubToMajorCode(majorIdToCode) {
   return subToMajorCode;
 }
 
-export async function getCriteria() {
-  const criteriaRows = await db.sequelize.query(
-    'SELECT code, name, description FROM criteria ORDER BY code',
-    { type: db.Sequelize.QueryTypes.SELECT }
-  );
-  return criteriaRows.map(row => ({ key: row.code, label: row.name, description: row.description }));
+export async function getCriteria(levelId = 1) {
+  let criteriaRows;
+  const codePattern = levelId === 2 ? 'CCIT%' : 'C_%';
+  try {
+    criteriaRows = await db.sequelize.query(
+      'SELECT code, name, description, weight FROM criteria WHERE level_id = :levelId ORDER BY code',
+      { replacements: { levelId }, type: db.Sequelize.QueryTypes.SELECT }
+    );
+  } catch (err) {
+    // level_id column may not exist — filter by code prefix instead
+    try {
+      criteriaRows = await db.sequelize.query(
+        'SELECT code, name, description, weight FROM criteria WHERE code LIKE :pattern ORDER BY code',
+        { replacements: { pattern: codePattern }, type: db.Sequelize.QueryTypes.SELECT }
+      );
+    } catch (_) {
+      // weight column also missing — select without it, still filter by prefix
+      criteriaRows = await db.sequelize.query(
+        'SELECT code, name, description FROM criteria WHERE code LIKE :pattern ORDER BY code',
+        { replacements: { pattern: codePattern }, type: db.Sequelize.QueryTypes.SELECT }
+      );
+    }
+  }
+
+  return criteriaRows.map(row => ({
+    key: row.code,
+    label: row.name,
+    description: row.description,
+    weight: row.weight != null ? Number(row.weight) : null,
+  }));
 }
 
 export async function getQuestionToCriteriaMap() {
   const mappingRows = await db.sequelize.query(
-    'SELECT question_id, criteria_code FROM question_criteria_map',
+    'SELECT question_id, criteria_code, weight FROM question_criteria_map',
     { type: db.Sequelize.QueryTypes.SELECT }
   );
   const questionToCriteria = {};
   for (const row of mappingRows) {
-    questionToCriteria[row.question_id] = row.criteria_code;
+    questionToCriteria[row.question_id] = {
+      code: row.criteria_code,
+      weight: row.weight != null ? Number(row.weight) : 1,
+    };
   }
   return questionToCriteria;
 }
