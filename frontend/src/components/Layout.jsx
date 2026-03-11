@@ -3,10 +3,8 @@ import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
 
-// Pages like login/register may have full-screen forms; still we keep consistent navbar/footer unless we decide otherwise.
 export default function Layout() {
   const location = useLocation();
-  // Determine active page key from pathname for Navbar highlight
   const path = location.pathname;
   const activePage =
     path === '/' ? 'home'
@@ -18,12 +16,16 @@ export default function Layout() {
     : undefined;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-primary-100 to-primary-300 dark:from-slate-900 dark:to-slate-800 transition-colors">
+    <div className="flex h-screen overflow-hidden" style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+      {/* Left sidebar */}
       <Navbar activePage={activePage} />
-      <main className="flex-1">
-        <Outlet />
-      </main>
-      <Footer />
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        <main className="flex-1 overflow-auto bg-white">
+          <Outlet />
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }

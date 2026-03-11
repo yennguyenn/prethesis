@@ -20,7 +20,8 @@ import CareerDetail from "./pages/CareerDetail";
 import SubMajorDetail from "./pages/SubMajorDetail";
 import Groups from "./pages/Groups";
 import Layout from "./components/Layout";
-import AdminDashboard from "./pages/Admin/AdminDashboard";
+import AdminHome from "./pages/Admin/AdminHome";
+import EditQuestion from "./pages/Admin/EditQuestion";
 import BootstrapAdmin from "./pages/Admin/BootstrapAdmin";
 // Lightweight JWT parser to avoid external dependency
 function parseJwt(token) {
@@ -56,7 +57,7 @@ function AdminRoute({ children }) {
 createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <Routes>
-      <Route element={<Layout />}>  
+      <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -67,8 +68,10 @@ createRoot(document.getElementById("root")).render(
         <Route path="/careers/:code" element={<CareerDetail />} />
         <Route path="/careers/:code/:subCode" element={<SubMajorDetail />} />
         <Route path="/groups" element={<Groups />} />
-        <Route path="/admin/*" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
         <Route path="/bootstrap-admin" element={<BootstrapAdmin />} />
+        {/* Admin routes — dùng chung Layout + Navbar */}
+        <Route path="/admin" element={<AdminRoute><AdminHome /></AdminRoute>} />
+        <Route path="/admin/questions/edit/:id" element={<AdminRoute><EditQuestion /></AdminRoute>} />
       </Route>
     </Routes>
   </BrowserRouter>
