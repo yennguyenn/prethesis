@@ -12,6 +12,7 @@ import Submission from './submission.js';
 import Criteria from './criteria.js';
 import QuestionCriteriaMap from './questionCriteriaMap.js';
 import Response from './response.js';
+import KeywordRule from './keywordRule.js';
 
 dotenv.config();
 const config = configFile.development;
@@ -38,6 +39,7 @@ db.Submission = Submission(sequelize, DataTypes);
 db.Criteria = Criteria(sequelize, DataTypes);
 db.QuestionCriteriaMap = QuestionCriteriaMap(sequelize, DataTypes);
 db.Response = Response(sequelize, DataTypes);
+db.KeywordRule = KeywordRule(sequelize, DataTypes);
 
 // relationships
 db.Level.hasMany(db.Question, { foreignKey: 'levelId' });

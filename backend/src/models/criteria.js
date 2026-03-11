@@ -5,7 +5,8 @@ export default (sequelize) => {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     code: { type: DataTypes.STRING, allowNull: false, unique: true },
     name: { type: DataTypes.STRING, allowNull: false },
-    description: { type: DataTypes.TEXT, allowNull: true }
+    description: { type: DataTypes.TEXT, allowNull: true },
+    levelId: { type: DataTypes.INTEGER, allowNull: true, defaultValue: 1, field: 'level_id' }
   }, {
     tableName: 'criteria',
     timestamps: false
