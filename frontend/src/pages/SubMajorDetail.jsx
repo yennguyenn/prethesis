@@ -41,7 +41,7 @@ export default function SubMajorDetail() {
         } else {
           setData(r.data);
         }
-      } catch (e) {
+      } catch {
         setError('Không tìm thấy chuyên ngành.');
       } finally {
         if (mounted) setLoading(false);

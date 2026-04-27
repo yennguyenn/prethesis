@@ -58,8 +58,8 @@ async function deleteMajor(req, res) {
 
 async function createQuestion(req, res) {
   try {
-    const { text, level, options } = req.body;
-    const qFull = await createQuestionService({ text, level, options });
+    const { text, level, options, majorCode } = req.body;
+    const qFull = await createQuestionService({ text, level, options, majorCode });
     res.json(qFull);
   } catch (err) {
     if (err.message && err.message.startsWith('Missing required fields')) {
@@ -95,11 +95,12 @@ async function getQuestionById(req, res) {
 async function updateQuestion(req, res) {
   try {
     const { id } = req.params;
-    const { text, levelId, options } = req.body;
+    const { text, levelId, options, majorCode } = req.body;
     const q = await db.Question.findByPk(id);
     if (!q) return res.status(404).json({ message: 'Question not found' });
     if (text !== undefined) q.text = text;
     if (levelId !== undefined) q.levelId = levelId;
+    if (majorCode !== undefined) q.major_code = majorCode;
     await q.save();
     if (Array.isArray(options)) {
       for (const opt of options) {

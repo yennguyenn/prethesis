@@ -64,7 +64,7 @@ router.put("/:id", authMiddleware, adminOnly, async (req, res) => {
     const { name, description } = req.body;
     const major = await db.Major.findByPk(id);
     if (!major) return res.status(404).json({ message: "Not found" });
-    
+
     await major.update({ name, description });
     res.json(major);
   } catch (error) {
@@ -78,7 +78,7 @@ router.delete("/:id", authMiddleware, adminOnly, async (req, res) => {
     const { id } = req.params;
     const major = await db.Major.findByPk(id);
     if (!major) return res.status(404).json({ message: "Not found" });
-    
+
     await major.destroy();
     res.json({ success: true });
   } catch (error) {

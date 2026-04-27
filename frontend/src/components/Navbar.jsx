@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const NAV_ITEMS = [
   {
@@ -14,15 +14,11 @@ const NAV_ITEMS = [
     to: '/careers', key: 'careers', label: 'Ngành học',
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>,
   },
-  {
-    to: '/groups', key: 'groups', label: 'Khối thi',
-    icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
-  },
+  // { to: '/groups', key: 'groups', label: 'Khối thi', hidden: true 
 ];
 
 export default function Navbar({ activePage = 'home' }) {
   const [collapsed, setCollapsed] = useState(false);
-  const navigate = useNavigate();
 
   const token = localStorage.getItem('token');
   let isAdmin = false;
@@ -34,7 +30,9 @@ export default function Navbar({ activePage = 'home' }) {
         const payload = JSON.parse(json);
         isAdmin = payload?.role === 'admin' || payload?.isAdmin === true;
       }
-    } catch {}
+    } catch (error) {
+      console.warn('Failed to parse auth token payload', error);
+    }
   }
 
   const items = [

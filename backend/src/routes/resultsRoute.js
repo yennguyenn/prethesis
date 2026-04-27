@@ -99,9 +99,14 @@ router.get("/me", authMiddleware, async (req, res) => {
     });
     const payload = list.map((s) => ({
       id: s.id,
-      created_at: s.createdAt,
+      createdAt: s.createdAt,
       score: s.score,
-      major_name: s.majorName,
+      majorCode: s.majorCode,
+      majorName: s.majorName,
+      subMajorCode: s.subMajorCode,
+      subMajorName: s.subMajorName,
+      percentage: s.percentage,
+      totalPoints: s.totalPoints,
       details: s.details,
     }));
     res.json(payload);

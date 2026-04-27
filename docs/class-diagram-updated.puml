@@ -96,6 +96,18 @@ class Criteria {
   -code: STRING
   -name: STRING
   -description: TEXT
+  -levelId: INTEGER
+  
+  +save()
+  +findByPk(id)
+}
+
+class KeywordRule {
+  -id: INTEGER
+  -level: INTEGER
+  -question_id: INTEGER
+  -keywords: TEXT[]
+  -scores: JSONB
   
   +save()
   +findByPk(id)
@@ -113,19 +125,17 @@ class QuestionCriteriaMap {
 
 ' Associations '
 Level "1" -- "0..*" Question : hasMany
+Level "1" -- "0..*" Criteria : scopes
 Question "1" -- "0..*" Option : hasMany
 Major "1" -- "0..*" SubMajor : hasMany
 Major "1" -- "0..*" Option : hasMany
 Question "1" -- "0..*" Result : hasMany
 User "1" -- "0..*" Result : hasMany
 Option "1" -- "0..*" Result : hasMany
-User "1" -- "0..*" Response : hasMany
-Question "1" -- "0..*" Response : hasMany
-Option "1" -- "0..*" Response : hasMany
 User "1" -- "0..*" Submission : hasMany
 Question "1" -- "0..*" QuestionCriteriaMap : hasMany
 Criteria "1" -- "0..*" QuestionCriteriaMap : hasMany
-'' Response model removed from ERD (answers stored in `Submission.details` / snapshots)
+Question "1" -- "0..*" KeywordRule : has
 
 note bottom
   Notes:

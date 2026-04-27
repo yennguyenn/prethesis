@@ -63,7 +63,11 @@ export default function EditQuestion(){
                     if (!confirm('Xóa lựa chọn này?')) return;
                     // If option has id, delete from backend too
                     if (o.id) {
-                      try { await API.delete(`/admin/options/${o.id}`); } catch {}
+                      try {
+                        await API.delete(`/admin/options/${o.id}`);
+                      } catch (error) {
+                        console.warn('Failed to delete option', error);
+                      }
                     }
                     setOptions(opts=>opts.filter((_,i)=>i!==idx));
                   }}>Xóa</button>
@@ -182,7 +186,9 @@ export default function EditQuestion(){
                 try {
                   const resp = await API.post(`/admin/questions/${id}/options`, { text: o.text, scoring: o.scoring || {} });
                   options[i] = { ...o, id: resp.data.id };
-                } catch {}
+                } catch (error) {
+                  console.warn('Failed to create option', error);
+                }
               }
             }
             await save();

@@ -9,6 +9,8 @@ export default (sequelize, DataTypes) => {
       subMajorCode: { type: DataTypes.STRING },
       subMajorName: { type: DataTypes.STRING },
       score: { type: DataTypes.FLOAT },
+      percentage: { type: DataTypes.FLOAT },
+      totalPoints: { type: DataTypes.FLOAT },
       // Store full breakdown and any other metadata
       details: { type: DataTypes.JSONB },
     },

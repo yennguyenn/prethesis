@@ -1,0 +1,93 @@
+@startuml
+skinparam backgroundColor #FFFFFF
+skinparam sequenceArrowThickness 1.5
+skinparam roundcorner 5
+skinparam sequenceParticipant underline
+skinparam noteBorderColor #999999
+skinparam noteBackgroundColor #FFFDE7
+
+actor Student
+participant "Frontend\n(React)" as FE
+participant "Backend\n(Express)" as BE
+participant "Database\n(PostgreSQL)" as DB
+
+== Level 1: Chọn Ngành (Major) ==
+
+Student -> FE : Start quiz
+FE -> BE : GET /quiz/1
+BE -> DB : SELECT * FROM questions\nWHERE level_id = 1
+DB --> BE : Return level 1 questions + options
+BE --> FE : [{id, text, options:[{id,text}]}]
+FE --> Student : Display level 1 questions\n(one by one)
+
+Student -> FE : Choose answers\n(optionId hoặc free text)
+FE -> BE : POST /quiz/major/submit\n{answers:[{questionId, optionId|text}]}
+
+group SAW Calculation - Level 1
+  BE -> DB : SELECT criteria WHERE level_id=1\n→ [C1,C2,C3,C4,C5]
+  DB --> BE : criteria + weights
+  BE -> DB : SELECT question_criteria_map
+  DB --> BE : {questionId → criteriaCode, weight}
+  BE -> DB : SELECT scoring FROM Options\nWHERE id IN (optionIds)
+  DB --> BE : option.scoring JSONB\n{"IT":3, "ICT":2, ...}
+  note right of BE
+    Free text answers:
+    SELECT * FROM keyword_rules
+    WHERE level=1 AND question_id=?
+    → match keywords → scores
+  end note
+  BE -> BE : Build decisionMatrix\nNormalize (min-max)\nCalculate SAW score S_j = Σ w_k × r_kj
+end
+
+alt user logged in
+  BE -> DB : INSERT INTO Submissions\n(userId, majorCode, score, details JSONB)
+  DB --> BE : submissionId
+end
+
+BE --> FE : {recommendedMajor, allScores,\nproceedToLevel2, nextLevel, weights, criteria}
+FE --> Student : Display recommended major\n+ score breakdown
+
+alt proceedToLevel2=true AND gap ≥ 0.05 AND major=IT/ICT
+
+== Level 2: Chọn Chuyên ngành CIT (Sub-Major) ==
+
+  FE -> BE : GET /quiz/2?major=IT\n(auto - không cần user bấm)
+  BE -> DB : SELECT * FROM questions\nWHERE level_id = 2
+  DB --> BE : Return level 2 questions + options
+  BE --> FE : [{id, text, options:[{id,text}]}]
+  FE --> Student : Display level 2 questions
+
+  Student -> FE : Choose answers\n(optionId hoặc free text)
+  FE -> BE : POST /quiz/submit\n{answers:[{questionId, optionId|text}]}
+
+  group SAW Calculation - Level 2
+    BE -> DB : SELECT criteria WHERE level_id=2\n→ [CCIT1,CCIT2,CCIT3,CCIT4]
+    DB --> BE : criteria + weights
+    BE -> DB : SELECT scoring FROM Options\nWHERE id IN (optionIds)
+    DB --> BE : option.scoring JSONB\n{"SE":4, "DS":2, "AI":1, ...}
+    note right of BE
+      Free text answers:
+      SELECT * FROM keyword_rules
+      WHERE level=2 AND question_id=?
+      → match keywords → scores
+    end note
+    BE -> BE : Build decisionMatrix\nNormalize\nCalculate SAW score
+  end
+
+  alt user logged in
+    BE -> DB : UPDATE Submissions SET\nsubMajorCode, subMajorName, details
+    DB --> BE : OK
+  end
+
+  BE --> FE : {recommendedSubmajor, recommendedMajor,\ntopScore, allScores, weights, criteria}
+
+  alt logged in
+    FE -> FE : navigate('/results')
+    FE --> Student : Redirect to Results page
+  else not logged in
+    FE --> Student : Display recommended sub-major\n+ score breakdown
+  end
+
+end
+
+@enduml

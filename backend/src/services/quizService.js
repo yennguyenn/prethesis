@@ -10,6 +10,7 @@ import {
 } from './quizSawHelpers.js';
 
 const BASE_SAW_WEIGHTS = { C1: 0.25, C2: 0.3, C3: 0.2, C4: 0.15, C5: 0.1 };
+const LEVEL2_ALLOWED_CODES = ['CIT', 'IT', 'ICT'];
 
 const buildEmptyScores = (CRITERIA) => {
   if (!Array.isArray(CRITERIA) || CRITERIA.length === 0) {
@@ -50,6 +51,8 @@ export const getQuizService = async (level, majorCode) => {
     levelId = levelRowByName.id;
   }
 
+  const normalizedMajorCode = majorCode ? String(majorCode).toUpperCase() : null;
+
   // Helper: fetch questions by raw id list with their options
   const fetchByIds = async (ids) => {
     if (!ids || ids.length === 0) return [];
@@ -66,9 +69,14 @@ export const getQuizService = async (level, majorCode) => {
     return ids.map(id => ({ id, options: optionsByQuestionId[id] || [] }));
   };
 
+  let whereClause = { level_id: levelId };
+  if (levelId === 2 && normalizedMajorCode) {
+    whereClause.major_code = normalizedMajorCode;
+  }
+
   // Primary: query by level_id column (model uses snake_case field)
   let questions = await db.Question.findAll({
-    where: { level_id: levelId },
+    where: whereClause,
     include: [{ model: db.Option }],
     order: [['id', 'ASC']],
     limit: levelId === 2 ? 50 : 30,
@@ -80,6 +88,14 @@ export const getQuizService = async (level, majorCode) => {
       text: q.text,
       options: (q.Options || []).map((o) => ({ id: o.id, text: o.text })),
     }));
+  }
+
+  const skipFallbackForMajor = levelId === 2 && normalizedMajorCode && !LEVEL2_ALLOWED_CODES.includes(normalizedMajorCode);
+
+  if (skipFallbackForMajor) {
+    const err = new Error('Level 2 question bank is not available for this major');
+    err.status = 404;
+    throw err;
   }
 
   // Fallback A: raw SQL with level_id
@@ -182,15 +198,21 @@ export const submitQuizService = async (answers, user) => {
   const sawScores = calculateSAWScores(normalizedMatrix, CRITERIA, weights);
 
   const allScores = Object.entries(sawScores)
-    .map(([code, score]) => ({
-      code,
-      name: subMajorMeta[code]?.name || code,
-      description: subMajorMeta[code]?.description || null,
-      studyGroup: subMajorMeta[code]?.studyGroup || null,
-      score: Number(score.toFixed(4)),
-      raw: decisionMatrix[code] || {},
-      normalized: normalizedMatrix[code] || {},
-    }))
+    .map(([code, score]) => {
+      const rawValues = Object.values(decisionMatrix[code] || {});
+      const totalPoints = rawValues.reduce((sum, v) => sum + (Number(v) || 0), 0);
+      return {
+        code,
+        name: subMajorMeta[code]?.name || code,
+        description: subMajorMeta[code]?.description || null,
+        studyGroup: subMajorMeta[code]?.studyGroup || null,
+        score: Number(score.toFixed(4)),
+        percentage: Number((score * 100).toFixed(2)),
+        totalPoints: Number(totalPoints.toFixed(2)),
+        raw: decisionMatrix[code] || {},
+        normalized: normalizedMatrix[code] || {},
+      };
+    })
     .filter(r => r.score > 0)
     .sort((a, b) => b.score - a.score);
 
@@ -224,6 +246,8 @@ export const submitQuizService = async (answers, user) => {
         subMajorCode: recommended.code || null,
         subMajorName: recommended.name || null,
         score: topScore,
+        percentage: recommended.percentage,
+        totalPoints: recommended.totalPoints,
         details: {
           decisionMatrix,
           normalizedMatrix,
@@ -322,14 +346,20 @@ export const submitMajorQuizService = async (answers, user) => {
 
   // Step 4: Rank majors by SAW score
   const allScores = Object.entries(sawScores)
-    .map(([code, score]) => ({
-      code,
-      name: majorMeta[code]?.name || code,
-      description: majorMeta[code]?.description || null,
-      score: Number(score.toFixed(4)),
-      raw: decisionMatrix[code] || {},
-      normalized: normalizedMatrix[code] || {},
-    }))
+    .map(([code, score]) => {
+      const rawValues = Object.values(decisionMatrix[code] || {});
+      const totalPoints = rawValues.reduce((sum, v) => sum + (Number(v) || 0), 0);
+      return {
+        code,
+        name: majorMeta[code]?.name || code,
+        description: majorMeta[code]?.description || null,
+        score: Number(score.toFixed(4)),
+        percentage: Number((score * 100).toFixed(2)),
+        totalPoints: Number(totalPoints.toFixed(2)),
+        raw: decisionMatrix[code] || {},
+        normalized: normalizedMatrix[code] || {},
+      };
+    })
     .filter(r => r.score > 0)
     .sort((a, b) => b.score - a.score);
 
@@ -368,6 +398,8 @@ export const submitMajorQuizService = async (answers, user) => {
         subMajorCode: null,
         subMajorName: null,
         score: topScore,
+        percentage: recommended.percentage,
+        totalPoints: recommended.totalPoints,
         details: {
           decisionMatrix,
           normalizedMatrix,

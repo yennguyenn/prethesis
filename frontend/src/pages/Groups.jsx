@@ -47,15 +47,6 @@ const groups = [
   }
 ];
 
-const itMapping = {
-  "A": ["Khoa học máy tính", "Kỹ thuật phần mềm", "Trí tuệ nhân tạo", "Khoa học dữ liệu", "Hệ thống nhúng", "Mạng máy tính"],
-  "A1": ["Kỹ thuật phần mềm", "Phát triển ứng dụng di động", "Điện toán đám mây", "DevOps", "An toàn thông tin"],
-  "B": ["Tin sinh học", "CNTT y tế", "Khoa học dữ liệu", "AI trong y tế"],
-  "C": ["Hệ thống thông tin", "Phân tích kinh doanh", "Marketing số", "Thương mại điện tử"],
-  "D": ["Thiết kế UX", "Quản trị nội dung", "Hệ thống thông tin", "Truyền thông số"],
-  "D1": ["Dự án CNTT quốc tế", "Bản địa hóa", "Truyền thông kỹ thuật"]
-};
-
 export default function Groups() {
   return (
     <div className="">

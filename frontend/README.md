@@ -1,16 +1,29 @@
-# React + Vite
+# DSS Frontend (React + Vite + Tailwind v4)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Single-page app for the career orientation quiz and admin console.
 
-Currently, two official plugins are available:
+## Prerequisites
+- Node.js 18+
+- Backend API running (default `http://localhost:5000/api`).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Setup & Run
+1) `cd frontend`
+2) `npm install`
+3) Create `.env` in `frontend/` as needed:
+```
+VITE_API_BASE=http://localhost:5000/api
+```
+4) Start dev server: `npm run dev` (Vite on port 5173 by default).
+5) Build for production: `npm run build`; preview: `npm run preview`.
 
-## React Compiler
+## Key Pages
+- Quiz flow (Level 1 & Level 2), results display.
+- Auth (login/register) with JWT stored in localStorage.
+- Admin: manage majors, submajors, questions, options, results, users.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Linting
+- `npm run lint` uses ESLint 9 with React hooks and refresh plugins.
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Notes
+- API client base URL is configurable via `VITE_API_BASE` (see `src/api.js`).
+- On 401 responses, auth state clears and redirects to `/login`.

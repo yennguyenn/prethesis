@@ -43,7 +43,7 @@ export default function Home() {
       try {
         const r = await API.get("/majors");
         setMajors(Array.isArray(r.data) ? r.data : []);
-      } catch (_) {
+      } catch {
         setMajors([]);
       }
     })();

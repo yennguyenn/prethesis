@@ -25,13 +25,13 @@ export async function deleteMajorService(id) {
   return { message: 'Deleted' };
 }
 
-export async function createQuestionService({ text, level, options }) {
+export async function createQuestionService({ text, level, options, majorCode }) {
   if (!text || !level || !Array.isArray(options) || options.length === 0) {
     throw new Error('Missing required fields: text, level, options[]');
   }
   const lvl = Number(level) || 1;
   const [levelRow] = await db.Level.findOrCreate({ where: { name: `Level ${lvl}` }, defaults: { name: `Level ${lvl}` } });
-  const q = await db.Question.create({ text, levelId: levelRow.id });
+  const q = await db.Question.create({ text, levelId: levelRow.id, major_code: majorCode || null });
   for (const opt of options) {
     const scoring = opt.scoring || {};
     await db.Option.create({ text: opt.text, scoring, questionId: q.id });

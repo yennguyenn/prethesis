@@ -1,6 +1,55 @@
-# Backend Data Notes
+# DSS Backend (Express + PostgreSQL)
 
-This project now manages seed data via SQL in pgAdmin. JavaScript seed scripts are deprecated to avoid accidental data wipes. This README preserves the reference content from the removed seed files.
+Service for the DSS career orientation quiz. Provides auth, admin CRUD, quiz scoring, and results APIs that back the React frontend.
+
+## Prerequisites
+- Node.js 18+
+- PostgreSQL 14+ running locally (default `localhost:5432`).
+- A `.env` file in `backend/` with values similar to:
+```
+PORT=5000
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_NAME=dss_db
+DB_USER=postgres
+DB_PASS=your_password
+JWT_SECRET=change_me
+CORS_ORIGIN=http://localhost:5173
+DEBUG_AUTH=false
+```
+
+## Install & Run
+1) `cd backend`
+2) `npm install`
+3) Ensure PostgreSQL is up and a database named `dss_db` exists.
+4) Import seed data via `../dss_db.sql` (pgAdmin or `psql -f dss_db.sql`). Optional: apply extra data patches in `sql/`.
+5) Start the API:
+- Dev with reload: `npm run dev`
+- Prod: `npm start`
+- Health check: `GET /api/health`
+
+## Database & Seeding Strategy
+- Schema sync: `npm run db:sync` (uses Sequelize `sync({ alter: true })` in dev).
+- Auto-seeding is intentionally disabled to avoid overwriting curated data. Populate with the SQL scripts noted above.
+- Validation enforces: each answer option can score **max 3 majors** (applies to create/update/import).
+
+## Scripts
+- `npm run dev` – start with nodemon
+- `npm start` – start without reload
+- `npm test` – run Jest suite
+- `npm run db:sync` – sync models to DB (dev convenience)
+
+## Core Endpoints
+- `POST /api/auth/login` – email/password, returns JWT
+- `GET /api/health` – service heartbeat
+- `POST /api/quiz/submit` – submit quiz responses
+- Admin (JWT required): manage questions, options, majors, submajors, results under `/api/admin/*`
+
+## Data Notes
+- Level 1 (orientation) and Level 2 (IT) questions are managed in SQL, not via JS seeders.
+- JSON `scoring` per option uses major codes; limit 3 majors per option.
+
+---
 
 ## Majors (23 groups)
 - EDU: Khoa học giáo dục và đào tạo giáo viên — Nhóm ngành đào tạo giáo viên, nghiên cứu giáo dục, phương pháp dạy học, quản lý lớp học.
@@ -34,7 +83,7 @@ B. Thực hành các thí nghiệm khoa học +4SCI, +2LIF
 C. Viết lách, sáng tạo nội dung + 2 ART, +2 HUM, +3 JOU
 D. Tính toán, giải các bài toán, câu đố logic  +3MAT +2 CIT
 2. Môn học mà bạn tự tin là mình học tốt nhất ?
-A. Ngữ văn +4 HUM + +2 JOU 1 EDU 
+A. Ngữ văn +4 HUM + +2 JOU 1 EDU
 B. Toán +4 MAT +2 CIT
 C. Sinh +3 LIF, +3 HEA +1 ENV
 D. Sử, Địa +4 SOC, +3 HUM
@@ -54,7 +103,7 @@ B. Quản lý, điều phối nhóm hoặc dự án, đảm bảo mọi việc v
 C. Nghiên cứu, phân tích, khám phá, tìm hiểu kiến thức mới  (+4 SCI, +2 LIF, +1 ENV)
 D. Tham gia sản xuất, chế tạo sản phẩm, vận hành máy móc, kiểm tra chất lượng sản phẩm (+4 MAN, +2 TEC)
 
-6. Đâu là kiểu công việc mà bạn nghĩ mình có thể làm được tốt? 
+6. Đâu là kiểu công việc mà bạn nghĩ mình có thể làm được tốt?
 A. Công việc chăm sóc, hỗ trợ và theo dõi sức khỏe con người  (+4 HEA, +1 WEL, +1 SOC)
 B. Công việc thiết kế, sáng tạo sản phẩm, không gian hoặc nội dung  (+4 ARC, +2 ART)
 C. Công việc phát triển phần mềm, hệ thống hoặc ứng dụng   (+4 CIT, +2 ENG)
@@ -71,13 +120,13 @@ D. Chăm sóc thú cưng  (+4 VET, +1 LIF)
  C. Vấn đề về pháp luật, công lý và quyền con người trong xã hội (+4 LAW)
  D. Vấn đề về các kênh truyền thông, báo chí đưa thông tin xuyên tạc, sai lệch (+4 JOU)
 
-9. Bạn thích làm việc cùng đối tượng nào? 
+9. Bạn thích làm việc cùng đối tượng nào?
  A. Hàng hóa (+4 TRA, +2 MAN)
  B. Động vật (+4 VET, +2ARC)
- C. Máy móc (+4 TEC, +1 ENG) 
+ C. Máy móc (+4 TEC, +1 ENG)
  D. Dữ liệu – số liệu (+3 MAT, +3 CIT, +1SCI)
 
-10. Bạn thích nơi làm việc nào? 
+10. Bạn thích nơi làm việc nào?
  A. Văn phòng, công ty (+4 BUS)
  B. Bệnh viện (+4 HEA)
  C. Công trình xây dựng (+ 4ENG, +1 ARC)
@@ -89,7 +138,7 @@ B. Khi thông tin bạn tạo ra có ảnh hưởng đến nhiều người  (+4
 C. Khi tìm ra giải pháp cho một vấn đề phức tạp  (+4 SCI, +2 LIF)
 D. Khi bạn tạo ra được một hệ thống phần mềm hoạt động được  (+4 CIT, +1 TEC)
 
-12, Điều bạn sợ nhất khi làm việc? 
+12, Điều bạn sợ nhất khi làm việc?
  A. Công việc có thu nhập không ổn định, phụ thuộc vào thị trường hoặc khách hàng (+2 EDU +2SEC)
  B. Sự khô khan, thiếu tính sáng tạo (+4 ART, +1 HUM, + 1JOU)
  C. Không được tương tác, làm việc với con người (+4 SOC, +1 WEL)
@@ -150,19 +199,19 @@ D. Điềm tĩnh, có trách nhiệm, chịu được áp lực, thích chăm s�
 
 21, Nếu phải chọn làm một công việc, bạn sẽ chọn công việc nào dưới đây?
  A. Chỉnh sửa một đoạn video, hình ảnh  (+4 ART)
- B. Giải một bài toán khó yêu cầu nhiều bước (+4 MAT, +2 CIT) 
+ B. Giải một bài toán khó yêu cầu nhiều bước (+4 MAT, +2 CIT)
  C. Viết một đoạn văn hoặc bài luận (+4 HUM)
  D. Quan sát các hiện tượng tự nhiên và ghi lại những gì đã quan sát được (+4 SCI, +2 ENV, +2 LIF)
 
 22. Nếu được chọn thử nghiệm một dự án nhỏ của CLB ở trường thì bạn sẽ chọn dự án nào?
  A. Tham gia một dự án kinh doanh nhỏ (+4 BUS)
- B. Tham gia sáng tạo một ứng dụng trên điện thoại (+4 CIT) 
+ B. Tham gia sáng tạo một ứng dụng trên điện thoại (+4 CIT)
  C. Tham gia lắp ráp mô hình robot mini (+4 TEC, +2 ENG)
  D. Tham gia sáng tạo một video truyền thông quảng bá địa điểm du lịch ở địa phương (+4 JOU, +1 TOU)
 
-23, Bạn muốn tạo ra giá trị gì cho xã hội? 
- A. Giáo dục tri thức (+4 EDU) 
- B. Phát triển công nghệ (+4 CIT, +2 TEC) 
+23, Bạn muốn tạo ra giá trị gì cho xã hội?
+ A. Giáo dục tri thức (+4 EDU)
+ B. Phát triển công nghệ (+4 CIT, +2 TEC)
  C. Khám phá và phát triển khoa học mới (+4 SCI, +2 LIF)
  D. Hỗ trợ cộng đồng khó khăn (+4 SOC)
 
@@ -205,7 +254,6 @@ A. Tham gia sản xuất và kiểm tra chất lượng sản phẩm của một
 B. Tham gia một hoạt động nông nghiệp về trồng và chăm sóc cây cối, đánh bắt hoặc chăm sóc vật nuôi (+4AGR)
 C. Sắp xếp, tổ chức và điều phối giao thông (+4 TRA)
 D. Tham gia chứng kiến một phiên tòa xử lý một vụ kiện tụng (+4LAW)
-
 
 ## Level 2 (IT) — Notes
 - Quản lý bằng SQL trong pgAdmin, với 30 câu hỏi chuyên ngành IT (CS, DS, SE, UIUX, EMB, CY, AI, NET, IS).

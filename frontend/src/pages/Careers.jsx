@@ -43,13 +43,13 @@ export default function Careers() {
                   className="h-10 w-10 mr-4 object-contain"
                   data-alts={(m.code && m.code.trim()) ? `/assets/majors/${m.code.trim()}.png,/assets/majors/${m.code.trim()}.svg,/assets/majors/default.svg` : '/assets/majors/default.svg'}
                   data-idx="0"
-                  onError={(e)=>{
+                  onError={(e) => {
                     const el = e.currentTarget;
-                    const list = (el.getAttribute('data-alts')||'').split(',').filter(Boolean);
-                    const idx = parseInt(el.getAttribute('data-idx')||'0',10);
+                    const list = (el.getAttribute('data-alts') || '').split(',').filter(Boolean);
+                    const idx = parseInt(el.getAttribute('data-idx') || '0', 10);
                     if (idx < list.length) {
                       el.src = list[idx];
-                      el.setAttribute('data-idx', String(idx+1));
+                      el.setAttribute('data-idx', String(idx + 1));
                     } else {
                       el.onerror = null;
                       el.src = '/assets/majors/default.svg';

@@ -144,7 +144,7 @@ export default function CareerDetail() {
         setLoading(true);
         const r = await API.get(`/majors/code/${code}`);
         if (mounted) setMajor(r.data || null);
-      } catch (e) {
+      } catch (err) {
         if (mounted) setMajor(null);
       } finally {
         if (mounted) setLoading(false);
