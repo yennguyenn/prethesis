@@ -22,7 +22,7 @@ export default function Careers() {
     <div className="">
       <div className="bg-white py-12">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold mb-4" style={{ color: "#8b5cf6" }}> 23 ngành học của Việt Nam </h1>
+          <h1 className="text-4xl font-bold mb-4" style={{ color: "var(--brand-blue)" }}> 23 ngành học của Việt Nam </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             Tổng quan 23 ngành học hiện đang được đào tạo tại các trường đại học và cao đẳng ở Việt Nam
           </p>
@@ -57,8 +57,8 @@ export default function Careers() {
                   }}
                 />
                 <div>
-                  <h2 className="text-xl font-bold mb-1 transition" style={{ color: "#8b5cf6" }}>{m.name || m.code}</h2>
-                  <span className="text-xs inline-block px-2 py-0.5 rounded-full border mb-1" style={{ background: '#ede9fe', color: '#7c3aed', borderColor: '#c4b5fd' }}>{m.code}</span>
+                  <h2 className="text-xl font-bold mb-1 transition" style={{ color: "var(--brand-blue)" }}>{m.name || m.code}</h2>
+                  <span className="text-xs inline-block px-2 py-0.5 rounded-full border mb-1" style={{ background: 'var(--brand-purple-50)', color: 'var(--brand-purple)', borderColor: 'var(--brand-purple-100)' }}>{m.code}</span>
                   <p className="text-xs text-slate-500 leading-relaxed line-clamp-3">{m.description}</p>
                 </div>
               </div>

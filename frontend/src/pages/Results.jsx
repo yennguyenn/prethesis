@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API, { setAuthToken } from "../api";
 
-const GREEN_SHADES = ["#16a34a", "#4ade80", "#bbf7d0"];
-const BLUE_SHADES = ["#2563eb", "#60a5fa", "#bfdbfe"];
+const MAJOR_SHADES = ["#2F6FDB", "#7B5CD6", "#E24848"];
+const SUB_SHADES = ["#7B5CD6", "#2F6FDB", "#E24848"];
 
 function PieChart({ slices, colors, size = 120 }) {
   const cx = size / 2, cy = size / 2, r = size / 2 - 8;
@@ -96,7 +96,10 @@ export default function Results() {
     if (!token) { setLoading(false); return; }
     setAuthToken(token);
     API.get("/results/me")
-      .then((r) => setSubs(Array.isArray(r.data) ? r.data : []))
+      .then((r) => {
+        console.log('[frontend] /api/results/me response:', r.data);
+        setSubs(Array.isArray(r.data) ? r.data : []);
+      })
       .catch((e) => {
         if (e?.response?.status === 401) {
           setError("Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.");
@@ -121,17 +124,17 @@ export default function Results() {
   if (!token) return (
     <div className="max-w-4xl mx-auto py-10 px-4">
       <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm text-center">
-        <h2 className="text-xl font-semibold mb-3" style={{ color: "#8b5cf6" }}>Yêu cầu đăng nhập</h2>
+        <h2 className="text-xl font-semibold mb-3" style={{ color: "var(--brand-blue)" }}>Yêu cầu đăng nhập</h2>
         <p className="text-gray-600 mb-6">Bạn cần đăng nhập để xem kết quả đánh giá đã lưu.</p>
         <Link to="/login" className="inline-block px-6 py-3 rounded-lg text-white font-semibold shadow-md"
-          style={{ background: "#8b5cf6" }}>Đi tới trang đăng nhập</Link>
+          style={{ background: "var(--brand-blue)" }}>Đi tới trang đăng nhập</Link>
       </div>
     </div>
   );
 
   return (
     <div className="max-w-4xl mx-auto py-8 px-4 space-y-4">
-      <h1 className="text-2xl font-bold" style={{ color: "#8b5cf6" }}>Kết quả đánh giá của tôi</h1>
+      <h1 className="text-2xl font-bold" style={{ color: "var(--brand-blue)" }}>Kết quả đánh giá của tôi</h1>
 
       {loading && (
         <div className="flex items-center justify-center py-20">
@@ -148,10 +151,10 @@ export default function Results() {
 
       {!loading && !error && attempts.length === 0 && (
         <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm text-center">
-          <h2 className="text-lg font-semibold mb-2" style={{ color: "#8b5cf6" }}>Chưa có kết quả</h2>
+          <h2 className="text-lg font-semibold mb-2" style={{ color: "var(--brand-blue)" }}>Chưa có kết quả</h2>
           <p className="text-slate-500 mb-6 text-sm">Bạn chưa hoàn thành bài đánh giá nào khi đang đăng nhập.</p>
           <Link to="/quiz" className="inline-block px-6 py-3 rounded-lg text-white font-semibold shadow-md"
-            style={{ background: "#8b5cf6" }}>Làm bài đánh giá</Link>
+            style={{ background: "var(--brand-blue)" }}>Làm bài đánh giá</Link>
         </div>
       )}
 
@@ -179,7 +182,7 @@ export default function Results() {
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full text-white text-sm font-bold shrink-0"
-                  style={{ background: "#8b5cf6" }}>
+                  style={{ background: "var(--brand-blue)" }}>
                   {num}
                 </div>
                 <div>
@@ -193,7 +196,7 @@ export default function Results() {
                       return (
                         <>
                           <span className="text-slate-300">•</span>
-                          <span className="font-medium" style={{ color: "#8b5cf6" }}>
+                          <span className="font-medium" style={{ color: "var(--brand-blue)" }}>
                             Tỉ lệ: {displayPct}%
                           </span>
                           <span className="text-slate-300">•</span>
@@ -209,14 +212,14 @@ export default function Results() {
 
               <div className="flex items-center gap-2">
                 {isLatest && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: "#fef9c3", color: "#854d0e" }}>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold" style={{ background: "var(--brand-red-50)", color: "var(--brand-red-700)" }}>
                     Mới nhất
                   </span>
                 )}
                 <span
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors"
                   style={isExpanded
-                    ? { background: "#ede9fe", color: "#7c3aed", borderColor: "#c4b5fd" }
+                    ? { background: "var(--brand-purple-50)", color: "var(--brand-purple)", borderColor: "var(--brand-purple-100)" }
                     : { background: "#f8fafc", color: "#64748b", borderColor: "#e2e8f0" }}
                 >
                   Chi tiết
@@ -241,8 +244,8 @@ export default function Results() {
                       <ResultChart
                         title="Top 3 ngành gợi ý"
                         scores={majorScores}
-                        colors={GREEN_SHADES}
-                        accentColor="#16a34a"
+                          colors={MAJOR_SHADES}
+                          accentColor="var(--brand-blue)"
                         recommended={majorSub?.majorName}
                       />
                     )}
@@ -253,8 +256,8 @@ export default function Results() {
                       <ResultChart
                         title="Top 3 chuyên ngành gợi ý"
                         scores={subMajorScores}
-                        colors={BLUE_SHADES}
-                        accentColor="#2563eb"
+                          colors={SUB_SHADES}
+                          accentColor="var(--brand-purple)"
                         recommended={subMajorSub?.subMajorName}
                       />
                     )}

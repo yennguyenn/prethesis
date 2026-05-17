@@ -158,7 +158,7 @@ export default function CareerDetail() {
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto py-16 px-4">
-        <h1 className="text-2xl font-bold mb-4" style={{ color: "#8b5cf6" }}>Đang tải...</h1>
+        <h1 className="text-2xl font-bold mb-4" style={{ color: "var(--brand-blue)" }}>Đang tải...</h1>
       </div>
     );
   }
@@ -169,8 +169,8 @@ export default function CareerDetail() {
       <div className="min-h-screen py-12 px-4">
         <div className="max-w-4xl mx-auto bg-white/90 backdrop-blur rounded-3xl shadow-lg p-8 border border-slate-100">
           <div className="mb-8">
-            <h1 className="text-3xl font-extrabold mb-2" style={{ color: "#8b5cf6" }}>{major.name}</h1>
-            <div className="text-xs inline-block px-3 py-1 rounded-full border" style={{ background: '#ede9fe', color: '#7c3aed', borderColor: '#c4b5fd' }}>Mã: {major.code}</div>
+            <h1 className="text-3xl font-extrabold mb-2" style={{ color: "var(--brand-blue)" }}>{major.name}</h1>
+            <div className="text-xs inline-block px-3 py-1 rounded-full border" style={{ background: 'var(--brand-purple-50)', color: 'var(--brand-purple)', borderColor: 'var(--brand-purple-100)' }}>Mã: {major.code}</div>
           </div>
           <section className="space-y-3">
             <h2 className="text-lg font-semibold text-slate-800">Giới thiệu</h2>
@@ -184,7 +184,7 @@ export default function CareerDetail() {
                   <Link to={`/careers/${major.code}/${sm.code}`} key={sm.id} className="block p-4 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-white hover:shadow transition">
                     <div className="flex items-center justify-between mb-1">
                       <h3 className="text-sm font-semibold text-slate-800 group-hover:text-primary-700">{sm.name}</h3>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full border" style={{ background: '#ede9fe', color: '#7c3aed', borderColor: '#c4b5fd' }}>{sm.code}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full border" style={{ background: 'var(--brand-purple-50)', color: 'var(--brand-purple)', borderColor: 'var(--brand-purple-100)' }}>{sm.code}</span>
                     </div>
                     {sm.studyGroup && <div className="text-[11px] text-slate-600 mb-1">Khối học: {sm.studyGroup}</div>}
                     <p className="text-xs text-slate-600 leading-relaxed line-clamp-4 whitespace-pre-line">{sm.description}</p>
@@ -195,7 +195,7 @@ export default function CareerDetail() {
           )}
           <div className="mt-10 flex gap-4">
             <Link to="/careers" className="flex-1 text-center px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium transition">Danh sách ngành</Link>
-            <Link to="/quiz" className="flex-1 text-center px-5 py-3 rounded-xl text-white text-sm font-semibold shadow hover:shadow-md transition" style={{ background: '#8b5cf6' }}>Làm trắc nghiệm</Link>
+            <Link to="/quiz" className="flex-1 text-center px-5 py-3 rounded-xl text-white text-sm font-semibold shadow hover:shadow-md transition" style={{ background: 'var(--brand-blue)' }}>Làm trắc nghiệm</Link>
           </div>
         </div>
       </div>
@@ -243,7 +243,7 @@ export default function CareerDetail() {
         </div>
         <div className="mt-10 flex gap-4">
           <Link to="/careers" className="flex-1 text-center px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-sm font-medium transition">Danh sách chuyên ngành</Link>
-          <Link to="/quiz" className="flex-1 text-center px-5 py-3 rounded-xl text-white text-sm font-semibold shadow hover:shadow-md transition" style={{ background: '#8b5cf6' }}>Làm trắc nghiệm</Link>
+          <Link to="/quiz" className="flex-1 text-center px-5 py-3 rounded-xl text-white text-sm font-semibold shadow hover:shadow-md transition" style={{ background: 'var(--brand-blue)' }}>Làm trắc nghiệm</Link>
         </div>
       </div>
     </div>

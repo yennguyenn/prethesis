@@ -25,10 +25,12 @@ export const submitQuiz = async (req, res) => {
   try {
     const { answers } = req.body;
     const result = await submitQuizService(answers, req.user);
-    res.json({
+    const responsePayload = {
       message: 'Quiz submitted successfully',
       ...result
-    });
+    };
+    console.log('[backend] /api/quiz/submit response:', JSON.stringify(responsePayload, null, 2));
+    res.json(responsePayload);
   } catch (err) {
     if (err.invalidOptionIds) {
       err.status = 400;
@@ -48,10 +50,12 @@ export const submitMajorQuiz = async (req, res) => {
   try {
     const { answers } = req.body;
     const result = await submitMajorQuizService(answers, req.user);
-    res.json({
+    const responsePayload = {
       message: 'Major quiz submitted successfully',
       ...result
-    });
+    };
+    console.log('[backend] /api/quiz/major/submit response:', JSON.stringify(responsePayload, null, 2));
+    res.json(responsePayload);
   } catch (err) {
     if (err.invalidOptionIds) {
       err.status = 400;

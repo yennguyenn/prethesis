@@ -109,6 +109,7 @@ router.get("/me", authMiddleware, async (req, res) => {
       totalPoints: s.totalPoints,
       details: s.details,
     }));
+    console.log(`[backend] /api/results/me response (userId=${req.user?.id ?? 'unknown'}):`, JSON.stringify(payload, null, 2));
     res.json(payload);
   } catch (err) {
     console.error(err);

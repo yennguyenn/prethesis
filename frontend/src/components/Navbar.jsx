@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const NAV_ITEMS = [
@@ -43,29 +43,29 @@ export default function Navbar({ activePage = 'home' }) {
 
   return (
     <aside
-      className="flex flex-col flex-shrink-0 shadow-2xl transition-all duration-300"
-      style={{ width: collapsed ? 64 : 240, background: '#f1f5f9' }}
+      className="flex flex-col flex-shrink-0 shadow-lg transition-all duration-300 border-r"
+      style={{ width: collapsed ? 64 : 240, background: '#475569', borderColor: '#334155' }}
     >
       {/* Brand + collapse toggle */}
       <div
-        className="flex items-center border-b border-slate-200 flex-shrink-0"
-        style={{ padding: collapsed ? '18px 14px' : '18px 16px', gap: collapsed ? 0 : 10, justifyContent: collapsed ? 'center' : 'space-between' }}
+        className="flex items-center border-b flex-shrink-0"
+        style={{ padding: collapsed ? '18px 14px' : '18px 16px', gap: collapsed ? 0 : 10, justifyContent: collapsed ? 'center' : 'space-between', borderColor: '#334155' }}
       >
         {!collapsed && (
           <Link to="/" className="flex items-center gap-2 min-w-0">
-            <div
-              className="flex-shrink-0 flex items-center justify-center rounded-xl text-slate-700 font-black text-sm"
-              style={{ width: 34, height: 34, background: '#8b5cf6' }}
-            >
-              S
-            </div>
-            <span className="text-slate-800 font-bold text-sm tracking-wide truncate">Support Career</span>
+            <img
+              src="/assets/icon.jpg"
+              alt="Support Career logo"
+              className="flex-shrink-0 rounded-xl"
+              style={{ width: 34, height: 34, objectFit: 'cover' }}
+            />
+            <span className="font-bold text-sm tracking-wide truncate" style={{ color: '#ffffff' }}>Support Career</span>
           </Link>
         )}
         <button
           onClick={() => setCollapsed(c => !c)}
-          className="flex-shrink-0 flex items-center justify-center rounded-lg transition-colors hover:bg-white/10"
-          style={{ width: 32, height: 32, color: 'rgba(0,0,0,0.4)', border: 'none', background: 'transparent', cursor: 'pointer' }}
+          className="flex-shrink-0 flex items-center justify-center rounded-lg transition-colors hover:bg-white/20"
+          style={{ width: 32, height: 32, color: '#e2e8f0', border: 'none', background: 'transparent', cursor: 'pointer' }}
           aria-label="Toggle sidebar"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 18, height: 18 }}>
@@ -75,7 +75,7 @@ export default function Navbar({ activePage = 'home' }) {
       </div>
 
       {/* Nav links */}
-      <nav className="flex-1 py-4 overflow-y-auto overflow-x-hidden">
+      <nav className="flex-1 py-4 overflow-y-auto overflow-x-hidden custom-scrollbar">
         <div className="flex flex-col gap-1 px-2">
           {items.map(item => {
             const active = activePage === item.key;
@@ -84,13 +84,13 @@ export default function Navbar({ activePage = 'home' }) {
                 key={item.key}
                 to={item.to}
                 title={collapsed ? item.label : undefined}
-                className="flex items-center rounded-xl transition-all"
+                className="flex items-center rounded-xl transition-all hover:bg-white/10"
                 style={{
                   gap: collapsed ? 0 : 10,
                   padding: collapsed ? '10px 0' : '10px 12px',
                   justifyContent: collapsed ? 'center' : 'flex-start',
-                  background: active ? 'rgba(139,92,246,0.12)' : 'transparent',
-                  color: active ? '#8b5cf6' : '#475569',
+                  background: active ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
+                  color: active ? '#ffffff' : '#cbd5e1',
                   fontWeight: active ? 600 : 400,
                   fontSize: 14,
                   textDecoration: 'none',
@@ -105,7 +105,7 @@ export default function Navbar({ activePage = 'home' }) {
       </nav>
 
       {/* Bottom: login/logout */}
-      <div className="border-t border-slate-200 p-2 flex-shrink-0">
+      <div className="border-t p-2 flex-shrink-0" style={{ borderColor: '#334155' }}>
         {token ? (
           <button
             onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = '/'; }}
@@ -114,7 +114,7 @@ export default function Navbar({ activePage = 'home' }) {
               gap: collapsed ? 0 : 10,
               padding: collapsed ? '10px 0' : '10px 12px',
               justifyContent: collapsed ? 'center' : 'flex-start',
-              color: '#64748b',
+              color: '#cbd5e1',
               fontSize: 14,
               border: 'none',
               background: 'transparent',
@@ -133,7 +133,7 @@ export default function Navbar({ activePage = 'home' }) {
               gap: collapsed ? 0 : 10,
               padding: collapsed ? '10px 0' : '10px 12px',
               justifyContent: collapsed ? 'center' : 'flex-start',
-              color: '#64748b',
+              color: '#cbd5e1',
               fontSize: 14,
               textDecoration: 'none',
             }}

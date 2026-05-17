@@ -2,6 +2,33 @@ import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import API, { setAuthToken } from "../api";
 // Navbar & Footer come from global Layout
+const MajorAvatar = ({ code, name, className }) => {
+  const safeCode = code ? String(code).trim() : '';
+  const src = safeCode ? `/assets/majors/${safeCode}.png` : '/assets/majors/default.svg';
+  const alts = safeCode ? `/assets/majors/${safeCode}.png,/assets/majors/${safeCode}.svg,/assets/majors/default.svg` : '/assets/majors/default.svg';
+  return (
+    <img
+      src={src}
+      alt={name}
+      loading="lazy"
+      className={className}
+      data-alts={alts}
+      data-idx="0"
+      onError={(e) => {
+        const el = e.currentTarget;
+        const list = (el.getAttribute('data-alts') || '').split(',').filter(Boolean);
+        const idx = parseInt(el.getAttribute('data-idx') || '0', 10);
+        if (idx < list.length) {
+          el.src = list[idx];
+          el.setAttribute('data-idx', String(idx + 1));
+        } else {
+          el.onerror = null;
+          el.src = '/assets/majors/default.svg';
+        }
+      }}
+    />
+  );
+};
 
 export default function Quiz() {
   // Mapping sub-major code -> full name
@@ -137,6 +164,7 @@ export default function Quiz() {
       if (level === 1) {
         const r = await API.post('/quiz/major/submit', payload);
         const data = r.data || {};
+        console.log('[frontend] /api/quiz/major/submit response:', data);
         setMajorResult(data);
 
         const scores = Array.isArray(data.allScores) ? data.allScores.slice().sort((a,b)=>b.score-a.score) : [];
@@ -151,6 +179,7 @@ export default function Quiz() {
         }
       } else {
         const r = await API.post('/quiz/submit', payload);
+        console.log('[frontend] /api/quiz/submit response:', r.data);
         setSubResult(r.data);
         // If user is logged in, redirect to consolidated results page for consistency
         const token = localStorage.getItem('token');
@@ -182,63 +211,126 @@ export default function Quiz() {
   // Level 1 finished (no auto-branch to Level 2)
   if (majorResult && level === 1 && !majorResult.nextLevel) {
     const scores = Array.isArray(majorResult.allScores) ? majorResult.allScores.slice().sort((a, b) => b.score - a.score) : [];
-    const top3 = scores.slice(0, 3);
-    const majorsByCode = majors.reduce((acc, m) => { if (m.code) acc[m.code] = m; return acc; }, {});
+    const topScore = majorResult.topScore || scores[0]?.score || 1;
+    const topRanks = scores.slice(0, 3);
+    const restRanks = scores.slice(3);
+    const getInitials = (label) => {
+      if (!label) return "?";
+      const parts = String(label).trim().split(/\s+/).filter(Boolean);
+      return parts.slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+    };
     return (
-      <div className="min-h-screen bg-slate-50 py-10 px-4">
-        <div className="max-w-3xl mx-auto bg-white/90 backdrop-blur-sm border border-slate-100 rounded-3xl shadow-xl p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-extrabold" style={{ color: "#8b5cf6" }}>Kết quả định hướng</h2>
-            <p className="mt-2 text-slate-600 text-sm">Ngành phù hợp nhất dựa trên 30 câu hỏi.</p>
-          </div>
-          {/* Top 3 majors recommendation */}
-          <div className="grid gap-4 mb-6">
-            {top3.map((m, i) => {
-              const meta = majorsByCode[m.code] || {};
-              const name = m.name || meta.name || m.code;
-              const desc = m.description || meta.description || '';
-              const level2Ready = supportsLevel2(m.code);
-              return (
-                <div key={m.code || i} className="bg-white border border-slate-200 rounded-2xl p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <div className="text-xs text-slate-500 mb-1">Gợi ý #{i + 1}</div>
-                      <h3 className="text-lg font-semibold mb-1" style={{ color: "#8b5cf6" }}>{name}</h3>
-                      <p className="text-sm text-slate-700 mb-2 leading-relaxed line-clamp-3">{desc}</p>
-                      <div className="text-xs font-semibold" style={{ color: "#8b5cf6" }}>Tỉ lệ phù hợp: {m.percentage}%</div>
-                      <div className="text-[10px] text-slate-500">Điểm SAW: {m.score}</div>
-                    </div>
-                    <button
-                      onClick={() => goToLevel2(m.code)}
-                      disabled={!level2Ready}
-                      className="px-5 py-2.5 rounded-xl text-white font-semibold text-sm shadow hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition shrink-0"
-                      style={{ background: "#8b5cf6" }}
-                    >
-                      {level2Ready ? 'Làm Mức 2' : 'Chưa hỗ trợ Mức 2'}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-          {majorResult.allScores?.length > 1 && (
-            <div className="space-y-3 mb-8">
-              {majorResult.allScores.map((m, i) => (
-                <div key={i}>
-                  <div className="flex justify-between text-[10px] mb-1">
-                    <span className="font-medium text-slate-700 truncate" title={m.name}>{m.name}</span>
-                    <span className="text-slate-500">{m.percentage}% ({m.score})</span>
-                  </div>
-                  <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-primary-700" style={{ width: `${(m.score / (majorResult.topScore || 1)) * 100}%` }}></div>
-                  </div>
-                </div>
-              ))}
+      <div className="rcm-shell relative overflow-hidden">
+        <div className="rcm-orb rcm-orb--one" />
+        <div className="rcm-orb rcm-orb--two" />
+        <div className="relative max-w-5xl mx-auto px-6 py-12 md:py-16">
+          <div className="rcm-card p-7 md:p-10 rcm-reveal">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+              <div>
+                <div className="rcm-eyebrow">Kết quả định hướng</div>
+                <h2 className="rcm-title">Ngành phù hợp nhất</h2>
+                <p className="rcm-subtitle">Ngành phù hợp nhất dựa trên 30 câu hỏi.</p>
+              </div>
+              <div className="rcm-pill">Mức 1</div>
             </div>
-          )}
-          <div className="flex gap-4">
-            <button onClick={() => { setMajorResult(null); loadQuestions(1); }} className="flex-1 px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium transition">Làm lại</button>
-            <button onClick={() => navigate('/')} className="flex-1 px-5 py-3 rounded-xl text-white font-semibold shadow transition" style={{ background: "#3b82f6" }}>Về trang chủ</button>
+
+            {topRanks.length > 0 && (
+              <div className="rcm-rank-section rcm-reveal" style={{ animationDelay: "0.04s" }}>
+                <div className="rcm-panel-title">Top 3 gợi ý ngành</div>
+                <div className="rcm-rank-grid">
+                  {topRanks.map((m, i) => {
+                    const name = m.name || m.code || `Hạng ${i + 1}`;
+                    const percentage = m.percentage ?? 0;
+                    const score = m.score ?? 0;
+                    const level2Ready = supportsLevel2(m.code);
+                    const medal = i === 0 ? "Top 1" : i === 1 ? "Top 2" : "Top 3";
+                    return (
+                      <div key={m.code || name || i} className={`rcm-rank-card rcm-rank-card--${i + 1}`}>
+                        <div className="rcm-rank-card__medal">{medal}</div>
+                        <MajorAvatar code={m.code} name={name} className="rcm-rank-card__avatar bg-white object-contain p-2" />
+                        <div className="rcm-rank-card__name" title={name}>{name}</div>
+                        {m.code && <div className="rcm-rank-card__code">{m.code}</div>}
+                        <div className="rcm-rank-card__pill">{percentage}% phù hợp</div>
+                        <div className="rcm-rank-card__stats">
+                          <div>
+                            <div className="rcm-rank-stat-label">Điểm</div>
+                            <div className="rcm-rank-stat-value">{score}</div>
+                          </div>
+                          <div>
+                            <div className="rcm-rank-stat-label">Tỉ lệ</div>
+                            <div className="rcm-rank-stat-value">{percentage}%</div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => level2Ready && goToLevel2(m.code)}
+                          disabled={!level2Ready}
+                          className={`rcm-btn ${level2Ready ? "rcm-btn--accent" : "rcm-btn--ghost"} rcm-rank-card__action disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                          {level2Ready ? "Làm Mức 2" : "Chưa hỗ trợ mức 2"}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {restRanks.length > 0 && (
+              <details className="rcm-details rcm-reveal" style={{ animationDelay: "0.16s" }}>
+                <summary className="rcm-details__summary">Xem chi tiết bảng xếp hạng</summary>
+                <div className="rcm-panel mt-4">
+                  <div className="rcm-panel-title">Bảng xếp hạng ngành</div>
+                  <div className="rcm-rank-list">
+                    <div className="rcm-rank-list__head">
+                      <span>Ngành</span>
+                      <span>Tỉ lệ</span>
+                      <span>Điểm SAW</span>
+                    </div>
+                    <div className="space-y-3 max-h-72 overflow-auto custom-scrollbar pr-2">
+                      {restRanks.map((m, i) => {
+                        const name = m.name || m.code || `Hạng ${i + 4}`;
+                        const percentage = m.percentage ?? 0;
+                        const score = m.score ?? 0;
+                        return (
+                          <div key={m.code || name || i} className="rcm-rank-list__row">
+                            <div className="rcm-rank-list__left">
+                              <div className="rcm-rank-list__badge">{i + 4}</div>
+                              <MajorAvatar code={m.code} name={name} className="rcm-rank-list__avatar bg-white object-contain p-1" />
+                              <div className="rcm-rank-list__meta">
+                                <div className="rcm-rank-list__name" title={name}>{name}</div>
+                                {m.code && <div className="rcm-rank-list__code">{m.code}</div>}
+                              </div>
+                            </div>
+                            <div className="rcm-rank-list__metrics">
+                              <div className="rcm-rank-list__pill"><span className="rcm-rank-list__label">Tỉ lệ</span>{percentage}%</div>
+                              <div className="rcm-rank-list__score"><span className="rcm-rank-list__label">Điểm</span>{score}</div>
+                            </div>
+                            <div className="rcm-rank-list__track">
+                              <div className="rcm-rank-list__bar" style={{ width: `${(score / (topScore || 1)) * 100}%` }}></div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </details>
+            )}
+
+            <div className="mt-8 grid sm:grid-cols-2 gap-4 rcm-reveal" style={{ animationDelay: "0.2s" }}>
+              <button
+                onClick={() => { setMajorResult(null); loadQuestions(1); }}
+                className="rcm-btn rcm-btn--ghost"
+              >
+                Làm lại
+              </button>
+              <button
+                onClick={() => navigate('/')}
+                className="rcm-btn rcm-btn--primary"
+              >
+                Về trang chủ
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -247,61 +339,97 @@ export default function Quiz() {
 
   // Level 2 finished (subResult)
   if (subResult) {
+    const majorLabel = MAJOR_NORMALIZE[subResult.recommendedMajor?.code]
+      || MAJOR_NORMALIZE[subResult.recommendedMajor?.name]
+      || subResult.recommendedMajor?.name
+      || "Chưa xác định";
+    const subLabel = SUBMAJOR_LABELS[subResult.recommendedSubmajor?.code]
+      || subResult.recommendedSubmajor?.name
+      || subResult.recommended?.name
+      || "Chưa xác định";
+    const subPct = subResult.recommendedSubmajor?.percentage || subResult.recommended?.percentage || 0;
+    const subScore = subResult.topScore || 0;
+    const topSubScores = Array.isArray(subResult.allScores) ? subResult.allScores.slice(0, 3) : [];
     return (
-      <div className="min-h-screen bg-slate-50 py-10 px-4">
-        <div className="max-w-3xl mx-auto bg-white/90 backdrop-blur-sm border border-slate-100 rounded-3xl shadow-xl p-8">
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-extrabold" style={{ color: "#8b5cf6" }}>Kết quả chuyên ngành {selectedMajor || ''}</h2>
-            <p className="mt-2 text-slate-600 text-sm">Chuyên ngành phù hợp nhất dựa trên bài đánh giá Mức 2.</p>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 mb-6">
-            <div className="grid gap-4">
-              <div className="rounded-xl bg-white/80 border border-primary-300 p-4">
-                <p className="text-xs uppercase tracking-wide text-primary-700 font-medium mb-1">Ngành gợi ý</p>
-                <h3 className="text-lg font-semibold mb-1" style={{ color: "#8b5cf6" }}>{MAJOR_NORMALIZE[subResult.recommendedMajor?.code] || MAJOR_NORMALIZE[subResult.recommendedMajor?.name] || subResult.recommendedMajor?.name}</h3>
-                <p className="text-xs text-slate-700 mb-2 leading-relaxed">{subResult.recommendedMajor?.description}</p>
+      <div className="rcm-shell relative overflow-hidden">
+        <div className="rcm-orb rcm-orb--one" />
+        <div className="rcm-orb rcm-orb--two" />
+        <div className="relative max-w-5xl mx-auto px-6 py-12 md:py-16">
+          <div className="rcm-card p-7 md:p-10 rcm-reveal">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
+              <div>
+                <div className="rcm-eyebrow">Kết quả chuyên ngành</div>
+                <h2 className="rcm-title">Chuyên ngành phù hợp nhất</h2>
+                <p className="rcm-subtitle">Dựa trên bài đánh giá Mức 2 cho {selectedMajor || "ngành"}.</p>
               </div>
-              <div className="rounded-xl bg-white/80 border border-primary-300 p-4">
-                <p className="text-xs uppercase tracking-wide text-primary-700 font-medium mb-1">Chuyên ngành gợi ý</p>
-                <h3 className="text-lg font-semibold mb-1" style={{ color: "#8b5cf6" }}>
-                  <Link to={`/careers/${subResult.recommendedSubmajor?.code}`} className="hover:underline decoration-primary-500 underline-offset-4">
-                    {SUBMAJOR_LABELS[subResult.recommendedSubmajor?.code] || subResult.recommendedSubmajor?.name || subResult.recommended?.name}
+              <div className="rcm-pill">Mức 2</div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-5 mb-8">
+              <div className="rcm-feature rcm-reveal" style={{ animationDelay: "0.05s" }}>
+                <div className="rcm-tag">Ngành gợi ý</div>
+                <h3 className="rcm-headline">{majorLabel}</h3>
+                <p className="rcm-desc line-clamp-4">{subResult.recommendedMajor?.description || "Chưa có mô tả ngành."}</p>
+              </div>
+              <div className="rcm-feature rcm-feature--alt rcm-reveal" style={{ animationDelay: "0.1s" }}>
+                <div className="rcm-tag">Chuyên ngành gợi ý</div>
+                <h3 className="rcm-headline">
+                  <Link to={`/careers/${subResult.recommendedSubmajor?.code}`} className="hover:underline">
+                    {subLabel}
                   </Link>
                 </h3>
-                <p className="text-xs text-slate-700 mb-2 leading-relaxed">{subResult.recommendedSubmajor?.description || subResult.recommended?.description}</p>
+                <p className="rcm-desc line-clamp-4">{subResult.recommendedSubmajor?.description || subResult.recommended?.description || "Chưa có mô tả chuyên ngành."}</p>
                 {subResult.recommendedSubmajor?.studyGroup && (
-                  <div className="mt-1 text-[11px] text-slate-600"><span className="font-semibold text-primary-700">Khối học:</span> {subResult.recommendedSubmajor.studyGroup}</div>
+                  <div className="rcm-metric mt-3">Khối học: {subResult.recommendedSubmajor.studyGroup}</div>
                 )}
-                <div className="mt-2 flex items-center gap-4">
-                  <div className="text-xs font-semibold" style={{ color: "#8b5cf6" }}>Tỉ lệ phù hợp: {subResult.recommendedSubmajor?.percentage || subResult.recommended?.percentage}%</div>
-                  <div className="text-[10px] text-slate-500">Điểm SAW: {subResult.topScore}</div>
+                <div className="mt-3 flex items-center justify-between gap-3">
+                  <div className="rcm-score">
+                    <div className="rcm-score-value">{subPct}%</div>
+                    <div className="rcm-score-label">Phù hợp</div>
+                  </div>
+                  <div className="rcm-metric">Điểm SAW: {subScore}</div>
                 </div>
               </div>
             </div>
-          </div>
-          {subResult.allScores?.length > 0 && (
-            <div className="space-y-3 mb-8">
-              {subResult.allScores.slice(0, 3).map((m, i) => {
-                const displayName = SUBMAJOR_LABELS[m.code] || SUBMAJOR_LABELS[m.name] || m.name;
-                return (
-                  <div key={i}>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span className="font-medium text-slate-700 truncate" title={displayName}>
-                        <Link to={`/careers/${m.code}`} className="hover:text-primary-700 hover:underline decoration-primary-500 underline-offset-4">{displayName}</Link>
-                      </span>
-                      <span className="text-slate-500 text-[10px]">{m.percentage}% ({m.score})</span>
-                    </div>
-                    <div className="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
-                      <div className="h-full bg-primary-700" style={{ width: `${(m.score / (subResult.topScore || 1)) * 100}%` }}></div>
-                    </div>
-                  </div>
-                );
-              })}
+
+            {topSubScores.length > 0 && (
+              <div className="rcm-panel rcm-reveal" style={{ animationDelay: "0.16s" }}>
+                <div className="rcm-panel-title">Top 3 chuyên ngành nổi bật</div>
+                <div className="space-y-3">
+                  {topSubScores.map((m, i) => {
+                    const displayName = SUBMAJOR_LABELS[m.code] || SUBMAJOR_LABELS[m.name] || m.name;
+                    return (
+                      <div key={i}>
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="font-medium text-slate-700 truncate" title={displayName}>
+                            <Link to={`/careers/${m.code}`} className="hover:underline">{displayName}</Link>
+                          </span>
+                          <span className="text-slate-500 text-[10px]">{m.percentage}% ({m.score})</span>
+                        </div>
+                        <div className="h-2 w-full bg-slate-200/70 rounded-full overflow-hidden">
+                          <div className="rcm-progress" style={{ width: `${(m.score / (subResult.topScore || 1)) * 100}%` }}></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-8 grid sm:grid-cols-2 gap-4 rcm-reveal" style={{ animationDelay: "0.2s" }}>
+              <button
+                onClick={() => { setSubResult(null); setMajorResult(null); setLevel(1); loadQuestions(1); }}
+                className="rcm-btn rcm-btn--ghost"
+              >
+                Làm lại
+              </button>
+              <button
+                onClick={() => navigate('/')}
+                className="rcm-btn rcm-btn--primary"
+              >
+                Về trang chủ
+              </button>
             </div>
-          )}
-          <div className="flex gap-4">
-            <button onClick={() => { setSubResult(null); setMajorResult(null); setLevel(1); loadQuestions(1); }} className="flex-1 px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-medium transition">Làm lại</button>
-            <button onClick={() => navigate('/')} className="flex-1 px-5 py-3 rounded-xl text-white font-semibold shadow transition" style={{ background: "#3b82f6" }}>Về trang chủ</button>
           </div>
         </div>
       </div>
@@ -318,13 +446,13 @@ export default function Quiz() {
     <div className="min-h-screen px-4 py-10 transition-colors">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
         {level === 2 && majorResult && (
-          <aside className="lg:w-80 w-full backdrop-blur-xl bg-white/70 border border-white/40 shadow-xl rounded-3xl p-6 h-fit sticky top-8">
-            <h3 className="text-sm font-semibold mb-3" style={{ color: "#8b5cf6" }}>Kết quả Mức 1</h3>
-            <div style={{ borderRadius: 12, background: 'linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)', padding: 16, border: '1.5px solid #c4b5fd' }}>
-              <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#7c3aed', fontWeight: 600, marginBottom: 4 }}>Ngành nổi bật</p>
-              <p style={{ fontWeight: 700, color: '#4c1d95', marginBottom: 4, fontSize: 13, lineHeight: 1.4 }}>{featuredMajor?.name || 'Chưa xác định'}</p>
+          <aside className="lg:w-80 w-full bg-white border border-slate-200 shadow-lg rounded-3xl p-6 h-fit sticky top-8">
+            <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--brand-blue)" }}>Kết quả Mức 1</h3>
+            <div style={{ borderRadius: 12, background: 'var(--brand-purple-50)', padding: 16, border: '1.5px solid var(--brand-purple-100)' }}>
+              <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--brand-purple)', fontWeight: 600, marginBottom: 4 }}>Ngành nổi bật</p>
+              <p style={{ fontWeight: 700, color: 'var(--ink-900)', marginBottom: 4, fontSize: 13, lineHeight: 1.4 }}>{featuredMajor?.name || 'Chưa xác định'}</p>
               <p style={{ fontSize: 11, color: '#475569', display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{featuredMajor?.description || 'Điểm các ngành đang khá sát nhau, vui lòng xem bảng xếp hạng phía dưới để so sánh.'}</p>
-              <div style={{ marginTop: 8, fontSize: 11, color: '#7c3aed', fontWeight: 700 }}>Tỉ lệ: {featuredMajor?.percentage}% | Điểm: {featuredMajorScore}</div>
+              <div style={{ marginTop: 8, fontSize: 11, color: 'var(--brand-purple)', fontWeight: 700 }}>Tỉ lệ: {featuredMajor?.percentage}% | Điểm: {featuredMajorScore}</div>
             </div>
             <details className="text-xs mt-5">
               <summary className="cursor-pointer select-none mb-2 text-slate-600 font-medium">Điểm của tất cả ngành</summary>
@@ -336,7 +464,7 @@ export default function Quiz() {
                       <span className="text-slate-500">{m.percentage}%</span>
                     </div>
                     <div className="w-full h-1.5 bg-slate-200 rounded">
-                      <div className="h-1.5 rounded" style={{ width: `${(m.score / (majorResult.topScore || 1)) * 100}%`, background: 'linear-gradient(90deg,#8b5cf6,#6d28d9)' }}></div>
+                      <div className="h-1.5 rounded" style={{ width: `${(m.score / (majorResult.topScore || 1)) * 100}%`, background: 'var(--brand-blue)' }}></div>
                     </div>
                   </div>
                 ))}
@@ -346,39 +474,8 @@ export default function Quiz() {
           </aside>
         )}
 
-        <div className="flex-1 space-y-6">
-          {/* Header */}
-          <div className="relative overflow-hidden rounded-3xl bg-white shadow-xl border border-slate-100 p-6 lg:p-8">
-            <div className="relative flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-              <div>
-                <h2 className="text-3xl font-extrabold tracking-tight" style={{ color: "#8b5cf6" }}>
-                  Định hướng ngành
-                </h2>
-                <p className="mt-2 text-sm text-slate-600 max-w-prose">
-                  Trả lời 30 câu hỏi để xác định nhóm ngành phù hợp.
-                </p>
-              </div>
-              <div className="flex items-center gap-4">
-                {isAdmin && level === 1 && (
-                  <button
-                    onClick={fillDemoAnswers}
-                    title="[Admin] Tự động chọn đáp án kịch bản CIT điểm cao nhất"
-                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 transition"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    Demo CIT
-                  </button>
-                )}
-                <button onClick={() => navigate('/')} className="inline-flex items-center justify-center px-3 py-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-                  <span className="sr-only">Đóng</span>
-                </button>
-              </div>
-            </div>
-            <div className="mt-6 flex items-center gap-3 text-xs font-medium text-slate-600">
-              <div className={`px-3 py-1 rounded-full border text-white border-transparent shadow-sm`} style={{ background: '#8b5cf6' }}>Bài đánh giá</div>
-            </div>
-          </div>
+        <div className="flex-1 w-full max-w-3xl mx-auto space-y-6">
+
 
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700 flex items-start gap-2">
@@ -390,7 +487,7 @@ export default function Quiz() {
           {currentQuestion && (
             <div key={currentQuestion.id} className="rounded-3xl bg-white/80 backdrop-blur-sm border border-slate-100 shadow-lg p-6 md:p-8 fade-in dark:bg-slate-800/70 dark:border-slate-700">
               <div className="flex items-start justify-between gap-4 mb-6">
-                <h3 className="text-xl md:text-2xl font-semibold leading-relaxed" style={{ color: "#8b5cf6" }}>{currentQuestion.text}</h3>
+                <h3 className="text-xl md:text-2xl font-semibold leading-relaxed" style={{ color: "var(--brand-blue)" }}>{currentQuestion.text}</h3>
                 {/* Admin actions removed */}
               </div>
               {currentQuestion.options && currentQuestion.options.length > 0 ? (
@@ -400,8 +497,8 @@ export default function Quiz() {
                     return (
                       <label
                         key={opt.id}
-                        className={`group relative flex items-center gap-4 rounded-2xl border px-5 py-4 cursor-pointer transition-all ${active ? 'shadow-md' : 'border-slate-200 hover:border-[#c4b5fd] hover:bg-[#f5f3ff]'}`}
-                        style={active ? { borderColor: '#8b5cf6', background: 'rgba(139,92,246,0.08)', boxShadow: '0 0 0 2px rgba(139,92,246,0.25)' } : {}}
+                        className={`group relative flex items-center gap-4 rounded-2xl border px-5 py-4 cursor-pointer transition-all ${active ? 'shadow-md' : 'border-slate-200 hover:border-[#c6d8ff] hover:bg-[#eef4ff]'}`}
+                        style={active ? { borderColor: 'var(--brand-purple)', background: 'rgba(100,116,139,0.08)', boxShadow: '0 0 0 2px rgba(100,116,139,0.2)' } : {}}
                       >
                         <input
                           type="radio"
@@ -411,12 +508,12 @@ export default function Quiz() {
                           className="sr-only"
                         />
                         <span
-                          className={`flex h-6 w-6 items-center justify-center rounded-full border text-xs font-semibold ${active ? 'text-white' : 'bg-white text-slate-500 border-slate-300 group-hover:border-[#8b5cf6] group-hover:text-[#8b5cf6]'}`}
-                          style={active ? { background: '#8b5cf6', borderColor: '#8b5cf6' } : {}}
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border text-xs font-semibold ${active ? 'text-white' : 'bg-white text-slate-500 border-slate-300 group-hover:border-[#2f6fdb] group-hover:text-[#2f6fdb]'}`}
+                          style={active ? { background: 'var(--brand-purple)', borderColor: 'var(--brand-purple)' } : {}}
                         >{String.fromCharCode(65 + idx)}</span>
-                        <span className={`text-sm md:text-base font-medium ${active ? '' : 'text-slate-700'}`} style={active ? { color: '#6d28d9' } : {}}>{opt.text}</span>
+                        <span className={`text-sm md:text-base font-medium ${active ? '' : 'text-slate-700'}`} style={active ? { color: 'var(--brand-purple-700)' } : {}}>{opt.text}</span>
                         {active && (
-                          <span className="absolute right-5 top-1/2 -translate-y-1/2" style={{ color: '#8b5cf6' }}>
+                          <span className="absolute right-5 top-1/2 -translate-y-1/2" style={{ color: 'var(--brand-purple)' }}>
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                           </span>
                         )}
@@ -428,8 +525,6 @@ export default function Quiz() {
                 <div className="mt-2">
                   <textarea
                     value={answers[currentQuestion.id] || ''}
-                    onChange={e => setAnswers(prev => ({ ...prev, [currentQuestion.id]: e.target.value }))}
-                    placeholder="Nhập câu trả lời của bạn..."
                     rows={4}
                     className="w-full rounded-2xl border border-slate-200 px-5 py-4 text-sm text-slate-700 leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-400 resize-none transition dark:bg-slate-700/80 dark:border-slate-600 dark:text-slate-200 dark:placeholder-slate-400"
                   />
@@ -442,7 +537,7 @@ export default function Quiz() {
             </div>
           )}
 
-          <div className="flex items-center justify-between mt-2">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <button
               onClick={prev}
               disabled={currentIndex === 0}
@@ -457,7 +552,7 @@ export default function Quiz() {
                 onClick={next}
                 disabled={!isAnswered}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white font-semibold shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed transition focus:outline-none"
-                style={{ background: "#8b5cf6" }}
+                style={{ background: "var(--brand-blue)" }}
               >
                 Tiếp
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
@@ -467,7 +562,7 @@ export default function Quiz() {
                 onClick={submit}
                 disabled={submitting || Object.keys(answers).length < questions.length}
                 className="inline-flex items-center gap-2 px-7 py-3 rounded-xl text-white font-semibold shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed transition focus:outline-none"
-                style={{ background: "#8b5cf6" }}
+                style={{ background: "var(--brand-blue)" }}
               >
                 {submitting && <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>}
                 {submitting ? 'Đang gửi...' : 'Hoàn thành bài Test'}

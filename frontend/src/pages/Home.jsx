@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import API from "../api";
 
 /* ── Stat card ── */
-function StatCard({ value, label, color, icon }) {
+function StatCard({ value, label, color }) {
   return (
     <div
       className="rounded-2xl p-6 text-white flex items-center justify-between"
@@ -13,22 +13,15 @@ function StatCard({ value, label, color, icon }) {
         <div className="text-4xl font-extrabold leading-none mb-1">{value}</div>
         <div style={{ fontSize: 13, opacity: 0.85 }}>{label}</div>
       </div>
-      <div style={{ opacity: 0.75, fontSize: 36 }}>{icon}</div>
     </div>
   );
 }
 
 /* ── Step card ── */
-function StepCard({ step, emoji, title, desc }) {
+function StepCard({ step, title, desc }) {
   return (
     <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-      <div
-        className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
-        style={{ background: "rgba(6,68,105,0.08)" }}
-      >
-        <span className="text-3xl">{emoji}</span>
-      </div>
-      <h3 className="text-base font-bold mb-2" style={{ color: "#8b5cf6" }}>
+      <h3 className="text-base font-bold mb-2" style={{ color: "var(--brand-blue)" }}>
         {step}. {title}
       </h3>
       <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
@@ -50,17 +43,17 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="min-h-screen" style={{ background: "var(--surface-muted)" }}>
 
       {/* ── Hero ── */}
       <div
-        className="relative py-28 overflow-hidden border-b border-slate-100"
-        style={{ background: "#fff" }}
+        className="relative py-28 overflow-hidden border-b"
+        style={{ background: "#fff", borderColor: "var(--border-soft)" }}
       >
         <div className="container mx-auto px-6 text-center relative z-10">
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-5 leading-tight" style={{ color: "#8b5cf6" }}>
+          <h1 className="text-5xl md:text-6xl font-extrabold mb-5 leading-tight" style={{ color: "var(--brand-blue)" }}>
             Chào mừng bạn đến với<br />
-            <span style={{ color: "#8b5cf6" }}>Support Career</span>
+            <span style={{ color: "var(--brand-purple)" }}>Support Career</span>
           </h1>
           <p className="text-base md:text-lg mb-10 max-w-2xl mx-auto text-slate-500">
             Support Career đồng hành cùng bạn hỗ trợ đưa ra quyết định lựa chọn ngành nghề dựa trên bộ câu hỏi phân tích sở thích, năng lực và tính cách
@@ -68,7 +61,7 @@ export default function Home() {
           <Link
             to="/quiz"
             className="inline-block px-8 py-3.5 text-lg font-bold rounded-xl transition-all hover:opacity-90 hover:scale-105 text-white"
-            style={{ background: "#ef4444" }}
+            style={{ background: "var(--brand-red)" }}
           >
             Bắt đầu làm bài đánh giá →
           </Link>
@@ -81,20 +74,17 @@ export default function Home() {
           <StatCard
             value="60+"
             label="Câu hỏi định hướng"
-            color="#8b5cf6"
-            icon="📝"
+            color="var(--brand-blue)"
           />
           <StatCard
             value="23"
             label="Ngành học"
-            color="#3b82f6"
-            icon="🎓"
+            color="var(--brand-purple)"
           />
           <StatCard
             value="100%"
             label="Miễn phí"
-            color="#10b981"
-            icon="✅"
+            color="var(--brand-red)"
           />
         </div>
       </div>
@@ -103,7 +93,7 @@ export default function Home() {
       <div className="py-20">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: "#8b5cf6" }}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: "var(--brand-blue)" }}>
               Quy trình đánh giá
             </h2>
             <p className="text-slate-500 text-sm max-w-md mx-auto">
@@ -111,9 +101,9 @@ export default function Home() {
             </p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
-            <StepCard step="1" emoji="📝" title="Định hướng" desc="Trả lời 60 câu hỏi về sở thích, phong cách học tập và giá trị cá nhân để xác định nhóm phù hợp trong 23 ngành học." />
-            <StepCard step="2" emoji="🤖" title="Phân tích điểm" desc="Thuật toán DSS tổng hợp điểm theo mã ngành và mã chuyên ngành để đưa ra gợi ý cá nhân hóa." />
-            <StepCard step="3" emoji="🎯" title="Kết quả" desc="Nhận gợi ý ngành/chuyên ngành kèm mô tả và kỹ năng phù hợp với lĩnh vực đó." />
+            <StepCard step="1" title="Định hướng" desc="Trả lời 60 câu hỏi về sở thích, phong cách học tập và giá trị cá nhân để xác định nhóm phù hợp trong 23 ngành học." />
+            <StepCard step="2" title="Phân tích điểm" desc="Thuật toán DSS tổng hợp điểm theo mã ngành và mã chuyên ngành để đưa ra gợi ý cá nhân hóa." />
+            <StepCard step="3" title="Kết quả" desc="Nhận gợi ý ngành/chuyên ngành kèm mô tả và kỹ năng phù hợp với lĩnh vực đó." />
           </div>
         </div>
       </div>
@@ -122,7 +112,7 @@ export default function Home() {
       <div className="py-16 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: "#8b5cf6" }}>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: "var(--brand-blue)" }}>
               Gợi ý 23 ngành học hiện có
             </h2>
             <p className="text-slate-500 text-sm max-w-xl mx-auto">
@@ -163,7 +153,7 @@ export default function Home() {
                       }
                     }}
                   />
-                  <h3 className="font-semibold text-[#8b5cf6] group-hover:text-[#7c3aed] line-clamp-2 text-xs leading-snug">
+                  <h3 className="font-semibold line-clamp-2 text-xs leading-snug" style={{ color: "var(--brand-blue)" }}>
                     {m.name || m.code}
                   </h3>
                 </Link>
@@ -182,7 +172,7 @@ export default function Home() {
             <Link
               to="/careers"
               className="inline-block px-8 py-3 text-white font-semibold rounded-xl transition-all hover:shadow-lg hover:scale-105"
-              style={{ background: "#3b82f6" }}
+              style={{ background: "var(--brand-blue)" }}
             >
               Xem tất cả ngành
             </Link>

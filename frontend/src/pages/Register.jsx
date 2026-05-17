@@ -40,26 +40,25 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative isolate">
-      <div className="absolute inset-0 bg-slate-900/90" aria-hidden="true" />
-      <div className="relative z-10 w-full max-w-md mx-auto">
-        <div className="relative backdrop-blur-md bg-white/10 border border-white/20 rounded-xl shadow-xl p-8 text-white">
+    <div className="min-h-screen w-full flex items-center justify-center" style={{ background: "var(--surface-muted)" }}>
+      <div className="w-full max-w-md mx-auto px-4">
+        <div className="relative bg-white border border-slate-200 rounded-2xl shadow-lg p-8">
           <button
             type="button"
             onClick={() => nav("/")}
             aria-label="Đóng đăng ký"
-            className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-white/15 hover:bg-white/25 text-white text-xl leading-none transition-colors"
+            className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 text-xl leading-none transition-colors"
           >
             &times;
           </button>
-          <h2 className="text-2xl font-semibold mb-6 text-center" style={{ color: "#8b5cf6" }}>Đăng ký</h2>
+          <h2 className="text-2xl font-semibold mb-6 text-center" style={{ color: "var(--brand-blue)" }}>Đăng ký</h2>
           {error && (
-            <div className="mb-4 text-sm bg-red-500/20 border border-red-500/40 text-red-200 rounded px-3 py-2">
+            <div className="mb-4 text-sm bg-red-50 border border-red-200 text-red-700 rounded px-3 py-2">
               {error}
             </div>
           )}
           {success && (
-            <div className="mb-4 text-sm bg-primary-500/20 border border-primary-500/40 text-primary-300 rounded px-3 py-2">
+            <div className="mb-4 text-sm border rounded px-3 py-2" style={{ background: "var(--brand-blue-50)", borderColor: "var(--brand-blue-100)", color: "var(--brand-blue-700)" }}>
               {success}
             </div>
           )}
@@ -72,7 +71,7 @@ export default function Register() {
                 required
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg bg-white/15 border border-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400 placeholder:text-slate-300 text-white"
+                className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-400 placeholder:text-slate-400 text-slate-700"
                 placeholder="Nhập họ và tên"
               />
             </div>
@@ -84,7 +83,7 @@ export default function Register() {
                 required
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg bg-white/15 border border-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400 placeholder:text-slate-300 text-white"
+                className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-400 placeholder:text-slate-400 text-slate-700"
                 placeholder="ban@vidu.com"
               />
             </div>
@@ -96,7 +95,7 @@ export default function Register() {
                 required
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg bg-white/15 border border-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400 placeholder:text-slate-300 text-white"
+                className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-400 placeholder:text-slate-400 text-slate-700"
                 placeholder="••••••••"
               />
             </div>
@@ -108,7 +107,7 @@ export default function Register() {
                 required
                 value={form.confirm}
                 onChange={(e) => setForm({ ...form, confirm: e.target.value })}
-                className="w-full px-3 py-2 rounded-lg bg-white/15 border border-white/30 focus:outline-none focus:ring-2 focus:ring-cyan-400 placeholder:text-slate-300 text-white"
+                className="w-full px-3 py-2 rounded-lg bg-white border border-slate-200 focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-400 placeholder:text-slate-400 text-slate-700"
                 placeholder="Nhập lại mật khẩu"
               />
             </div>
@@ -116,14 +115,14 @@ export default function Register() {
               type="submit"
               disabled={loading}
               className="w-full py-2.5 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors text-white"
-              style={{ background: "#3b82f6" }}
+              style={{ background: "var(--brand-blue)" }}
             >
               {loading ? "Đang tạo tài khoản..." : "Tạo tài khoản"}
             </button>
           </form>
           <div className="text-center mt-5 text-sm">
             Đã có tài khoản?{' '}
-            <Link to="/login" className="text-cyan-300 hover:text-cyan-200 underline underline-offset-4">
+            <Link to="/login" className="underline underline-offset-4" style={{ color: "var(--brand-purple)" }}>
               Đăng nhập
             </Link>
           </div>
