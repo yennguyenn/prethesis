@@ -208,6 +208,31 @@ export default function Quiz() {
     );
   }
 
+  if (!error && questions.length === 0) {
+    return (
+      <div className="min-h-screen px-4 py-10 flex items-center justify-center">
+        <div className="max-w-lg w-full rounded-3xl bg-white shadow-lg border border-slate-100 p-8 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 text-amber-600">
+            <svg className="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-slate-800 mb-2">Chưa có câu hỏi</h2>
+          <p className="text-slate-600 mb-6">
+            Backend đã chạy và đăng nhập hoạt động, nhưng database hiện chưa có dữ liệu câu hỏi để hiển thị.
+          </p>
+          <button
+            onClick={() => loadQuestions(1)}
+            className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-white font-semibold shadow-md"
+            style={{ background: 'var(--brand-blue)' }}
+          >
+            Tải lại
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   // Level 1 finished (no auto-branch to Level 2)
   if (majorResult && level === 1 && !majorResult.nextLevel) {
     const scores = Array.isArray(majorResult.allScores) ? majorResult.allScores.slice().sort((a, b) => b.score - a.score) : [];

@@ -16,20 +16,35 @@ dotenv.config();
 const app = express();
 app.use(bodyParser.json());
 // Enable flexible CORS for any localhost port in dev
-const corsOrigin = process.env.CORS_ORIGIN;
+const corsOrigins = (process.env.CORS_ORIGIN || '')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 app.use(cors({
   origin: (origin, cb) => {
     // Allow tools like Postman (no origin) and any localhost:<port>
     if (!origin) return cb(null, true);
-    if (corsOrigin) {
-      if (origin === corsOrigin) return cb(null, true);
+    if (corsOrigins.length > 0) {
+      if (corsOrigins.includes(origin)) return cb(null, true);
+      console.warn(`[cors] blocked origin: ${origin}. Allowed: ${corsOrigins.join(', ')}`);
       return cb(new Error('CORS blocked: origin not allowed'));
     }
+    if (process.env.NODE_ENV === 'production') return cb(null, true);
     if (/^http:\/\/localhost:\d+$/.test(origin)) return cb(null, true);
+    console.warn(`[cors] blocked origin: ${origin}. Set CORS_ORIGIN to allow it.`);
     return cb(new Error('CORS blocked: origin not permitted'));
   },
   credentials: true
 }));
+
+app.use((req, res, next) => {
+  const startedAt = Date.now();
+  res.on('finish', () => {
+    console.log(`[http] ${req.method} ${req.originalUrl} -> ${res.statusCode} (${Date.now() - startedAt}ms)`);
+  });
+  next();
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, port: process.env.PORT || 5000, time: new Date().toISOString() });
 });
