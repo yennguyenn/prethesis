@@ -9,6 +9,7 @@
     "seed": "node src/seed/seed_quiz.js",
     "db:sync": "node src/utils/initDb.js",
     "initdb": "npm run db:sync && npm run seed",
+    "db:push": "node scripts/migrateDirect.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "dependencies": {
