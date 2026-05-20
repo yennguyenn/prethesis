@@ -9,7 +9,6 @@ import questionRoutes from './routes/questionsRoute.js';
 import resultRoutes from './routes/resultsRoute.js';
 import majorsRoutes from './routes/majorsRoute.js';
 import submajorsRoutes from './routes/submajorsRoute.js';
-import webhookRoutes from './routes/webhookRoute.js';
 
 dotenv.config();
 
@@ -56,7 +55,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/quiz', quizRoutes);
 app.use('/api/majors', majorsRoutes);
 app.use('/api/submajors', submajorsRoutes);
-app.use('/api/webhook', webhookRoutes);
 // Prefer plural path; keep legacy singular for backward compatibility
 app.use('/api/questions', questionRoutes);
 
