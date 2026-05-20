@@ -446,31 +446,54 @@ export default function Quiz() {
     <div className="min-h-screen px-4 py-10 transition-colors">
       <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
         {level === 2 && majorResult && (
-          <aside className="lg:w-80 w-full bg-white border border-slate-200 shadow-lg rounded-3xl p-6 h-fit sticky top-8">
-            <h3 className="text-sm font-semibold mb-3" style={{ color: "var(--brand-blue)" }}>Kết quả Mức 1</h3>
-            <div style={{ borderRadius: 12, background: 'var(--brand-purple-50)', padding: 16, border: '1.5px solid var(--brand-purple-100)' }}>
-              <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--brand-purple)', fontWeight: 600, marginBottom: 4 }}>Ngành nổi bật</p>
-              <p style={{ fontWeight: 700, color: 'var(--ink-900)', marginBottom: 4, fontSize: 13, lineHeight: 1.4 }}>{featuredMajor?.name || 'Chưa xác định'}</p>
-              <p style={{ fontSize: 11, color: '#475569', display: '-webkit-box', WebkitLineClamp: 5, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{featuredMajor?.description || 'Điểm các ngành đang khá sát nhau, vui lòng xem bảng xếp hạng phía dưới để so sánh.'}</p>
-              <div style={{ marginTop: 8, fontSize: 11, color: 'var(--brand-purple)', fontWeight: 700 }}>Tỉ lệ: {featuredMajor?.percentage}% | Điểm: {featuredMajorScore}</div>
+          <aside className="lg:w-[340px] w-full bg-white/95 backdrop-blur shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 rounded-3xl p-6 h-fit sticky top-8 flex flex-col gap-6 fade-in">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary-50 text-primary-700">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+              </div>
+              <h3 className="text-lg font-bold text-slate-800">Kết quả Mức 1</h3>
             </div>
-            <details className="text-xs mt-5">
-              <summary className="cursor-pointer select-none mb-2 text-slate-600 font-medium">Điểm của tất cả ngành</summary>
-              <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+
+            <div className="relative overflow-hidden rounded-[20px] p-5 shadow-inner" style={{ backgroundColor: 'var(--brand-purple-50)', border: '1px solid var(--brand-purple-100)' }}>
+              <p className="text-[10px] font-bold uppercase tracking-widest mb-1.5" style={{ color: 'var(--brand-purple)' }}>Ngành nổi bật</p>
+              <p className="text-[17px] font-extrabold text-slate-900 mb-2 leading-tight">{featuredMajor?.name || 'Chưa xác định'}</p>
+              <p className="text-xs opacity-80 line-clamp-4 leading-relaxed mb-4 text-slate-700">{featuredMajor?.description || 'Điểm các ngành đang khá sát nhau, vui lòng xem bảng xếp hạng phía dưới để so sánh.'}</p>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/70 shadow-sm border border-white/50 text-xs font-bold" style={{ color: 'var(--brand-purple)' }}>
+                <span>✨ Phù hợp: {featuredMajor?.percentage}%</span>
+                <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                <span>Điểm: {featuredMajorScore}</span>
+              </div>
+            </div>
+
+            <div className="flex-1 min-h-0 flex flex-col">
+              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 px-1">Bảng điểm các ngành</h4>
+              <div className="space-y-4 max-h-[300px] overflow-y-auto custom-scrollbar pr-2">
                 {majorResult.allScores.map((m, i) => (
-                  <div key={i} className="flex flex-col">
-                    <div className="flex justify-between text-[10px] mb-1">
-                      <span className="font-medium text-slate-700 truncate" title={m.name}>{m.name}</span>
-                      <span className="text-slate-500">{m.percentage}%</span>
+                  <div key={i} className="group relative">
+                    <div className="flex justify-between items-end mb-1">
+                      <span className="text-[13px] font-semibold text-slate-700 group-hover:text-primary-700 transition-colors truncate pr-3" title={m.name}>
+                        {m.name}
+                      </span>
+                      <span className="text-[11px] font-bold text-slate-500 whitespace-nowrap">{m.percentage}%</span>
                     </div>
-                    <div className="w-full h-1.5 bg-slate-200 rounded">
-                      <div className="h-1.5 rounded" style={{ width: `${(m.score / (majorResult.topScore || 1)) * 100}%`, background: 'var(--brand-blue)' }}></div>
+                    <div className="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden shadow-inner">
+                      <div 
+                        className="h-full rounded-full transition-all duration-700 ease-out" 
+                        style={{ width: `${(m.score / (majorResult.topScore || 1)) * 100}%`, backgroundColor: i === 0 ? 'var(--brand-purple)' : 'var(--brand-blue-200)' }}
+                      ></div>
                     </div>
                   </div>
                 ))}
               </div>
-            </details>
-            <button onClick={() => { setLevel(1); setMajorResult(null); loadQuestions(1); }} className="mt-6 w-full text-center px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700 transition">Làm lại</button>
+            </div>
+
+            <button 
+              onClick={() => { setLevel(1); setMajorResult(null); loadQuestions(1); }} 
+              className="mt-2 w-full flex items-center justify-center gap-2 px-4 py-3 bg-white hover:bg-slate-50 text-slate-700 rounded-xl text-sm font-semibold transition-all border border-slate-200 shadow-sm hover:shadow active:scale-[0.98]"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+              Làm lại Mức 1
+            </button>
           </aside>
         )}
 
@@ -485,7 +508,7 @@ export default function Quiz() {
           )}
 
           {currentQuestion && (
-            <div key={currentQuestion.id} className="rounded-3xl bg-white/80 backdrop-blur-sm border border-slate-100 shadow-lg p-6 md:p-8 fade-in dark:bg-slate-800/70 dark:border-slate-700">
+            <div key={currentQuestion.id} className="rounded-3xl bg-white/80 backdrop-blur-sm shadow-lg p-6 md:p-8 fade-in dark:bg-slate-800/70 dark:border-slate-700" style={{ border: '1px solid var(--border-soft)' }}>
               <div className="flex items-start justify-between gap-4 mb-6">
                 <h3 className="text-xl md:text-2xl font-semibold leading-relaxed" style={{ color: "var(--brand-blue)" }}>{currentQuestion.text}</h3>
                 {/* Admin actions removed */}
@@ -497,8 +520,8 @@ export default function Quiz() {
                     return (
                       <label
                         key={opt.id}
-                        className={`group relative flex items-center gap-4 rounded-2xl border px-5 py-4 cursor-pointer transition-all ${active ? 'shadow-md' : 'border-slate-200 hover:border-[#c6d8ff] hover:bg-[#eef4ff]'}`}
-                        style={active ? { borderColor: 'var(--brand-purple)', background: 'rgba(100,116,139,0.08)', boxShadow: '0 0 0 2px rgba(100,116,139,0.2)' } : {}}
+                        className={`group relative flex items-center gap-4 rounded-2xl border px-5 py-4 cursor-pointer transition-all ${active ? 'shadow-md' : ''}`}
+                        style={active ? { borderColor: 'var(--brand-purple)', background: 'rgba(120,165,163,0.08)', boxShadow: '0 0 0 2px rgba(120,165,163,0.18)' } : { borderColor: 'var(--border-soft)' }}
                       >
                         <input
                           type="radio"
@@ -508,10 +531,10 @@ export default function Quiz() {
                           className="sr-only"
                         />
                         <span
-                          className={`flex h-6 w-6 items-center justify-center rounded-full border text-xs font-semibold ${active ? 'text-white' : 'bg-white text-slate-500 border-slate-300 group-hover:border-[#2f6fdb] group-hover:text-[#2f6fdb]'}`}
-                          style={active ? { background: 'var(--brand-purple)', borderColor: 'var(--brand-purple)' } : {}}
+                          className={`flex h-6 w-6 items-center justify-center rounded-full border text-xs font-semibold ${active ? 'text-white' : ''}`}
+                          style={active ? { background: 'var(--brand-purple)', borderColor: 'var(--brand-purple)' } : { background: '#fff', color: 'var(--ink-500)', borderColor: 'var(--border-soft)' }}
                         >{String.fromCharCode(65 + idx)}</span>
-                        <span className={`text-sm md:text-base font-medium ${active ? '' : 'text-slate-700'}`} style={active ? { color: 'var(--brand-purple-700)' } : {}}>{opt.text}</span>
+                        <span className="text-sm md:text-base font-medium" style={active ? { color: 'var(--brand-purple-700)' } : { color: 'var(--ink-700)' }}>{opt.text}</span>
                         {active && (
                           <span className="absolute right-5 top-1/2 -translate-y-1/2" style={{ color: 'var(--brand-purple)' }}>
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>

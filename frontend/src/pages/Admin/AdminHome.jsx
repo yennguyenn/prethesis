@@ -18,7 +18,7 @@ const PANELS = [
     id: "majors",
     label: "Ngành",
     desc: "Quản lý danh sách ngành đào tạo",
-    color: "#3b82f6",
+    color: "var(--brand-blue)",
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 28, height: 28 }}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>,
     component: <Majors />,
   },
@@ -26,7 +26,7 @@ const PANELS = [
     id: "questions",
     label: "Câu hỏi",
     desc: "Quản lý ngân hàng câu hỏi",
-    color: "#8b5cf6",
+    color: "var(--brand-purple)",
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 28, height: 28 }}><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>,
     component: <QuestionList />,
   },
@@ -34,7 +34,7 @@ const PANELS = [
     id: "results",
     label: "Kết quả",
     desc: "Xem kết quả và bài nộp của học sinh",
-    color: "#22c55e",
+    color: "var(--brand-warm)",
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 28, height: 28 }}><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>,
     component: <ResultsAdmin />,
   },
@@ -42,7 +42,7 @@ const PANELS = [
     id: "criteria",
     label: "Tiêu chí",
     desc: "Cấu hình tiêu chí và quy tắc từ khóa",
-    color: "#8b5cf6",
+    color: "var(--brand-ocean)",
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 28, height: 28 }}><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
     component: <CriteriaAdmin />,
   },
@@ -50,7 +50,7 @@ const PANELS = [
     id: "users",
     label: "Người dùng",
     desc: "Quản lý tài khoản người dùng",
-    color: "#ef4444",
+    color: "var(--brand-red)",
     icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 28, height: 28 }}><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>,
     component: <UsersAdmin />,
   },
@@ -66,17 +66,17 @@ export default function AdminHome() {
     <div style={{ maxWidth: 1100, margin: "0 auto", paddingTop: 8 }}>
       {/* Page heading */}
       <div style={{ marginBottom: 24 }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, color: "#8b5cf6", margin: 0 }}>
+        <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--brand-blue)", margin: 0 }}>
           Tổng quan hệ thống
         </h2>
-        <p style={{ fontSize: 13, color: "#64748b", marginTop: 4 }}>
+        <p style={{ fontSize: 13, color: "var(--ink-500)", marginTop: 4 }}>
           Chọn mục để quản lý nội dung
         </p>
       </div>
 
       {/* ── 5 Section panels ── */}
       <div style={{ marginBottom: 8 }}>
-        <h3 style={{ fontSize: 15, fontWeight: 700, color: "#1e293b", marginBottom: 16 }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, color: "var(--ink-700)", marginBottom: 16 }}>
           Quản lý nội dung
         </h3>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -88,7 +88,7 @@ export default function AdminHome() {
                 style={{
                   borderRadius: 14,
                   overflow: "hidden",
-                  boxShadow: isOpen ? "0 4px 24px rgba(0,0,0,0.10)" : "0 1px 6px rgba(0,0,0,0.07)",
+                  boxShadow: isOpen ? "0 4px 24px rgba(29,34,43,0.10)" : "0 1px 6px rgba(29,34,43,0.07)",
                   border: isOpen ? `2px solid ${panel.color}` : "2px solid transparent",
                   transition: "box-shadow 0.2s, border-color 0.2s",
                   background: "#fff",
@@ -127,10 +127,10 @@ export default function AdminHome() {
                     {panel.icon}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 16, fontWeight: 700, color: isOpen ? "#fff" : "#1e293b", lineHeight: 1.3 }}>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: isOpen ? "#fff" : "var(--ink-700)", lineHeight: 1.3 }}>
                       {panel.label}
                     </div>
-                    <div style={{ fontSize: 13, color: isOpen ? "rgba(255,255,255,0.75)" : "#64748b", marginTop: 2 }}>
+                    <div style={{ fontSize: 13, color: isOpen ? "rgba(255,255,255,0.75)" : "var(--ink-500)", marginTop: 2 }}>
                       {panel.desc}
                     </div>
                   </div>
@@ -141,7 +141,7 @@ export default function AdminHome() {
 
                 {/* Panel content */}
                 {isOpen && (
-                  <div style={{ padding: "24px", borderTop: `1px solid ${panel.color}22`, background: "#fafafa" }}>
+                  <div style={{ padding: "24px", borderTop: `1px solid ${panel.color}22`, background: "var(--surface-muted)" }}>
                     {panel.component}
                   </div>
                 )}

@@ -44,12 +44,12 @@ export default function Navbar({ activePage = 'home' }) {
   return (
     <aside
       className="flex flex-col flex-shrink-0 shadow-lg transition-all duration-300 border-r"
-      style={{ width: collapsed ? 64 : 240, background: '#475569', borderColor: '#334155' }}
+      style={{ width: collapsed ? 64 : 240, background: 'var(--brand-blue)', borderColor: 'rgba(255,255,255,0.12)' }}
     >
       {/* Brand + collapse toggle */}
       <div
         className="flex items-center border-b flex-shrink-0"
-        style={{ padding: collapsed ? '18px 14px' : '18px 16px', gap: collapsed ? 0 : 10, justifyContent: collapsed ? 'center' : 'space-between', borderColor: '#334155' }}
+        style={{ padding: collapsed ? '18px 14px' : '18px 16px', gap: collapsed ? 0 : 10, justifyContent: collapsed ? 'center' : 'space-between', borderColor: 'rgba(255,255,255,0.12)' }}
       >
         {!collapsed && (
           <Link to="/" className="flex items-center gap-2 min-w-0">
@@ -65,7 +65,7 @@ export default function Navbar({ activePage = 'home' }) {
         <button
           onClick={() => setCollapsed(c => !c)}
           className="flex-shrink-0 flex items-center justify-center rounded-lg transition-colors hover:bg-white/20"
-          style={{ width: 32, height: 32, color: '#e2e8f0', border: 'none', background: 'transparent', cursor: 'pointer' }}
+          style={{ width: 32, height: 32, color: '#eef1f5', border: 'none', background: 'transparent', cursor: 'pointer' }}
           aria-label="Toggle sidebar"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 18, height: 18 }}>
@@ -89,8 +89,8 @@ export default function Navbar({ activePage = 'home' }) {
                   gap: collapsed ? 0 : 10,
                   padding: collapsed ? '10px 0' : '10px 12px',
                   justifyContent: collapsed ? 'center' : 'flex-start',
-                  background: active ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
-                  color: active ? '#ffffff' : '#cbd5e1',
+                  background: active ? 'rgba(255, 255, 255, 0.14)' : 'transparent',
+                  color: active ? '#ffffff' : 'rgba(238, 241, 245, 0.86)',
                   fontWeight: active ? 600 : 400,
                   fontSize: 14,
                   textDecoration: 'none',
@@ -105,7 +105,7 @@ export default function Navbar({ activePage = 'home' }) {
       </nav>
 
       {/* Bottom: login/logout */}
-      <div className="border-t p-2 flex-shrink-0" style={{ borderColor: '#334155' }}>
+      <div className="border-t p-2 flex-shrink-0" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
         {token ? (
           <button
             onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = '/'; }}
@@ -114,7 +114,7 @@ export default function Navbar({ activePage = 'home' }) {
               gap: collapsed ? 0 : 10,
               padding: collapsed ? '10px 0' : '10px 12px',
               justifyContent: collapsed ? 'center' : 'flex-start',
-              color: '#cbd5e1',
+              color: 'rgba(238, 241, 245, 0.86)',
               fontSize: 14,
               border: 'none',
               background: 'transparent',
@@ -133,7 +133,7 @@ export default function Navbar({ activePage = 'home' }) {
               gap: collapsed ? 0 : 10,
               padding: collapsed ? '10px 0' : '10px 12px',
               justifyContent: collapsed ? 'center' : 'flex-start',
-              color: '#cbd5e1',
+              color: 'rgba(238, 241, 245, 0.86)',
               fontSize: 14,
               textDecoration: 'none',
             }}

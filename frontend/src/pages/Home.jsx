@@ -21,7 +21,7 @@ function StatCard({ value, label, color }) {
 function StepCard({ step, title, desc }) {
   return (
     <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-      <h3 className="text-base font-bold mb-2" style={{ color: "var(--brand-blue)" }}>
+      <h3 className="text-base font-bold mb-2" style={{ color: "var(--brand-ocean)" }}>
         {step}. {title}
       </h3>
       <p className="text-slate-500 text-sm leading-relaxed">{desc}</p>
@@ -53,7 +53,7 @@ export default function Home() {
         <div className="container mx-auto px-6 text-center relative z-10">
           <h1 className="text-5xl md:text-6xl font-extrabold mb-5 leading-tight" style={{ color: "var(--brand-blue)" }}>
             Chào mừng bạn đến với<br />
-            <span style={{ color: "var(--brand-purple)" }}>Support Career</span>
+            <span style={{ color: "var(--brand-warm)" }}>Support Career</span>
           </h1>
           <p className="text-base md:text-lg mb-10 max-w-2xl mx-auto text-slate-500">
             Support Career đồng hành cùng bạn hỗ trợ đưa ra quyết định lựa chọn ngành nghề dựa trên bộ câu hỏi phân tích sở thích, năng lực và tính cách
@@ -84,7 +84,7 @@ export default function Home() {
           <StatCard
             value="100%"
             label="Miễn phí"
-            color="var(--brand-red)"
+            color="var(--brand-warm)"
           />
         </div>
       </div>

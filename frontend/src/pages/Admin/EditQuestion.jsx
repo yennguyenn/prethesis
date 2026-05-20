@@ -39,27 +39,27 @@ export default function EditQuestion(){
   if (!question) return <div>Đang tải...</div>;
   return (
     <div className="max-w-3xl mx-auto p-6">
-      <h3 className="text-xl font-semibold mb-4" style={{ color: "#8b5cf6" }}>Sửa câu hỏi #{id}</h3>
-      <div className="space-y-4 bg-white border border-slate-200 rounded-xl p-4">
+      <h3 className="text-xl font-semibold mb-4" style={{ color: "var(--brand-blue)" }}>Sửa câu hỏi #{id}</h3>
+      <div className="space-y-4 bg-white border rounded-xl p-4" style={{ borderColor: 'var(--border-soft)' }}>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Nội dung</label>
-          <input className="w-full border border-slate-300 rounded-lg px-3 py-2" value={text} onChange={e=>setText(e.target.value)} />
+          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--ink-700)' }}>Nội dung</label>
+          <input className="w-full rounded-lg px-3 py-2" style={{ border: '1px solid var(--border-soft)', color: 'var(--ink-900)' }} value={text} onChange={e=>setText(e.target.value)} />
         </div>
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Mức (LevelId)</label>
-          <input className="w-32 border border-slate-300 rounded-lg px-3 py-2" type="number" value={levelId} onChange={e=>setLevelId(Number(e.target.value))} />
+          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--ink-700)' }}>Mức (LevelId)</label>
+          <input className="w-32 rounded-lg px-3 py-2" style={{ border: '1px solid var(--border-soft)', color: 'var(--ink-900)' }} type="number" value={levelId} onChange={e=>setLevelId(Number(e.target.value))} />
         </div>
         <div>
           <div className="flex items-center justify-between mb-2">
-            <h4 className="text-sm font-semibold">Lựa chọn</h4>
-            <button className="px-3 py-1 rounded text-white text-sm" style={{ background: "#8b5cf6" }} onClick={()=>setOptions(opts=>[...opts, { text: '', scoring: {} }])}>Thêm lựa chọn</button>
+            <h4 className="text-sm font-semibold" style={{ color: 'var(--ink-700)' }}>Lựa chọn</h4>
+            <button className="px-3 py-1 rounded text-white text-sm" style={{ background: "var(--brand-blue)" }} onClick={()=>setOptions(opts=>[...opts, { text: '', scoring: {} }])}>Thêm lựa chọn</button>
           </div>
           <div className="space-y-3">
             {options.map((o, idx) => (
-              <div key={o.id || idx} className="rounded-lg border border-slate-200 p-3">
+              <div key={o.id || idx} className="rounded-lg border p-3" style={{ borderColor: 'var(--border-soft)' }}>
                 <div className="flex items-center gap-2 mb-2">
-                  <input className="flex-1 border border-slate-300 rounded-lg px-3 py-2" placeholder="Nội dung đáp án" value={o.text} onChange={e=>{ const c=[...options]; c[idx].text=e.target.value; setOptions(c); }} />
-                  <button className="px-2 py-1 rounded text-white text-xs" style={{ background: "#ef4444" }} onClick={async()=>{
+                  <input className="flex-1 rounded-lg px-3 py-2" style={{ border: '1px solid var(--border-soft)', color: 'var(--ink-900)' }} placeholder="Nội dung đáp án" value={o.text} onChange={e=>{ const c=[...options]; c[idx].text=e.target.value; setOptions(c); }} />
+                  <button className="px-2 py-1 rounded text-white text-xs" style={{ background: "var(--brand-red)" }} onClick={async()=>{
                     if (!confirm('Xóa lựa chọn này?')) return;
                     // If option has id, delete from backend too
                     if (o.id) {
@@ -74,19 +74,19 @@ export default function EditQuestion(){
                 </div>
                 {Number(levelId) === 1 ? (
                   <div className="space-y-2">
-                    <div className="text-xs text-slate-600 mb-1">Chấm điểm (Mức 1 chỉ dùng mã Ngành)</div>
+                    <div className="text-xs mb-1" style={{ color: 'var(--ink-500)' }}>Chấm điểm (Mức 1 chỉ dùng mã Ngành)</div>
                     {/* Existing entries */}
                     <div className="space-y-2">
                       {Object.entries(o.scoring || {}).length === 0 && (
-                        <div className="text-xs text-slate-500">Chưa có điểm.</div>
+                        <div className="text-xs" style={{ color: 'var(--ink-500)' }}>Chưa có điểm.</div>
                       )}
                       {Object.entries(o.scoring || {}).map(([code, pts]) => {
                         const isMajor = majorCodeSet.has(code);
                         return (
-                          <div key={code} className={`flex items-center gap-2 p-2 rounded border ${isMajor ? 'border-slate-200 bg-slate-50' : 'border-amber-300 bg-amber-50'}`}>
-                            <span className={`text-xs font-semibold ${isMajor ? 'text-slate-700' : 'text-amber-800'}`}>{code}</span>
+                          <div key={code} className={`flex items-center gap-2 p-2 rounded border ${isMajor ? '' : ''}`} style={{ borderColor: isMajor ? 'var(--border-soft)' : 'rgba(225, 177, 106, 0.45)', background: isMajor ? 'var(--surface-muted)' : 'rgba(225, 177, 106, 0.12)' }}>
+                            <span className="text-xs font-semibold" style={{ color: isMajor ? 'var(--ink-700)' : 'var(--brand-warm)' }}>{code}</span>
                             {isMajor ? (
-                              <input type="number" className="w-24 border border-slate-300 rounded px-2 py-1 text-sm" value={Number(pts) || 0}
+                              <input type="number" className="w-24 rounded px-2 py-1 text-sm" style={{ border: '1px solid var(--border-soft)', color: 'var(--ink-900)' }} value={Number(pts) || 0}
                                 onChange={e=>{
                                   const c=[...options];
                                   const v = Number(e.target.value) || 0;
@@ -95,8 +95,8 @@ export default function EditQuestion(){
                                 }} />
                             ) : (
                               <>
-                                <span className="text-xs">→</span>
-                                <select className="border border-amber-300 rounded px-2 py-1 text-xs"
+                                <span className="text-xs" style={{ color: 'var(--ink-500)' }}>→</span>
+                                <select className="rounded px-2 py-1 text-xs" style={{ border: '1px solid rgba(225, 177, 106, 0.45)', color: 'var(--ink-900)', background: '#fff' }}
                                   onChange={e=>{
                                     const target = e.target.value;
                                     if (!target) return;
@@ -115,10 +115,10 @@ export default function EditQuestion(){
                                     <option key={m.code} value={m.code}>{m.code}</option>
                                   ))}
                                 </select>
-                                <span className="text-xs text-amber-800">(chuyển {Number(pts)||0})</span>
+                                <span className="text-xs" style={{ color: 'var(--brand-warm)' }}>(chuyển {Number(pts)||0})</span>
                               </>
                             )}
-                            <button className="ml-auto text-xs text-white px-2 py-1 rounded" style={{ background: "#ef4444" }}
+                            <button className="ml-auto text-xs text-white px-2 py-1 rounded" style={{ background: "var(--brand-red)" }}
                               onClick={()=>{
                                 const c=[...options];
                                 const next = { ...(c[idx].scoring||{}) };
@@ -133,7 +133,7 @@ export default function EditQuestion(){
                     </div>
                     {/* Add new major score */}
                     <div className="flex items-center gap-2">
-                      <select className="border border-slate-300 rounded px-2 py-1 text-sm" defaultValue="" onChange={e=>{
+                      <select className="rounded px-2 py-1 text-sm" style={{ border: '1px solid var(--border-soft)', color: 'var(--ink-900)' }} defaultValue="" onChange={e=>{
                         const sel = e.target.value;
                         if (!sel) return;
                         const c=[...options];
@@ -148,17 +148,17 @@ export default function EditQuestion(){
                           <option key={m.code} value={m.code}>{m.code}</option>
                         ))}
                       </select>
-                      <span className="text-xs text-slate-500">Nhập điểm ở ô phía trên sau khi thêm.</span>
+                      <span className="text-xs" style={{ color: 'var(--ink-500)' }}>Nhập điểm ở ô phía trên sau khi thêm.</span>
                     </div>
                     {/* Warning if non-major codes present */}
                     {Object.keys(o.scoring||{}).some(k=>!majorCodeSet.has(k)) && (
-                      <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded p-2">Phát hiện mã không thuộc Ngành. Vui lòng chuyển chúng về mã Ngành cho Mức 1.</div>
+                      <div className="text-xs rounded p-2" style={{ color: 'var(--brand-warm)', background: 'rgba(225,177,106,0.12)', border: '1px solid rgba(225,177,106,0.25)' }}>Phát hiện mã không thuộc Ngành. Vui lòng chuyển chúng về mã Ngành cho Mức 1.</div>
                     )}
                   </div>
                 ) : (
                   <>
-                    <label className="block text-xs text-slate-600 mb-1">Chấm điểm (JSON: {`{"SE":2,"AI":1}`})</label>
-                    <textarea className={`w-full rounded-lg px-3 py-2 text-sm border ${jsonErrors[idx] ? 'border-red-400 focus:ring-red-200' : 'border-slate-300 focus:ring-primary-200'}`} rows={3} value={JSON.stringify(o.scoring || {})}
+                    <label className="block text-xs mb-1" style={{ color: 'var(--ink-500)' }}>Chấm điểm (JSON: {`{"SE":2,"AI":1}`})</label>
+                    <textarea className={`w-full rounded-lg px-3 py-2 text-sm border ${jsonErrors[idx] ? '' : ''}`} style={{ borderColor: jsonErrors[idx] ? 'var(--brand-red)' : 'var(--border-soft)' }} rows={3} value={JSON.stringify(o.scoring || {})}
                       onChange={e=>{
                         const v = e.target.value;
                         const c=[...options];
@@ -178,7 +178,7 @@ export default function EditQuestion(){
           </div>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 rounded text-white disabled:opacity-50" style={{ background: "#8b5cf6" }} disabled={Object.values(jsonErrors).some(Boolean)} onClick={async()=>{
+          <button className="px-4 py-2 rounded text-white disabled:opacity-50" style={{ background: "var(--brand-blue)" }} disabled={Object.values(jsonErrors).some(Boolean)} onClick={async()=>{
             // Create any new options without id in backend before saving question updates
             for (let i=0;i<options.length;i++) {
               const o = options[i];
@@ -193,7 +193,7 @@ export default function EditQuestion(){
             }
             await save();
           }}>Lưu</button>
-          <button className="px-4 py-2 rounded border border-slate-300" onClick={()=>navigate(-1)}>Quay lại</button>
+          <button className="px-4 py-2 rounded border" style={{ borderColor: 'var(--border-soft)', color: 'var(--ink-700)' }} onClick={()=>navigate(-1)}>Quay lại</button>
         </div>
       </div>
     </div>

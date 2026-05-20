@@ -2,8 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import API, { setAuthToken } from "../api";
 
-const MAJOR_SHADES = ["#2F6FDB", "#7B5CD6", "#E24848"];
-const SUB_SHADES = ["#7B5CD6", "#2F6FDB", "#E24848"];
+const MAJOR_SHADES = ["#DC3E26", "#78a5a3", "#e1b16a"];
+const SUB_SHADES = ["#78a5a3", "#e1b16a", "#DC3E26"];
 
 function PieChart({ slices, colors, size = 120 }) {
   const cx = size / 2, cy = size / 2, r = size / 2 - 8;
@@ -48,7 +48,7 @@ function ResultChart({ title, scores, colors, accentColor, recommended }) {
           return (
             <div key={r.code || i} className="flex items-center gap-2 text-xs">
               <span className="inline-block h-2.5 w-2.5 rounded-full shrink-0" style={{ background: colors[i % colors.length] }} />
-              <span className="truncate text-slate-700 flex-1 leading-tight" title={r.name}>{r.name}</span>
+              <span className="truncate flex-1 leading-tight" style={{ color: 'var(--ink-700)' }} title={r.name}>{r.name}</span>
               <span className="font-semibold shrink-0" style={{ color: colors[i % colors.length] }}>{pct}%</span>
             </div>
           );
@@ -56,7 +56,7 @@ function ResultChart({ title, scores, colors, accentColor, recommended }) {
       </div>
       {recommended && (
         <div className="mt-3 text-xs text-center">
-          <span className="text-slate-500">Đề xuất: </span>
+          <span style={{ color: 'var(--ink-500)' }}>Đề xuất: </span>
           <span className="font-semibold" style={{ color: accentColor }}>{recommended}</span>
         </div>
       )}
@@ -123,9 +123,9 @@ export default function Results() {
 
   if (!token) return (
     <div className="max-w-4xl mx-auto py-10 px-4">
-      <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm text-center">
+      <div className="bg-white border rounded-2xl p-8 shadow-sm text-center" style={{ borderColor: 'var(--border-soft)' }}>
         <h2 className="text-xl font-semibold mb-3" style={{ color: "var(--brand-blue)" }}>Yêu cầu đăng nhập</h2>
-        <p className="text-gray-600 mb-6">Bạn cần đăng nhập để xem kết quả đánh giá đã lưu.</p>
+        <p className="mb-6" style={{ color: 'var(--ink-500)' }}>Bạn cần đăng nhập để xem kết quả đánh giá đã lưu.</p>
         <Link to="/login" className="inline-block px-6 py-3 rounded-lg text-white font-semibold shadow-md"
           style={{ background: "var(--brand-blue)" }}>Đi tới trang đăng nhập</Link>
       </div>
@@ -139,8 +139,8 @@ export default function Results() {
       {loading && (
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4" />
-            <p className="text-slate-500 text-sm">Đang tải kết quả...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: 'var(--brand-blue)' }} />
+            <p className="text-sm" style={{ color: 'var(--ink-500)' }}>Đang tải kết quả...</p>
           </div>
         </div>
       )}
@@ -150,9 +150,9 @@ export default function Results() {
       )}
 
       {!loading && !error && attempts.length === 0 && (
-        <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm text-center">
+        <div className="bg-white border rounded-2xl p-8 shadow-sm text-center" style={{ borderColor: 'var(--border-soft)' }}>
           <h2 className="text-lg font-semibold mb-2" style={{ color: "var(--brand-blue)" }}>Chưa có kết quả</h2>
-          <p className="text-slate-500 mb-6 text-sm">Bạn chưa hoàn thành bài đánh giá nào khi đang đăng nhập.</p>
+          <p className="mb-6 text-sm" style={{ color: 'var(--ink-500)' }}>Bạn chưa hoàn thành bài đánh giá nào khi đang đăng nhập.</p>
           <Link to="/quiz" className="inline-block px-6 py-3 rounded-lg text-white font-semibold shadow-md"
             style={{ background: "var(--brand-blue)" }}>Làm bài đánh giá</Link>
         </div>
@@ -174,11 +174,12 @@ export default function Results() {
         const isExpanded = expandedId === i;
 
         return (
-          <div key={i} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div key={i} className="bg-white rounded-2xl border shadow-sm overflow-hidden" style={{ borderColor: 'var(--border-soft)' }}>
             {/* Header row — click anywhere to toggle */}
             <button
               onClick={() => setExpandedId(isExpanded ? null : i)}
-              className="w-full flex items-center justify-between px-5 py-4 text-left transition-colors hover:bg-slate-50"
+              className="w-full flex items-center justify-between px-5 py-4 text-left transition-colors"
+              style={{ background: isExpanded ? 'var(--surface-muted)' : '#fff' }}
             >
               <div className="flex items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full text-white text-sm font-bold shrink-0"
@@ -186,21 +187,21 @@ export default function Results() {
                   {num}
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-slate-800">Lần làm thứ {num}</div>
+                  <div className="text-sm font-semibold" style={{ color: 'var(--ink-700)' }}>Lần làm thứ {num}</div>
                   <div className="flex items-center gap-2 text-[11px] mt-0.5">
-                    <span className="text-slate-400">{dateStr} {timeStr}</span>
+                    <span style={{ color: 'var(--ink-500)' }}>{dateStr} {timeStr}</span>
                     {(() => {
                       const score = subMajorSub?.score ?? majorSub?.score;
                       if (score == null) return null;
                       const displayPct = subMajorSub?.percentage ?? majorSub?.percentage ?? (score * 100).toFixed(2);
                       return (
                         <>
-                          <span className="text-slate-300">•</span>
+                          <span style={{ color: 'var(--border-soft)' }}>•</span>
                           <span className="font-medium" style={{ color: "var(--brand-blue)" }}>
                             Tỉ lệ: {displayPct}%
                           </span>
-                          <span className="text-slate-300">•</span>
-                          <span className="font-medium text-slate-500">
+                          <span style={{ color: 'var(--border-soft)' }}>•</span>
+                          <span className="font-medium" style={{ color: 'var(--ink-500)' }}>
                             Điểm SAW: {score}
                           </span>
                         </>
@@ -220,7 +221,7 @@ export default function Results() {
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors"
                   style={isExpanded
                     ? { background: "var(--brand-purple-50)", color: "var(--brand-purple)", borderColor: "var(--brand-purple-100)" }
-                    : { background: "#f8fafc", color: "#64748b", borderColor: "#e2e8f0" }}
+                    : { background: "var(--surface-muted)", color: "var(--ink-500)", borderColor: "var(--border-soft)" }}
                 >
                   Chi tiết
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
@@ -236,7 +237,7 @@ export default function Results() {
 
             {/* Detail panel */}
             {isExpanded && (
-              <div className="border-t border-slate-100 px-5 py-5 space-y-5">
+              <div className="border-t px-5 py-5 space-y-5" style={{ borderColor: 'var(--border-soft)' }}>
                 {/* Charts */}
                 {(hasMajor || hasSubMajor) && (
                   <div className="flex gap-8 justify-center flex-wrap pt-2">
@@ -245,19 +246,19 @@ export default function Results() {
                         title="Top 3 ngành gợi ý"
                         scores={majorScores}
                           colors={MAJOR_SHADES}
-                          accentColor="var(--brand-blue)"
+                          accentColor="var(--brand-red)"
                         recommended={majorSub?.majorName}
                       />
                     )}
                     {hasMajor && hasSubMajor && (
-                      <div className="w-px bg-slate-100 self-stretch hidden sm:block" />
+                      <div className="w-px self-stretch hidden sm:block" style={{ background: 'var(--border-soft)' }} />
                     )}
                     {hasSubMajor && (
                       <ResultChart
                         title="Top 3 chuyên ngành gợi ý"
                         scores={subMajorScores}
                           colors={SUB_SHADES}
-                          accentColor="var(--brand-purple)"
+                          accentColor="var(--brand-red)"
                         recommended={subMajorSub?.subMajorName}
                       />
                     )}
@@ -265,7 +266,7 @@ export default function Results() {
                 )}
 
                 {!hasMajor && !hasSubMajor && (
-                  <div className="text-xs text-slate-400 text-center py-4">Không có dữ liệu điểm.</div>
+                  <div className="text-xs text-center py-4" style={{ color: 'var(--ink-500)' }}>Không có dữ liệu điểm.</div>
                 )}
               </div>
             )}

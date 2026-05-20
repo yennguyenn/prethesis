@@ -62,7 +62,7 @@ export default function UsersAdmin() {
     <div className="space-y-6">
       <div className="rounded-3xl bg-white/90 backdrop-blur-sm border border-slate-100 shadow-xl p-6">
         <div className="mb-4">
-          <h3 className="text-xl font-bold" style={{ color: "#8b5cf6" }}>Tạo tài khoản quản trị</h3>
+          <h3 className="text-xl font-bold" style={{ color: "var(--brand-blue)" }}>Tạo tài khoản quản trị</h3>
           <p className="text-sm text-slate-600">Yêu cầu tài khoản hiện tại là admin.</p>
         </div>
         {message && (
@@ -96,7 +96,7 @@ export default function UsersAdmin() {
             <button
               type="submit"
               disabled={busy}
-              className="px-5 py-2 rounded-xl text-white font-semibold shadow-md hover:shadow-lg disabled:opacity-50" style={{ background: "#8b5cf6" }}
+              className="px-5 py-2 rounded-xl text-white font-semibold shadow-md hover:shadow-lg disabled:opacity-50" style={{ background: "var(--brand-blue)" }}
             >
               {busy ? "Đang xử lý..." : "Tạo quản trị"}
             </button>
@@ -106,7 +106,7 @@ export default function UsersAdmin() {
 
       <div className="rounded-3xl bg-white/90 backdrop-blur-sm border border-slate-100 shadow-xl p-6">
         <div className="mb-2">
-          <h3 className="text-xl font-bold" style={{ color: "#8b5cf6" }}>Nâng quyền người dùng hiện có</h3>
+          <h3 className="text-xl font-bold" style={{ color: "var(--brand-ocean)" }}>Nâng quyền người dùng hiện có</h3>
           <p className="text-sm text-slate-600">Nhập mã người dùng (userId) để đặt role = admin.</p>
         </div>
         <form onSubmit={promoteUser} className="flex items-center gap-3">

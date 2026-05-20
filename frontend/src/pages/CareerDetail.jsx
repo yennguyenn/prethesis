@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import API from '../api';
 
-// Centralized mapping for IT submajors (codes used in Level 2 results)
+// Centralized mapping for IT submajors (only the allowed 5 codes)
 const SUBMAJORS = {
   SE: {
     name: 'Kỹ thuật phần mềm',
@@ -20,14 +20,6 @@ const SUBMAJORS = {
     studyGroup: 'Toán, Kinh tế, Tin',
     careers: ['Chuyên viên phân tích nghiệp vụ', 'Chuyên viên phân tích hệ thống', 'Điều phối CNTT', 'Chuyên viên ERP', 'Chủ sản phẩm (Product Owner)']
   },
-  UIUX: {
-    name: 'Thiết kế UI/UX',
-    intro: 'Thiết kế giao diện và trải nghiệm người dùng trực quan, thân thiện, nhất quán.',
-    description: 'Thiết kế UI/UX chú trọng nghiên cứu người dùng, luồng tương tác, bố cục trực quan và ngôn ngữ thiết kế. Kết hợp mỹ thuật với tâm lý hành vi để tạo sản phẩm số dễ dùng và hấp dẫn.',
-    skills: ['Phác thảo khung (Wireframe)', 'Tạo mẫu (Prototype)', 'Nghiên cứu người dùng', 'Thiết kế thị giác', 'Khả năng tiếp cận'],
-    studyGroup: 'Mỹ thuật, Tin, Truyền thông',
-    careers: ['Thiết kế UI', 'Nghiên cứu UX', 'Thiết kế sản phẩm', 'Thiết kế tương tác']
-  },
   CS: {
     name: 'Khoa học máy tính',
     intro: 'Nền tảng lý thuyết tính toán, thuật toán và cấu trúc dữ liệu phục vụ đổi mới lâu dài.',
@@ -36,23 +28,7 @@ const SUBMAJORS = {
     studyGroup: 'Toán, Lý, Tin',
     careers: ['Kỹ sư thuật toán', 'Kỹ sư nghiên cứu', 'Lập trình hệ thống', 'Nghiên cứu viên học thuật']
   },
-  AI: {
-    name: 'Trí tuệ nhân tạo',
-    intro: 'Phát triển hệ thống thông minh: học máy, học sâu, xử lý ngôn ngữ và thị giác máy.',
-    description: 'AI kết hợp thống kê, tối ưu hoá và lập trình để xây dựng mô hình dự đoán, nhận dạng và tự động hoá. Ứng dụng trong y tế, tài chính, robot và sản phẩm số thông minh.',
-    skills: ['Học máy', 'Học sâu', 'Python', 'Xử lý dữ liệu', 'Đánh giá mô hình'],
-    studyGroup: 'Toán, Tin, Lý',
-    careers: ['Kỹ sư ML', 'Nghiên cứu AI', 'Nhà khoa học dữ liệu', 'Kỹ sư NLP', 'Kỹ sư thị giác máy tính']
-  },
-  DS: {
-    name: 'Khoa học dữ liệu',
-    intro: 'Phân tích dữ liệu, mô hình thống kê và trực quan hoá để hỗ trợ quyết định.',
-    description: 'Khoa học dữ liệu sử dụng thống kê, xử lý dữ liệu lớn và học máy mức ứng dụng để khai thác insight. Tập trung chất lượng dữ liệu, diễn giải (storytelling) và tối ưu hiệu suất mô hình.',
-    skills: ['Thống kê', 'SQL', 'Python/R', 'Trực quan hoá dữ liệu', 'Kỹ thuật đặc trưng'],
-    studyGroup: 'Toán, Thống kê, Tin',
-    careers: ['Nhà khoa học dữ liệu', 'Chuyên viên phân tích dữ liệu', 'Lập trình BI', 'Kỹ sư phân tích']
-  },
-  NET: {
+  NW: {
     name: 'Mạng máy tính',
     intro: 'Thiết kế, quản trị hạ tầng mạng và kết nối an toàn, tin cậy.',
     description: 'Mạng máy tính bao gồm kiến trúc mạng, giao thức, định tuyến, ảo hoá và hạ tầng cloud. Đảm bảo thông suốt, hiệu năng và bảo mật truyền thông dữ liệu.',
@@ -60,21 +36,13 @@ const SUBMAJORS = {
     studyGroup: 'Toán, Lý, Tin',
     careers: ['Kỹ sư mạng', 'Kỹ sư hạ tầng', 'Chuyên gia mạng Cloud']
   },
-  CY: {
+  CSEC: {
     name: 'An ninh mạng',
     intro: 'Phòng thủ và kiểm thử an ninh hệ thống, bảo vệ dữ liệu và quyền riêng tư.',
     description: 'An ninh mạng gồm đánh giá lỗ hổng, giám sát sự kiện, ứng phó sự cố và xây dựng chính sách bảo mật. Kết hợp tư duy tấn công & phòng thủ.',
     skills: ['Phân tích mối đe doạ', 'Kiểm thử xâm nhập', 'Mã hoá', 'Ứng phó sự cố', 'SIEM'],
     studyGroup: 'Toán, Tin, An ninh',
     careers: ['Chuyên viên an ninh', 'Chuyên viên kiểm thử xâm nhập', 'Kỹ sư SOC', 'Tư vấn bảo mật']
-  },
-  EMB: {
-    name: 'Hệ thống nhúng',
-    intro: 'Kết hợp phần cứng và phần mềm mức thấp cho thiết bị thông minh & IoT.',
-    description: 'Hệ thống nhúng tập trung vi điều khiển, cảm biến, firmware, giao tiếp ngoại vi và tối ưu dung lượng/hiệu năng hệ thống nhúng.',
-    skills: ['C/C++', 'Vi điều khiển', 'Điện tử', 'RTOS', 'Giao thức truyền thông nối tiếp'],
-    studyGroup: 'Điện tử, Lý, Tin',
-    careers: ['Kỹ sư nhúng', 'Lập trình firmware', 'Kỹ sư IoT', 'Chuyên viên tích hợp phần cứng']
   }
 };
 

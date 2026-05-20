@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import API, { setAuthToken } from "../../api";
 
-const GREEN_SHADES  = ["#16a34a", "#4ade80", "#bbf7d0"];
-const BLUE_SHADES   = ["#2563eb", "#60a5fa", "#bfdbfe"];
-const AVATAR_COLORS = ["#8b5cf6", "#22c55e", "#ef4444"];
+const MAJOR_SHADES  = ["#DC3E26", "#78a5a3", "#e1b16a"];
+const SUB_SHADES     = ["#78a5a3", "#e1b16a", "#444c5c"];
+const AVATAR_COLORS  = ["#444c5c", "#78a5a3", "#DC3E26"];
 
 function PieChart({ slices, colors, size = 120 }) {
   const cx = size / 2, cy = size / 2, r = size / 2 - 8;
@@ -49,7 +49,7 @@ function ResultChart({ title, scores, colors, accentColor, recommended }) {
           return (
             <div key={r.code || i} className="flex items-center gap-2 text-xs">
               <span className="inline-block h-2.5 w-2.5 rounded-full shrink-0" style={{ background: colors[i % colors.length] }} />
-              <span className="truncate text-slate-700 flex-1 leading-tight" title={r.name}>{r.name}</span>
+              <span className="truncate flex-1 leading-tight" style={{ color: 'var(--ink-700)' }} title={r.name}>{r.name}</span>
               <span className="font-semibold shrink-0" style={{ color: colors[i % colors.length] }}>{pct}%</span>
             </div>
           );
@@ -57,7 +57,7 @@ function ResultChart({ title, scores, colors, accentColor, recommended }) {
       </div>
       {recommended && (
         <div className="mt-3 text-xs text-center">
-          <span className="text-slate-500">Đề xuất: </span>
+          <span style={{ color: 'var(--ink-500)' }}>Đề xuất: </span>
           <span className="font-semibold" style={{ color: accentColor }}>{recommended}</span>
         </div>
       )}
@@ -85,7 +85,7 @@ export default function ResultsAdmin() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return <div className="p-6 text-sm text-slate-600">Đang tải...</div>;
+  if (loading) return <div className="p-6 text-sm" style={{ color: 'var(--ink-500)' }}>Đang tải...</div>;
   if (error) return <div className="p-6 text-sm text-red-700 bg-red-50 border border-red-200 rounded-xl">{error}</div>;
 
   // Group ALL submissions by user
@@ -121,9 +121,10 @@ export default function ResultsAdmin() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h3 className="text-xl font-bold" style={{ color: "#16a34a" }}>Kết quả người dùng</h3>
+        <h3 className="text-xl font-bold" style={{ color: "var(--brand-blue)" }}>Kết quả người dùng</h3>
         <input
-          className="w-64 border border-slate-300 rounded-lg px-3 py-2 text-sm"
+          className="w-64 border rounded-lg px-3 py-2 text-sm bg-white"
+          style={{ borderColor: 'var(--border-soft)', color: 'var(--ink-700)' }}
           placeholder="Tìm theo tên, email..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -131,7 +132,7 @@ export default function ResultsAdmin() {
       </div>
 
       {groups.length === 0 && (
-        <div className="text-sm text-slate-500 py-8 text-center">Không có kết quả nào.</div>
+        <div className="text-sm py-8 text-center" style={{ color: 'var(--ink-500)' }}>Không có kết quả nào.</div>
       )}
 
       {groups.map((g, idx) => {
@@ -167,9 +168,9 @@ export default function ResultsAdmin() {
         const hasHistory  = attemptCount > 1;
 
         return (
-          <div key={g.key} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+          <div key={g.key} className="bg-white rounded-2xl border shadow-sm overflow-hidden" style={{ borderColor: 'var(--border-soft)' }}>
             {/* Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+            <div className="flex items-center justify-between px-5 py-4 border-b" style={{ borderColor: 'var(--border-soft)' }}>
               <div className="flex items-center gap-3">
                 <div
                   className="flex h-9 w-9 items-center justify-center rounded-full text-white text-sm font-bold shrink-0"
@@ -178,8 +179,8 @@ export default function ResultsAdmin() {
                   {(user?.name || "?")[0].toUpperCase()}
                 </div>
                 <div>
-                  <div className="text-sm font-semibold text-slate-800">{user?.name || "Ẩn danh"}</div>
-                  <div className="text-xs text-slate-500">{user?.email || "—"}</div>
+                  <div className="text-sm font-semibold" style={{ color: 'var(--ink-700)' }}>{user?.name || "Ẩn danh"}</div>
+                  <div className="text-xs" style={{ color: 'var(--ink-500)' }}>{user?.email || "—"}</div>
                 </div>
               </div>
 
@@ -191,8 +192,8 @@ export default function ResultsAdmin() {
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors"
                     style={
                       isExpanded
-                        ? { background: "#ede9fe", color: "#7c3aed", borderColor: "#c4b5fd" }
-                        : { background: "#f8fafc", color: "#64748b", borderColor: "#e2e8f0" }
+                        ? { background: 'var(--surface-muted)', color: 'var(--brand-blue)', borderColor: 'var(--border-soft)' }
+                        : { background: '#fff8f4', color: 'var(--ink-500)', borderColor: 'var(--border-soft)' }
                     }
                   >
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 12, height: 12 }}>
@@ -207,13 +208,13 @@ export default function ResultsAdmin() {
                 )}
 
                 {/* Latest date pill */}
-                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-100">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14, flexShrink: 0 }}>
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl" style={{ background: 'var(--surface-muted)', border: '1px solid var(--border-soft)' }}>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink-500)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14, flexShrink: 0 }}>
                     <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                   </svg>
                   <div className="text-right">
-                    <div className="text-[10px] text-slate-400 leading-none mb-0.5">Lần làm gần nhất</div>
-                    <div className="text-xs font-semibold text-slate-700 leading-none">{dateStr} <span className="text-slate-400 font-normal">{timeStr}</span></div>
+                    <div className="text-[10px] leading-none mb-0.5" style={{ color: 'var(--ink-400)' }}>Lần làm gần nhất</div>
+                    <div className="text-xs font-semibold leading-none" style={{ color: 'var(--ink-700)' }}>{dateStr} <span style={{ color: 'var(--ink-400)', fontWeight: 400 }}>{timeStr}</span></div>
                   </div>
                 </div>
               </div>
@@ -226,8 +227,8 @@ export default function ResultsAdmin() {
                   <ResultChart
                     title="Top 3 ngành gợi ý"
                     scores={majorScores}
-                    colors={GREEN_SHADES}
-                    accentColor="#16a34a"
+                    colors={MAJOR_SHADES}
+                    accentColor="#DC3E26"
                     recommended={recommendedMajor}
                   />
                 )}
@@ -238,20 +239,20 @@ export default function ResultsAdmin() {
                   <ResultChart
                     title="Top 3 chuyên ngành gợi ý"
                     scores={subMajorScores}
-                    colors={BLUE_SHADES}
-                    accentColor="#2563eb"
+                    colors={SUB_SHADES}
+                    accentColor="var(--brand-ocean)"
                     recommended={recommendedSubMajor}
                   />
                 )}
               </div>
             ) : (
-              <div className="text-xs text-slate-400 text-center py-6">Không có dữ liệu điểm.</div>
+              <div className="text-xs text-center py-6" style={{ color: 'var(--ink-400)' }}>Không có dữ liệu điểm.</div>
             )}
 
             {/* History panel — expandable */}
             {isExpanded && (
-              <div className="border-t border-slate-100 bg-slate-50 px-5 py-4">
-                <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-3">Lịch sử tất cả các lần làm</div>
+              <div className="border-t px-5 py-4" style={{ borderColor: 'var(--border-soft)', background: 'var(--surface-muted)' }}>
+                <div className="text-[11px] font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--ink-400)' }}>Lịch sử tất cả các lần làm</div>
                 <div className="space-y-2">
                   {attempts.map((attempt, i) => {
                     const ms = attempt.majorSub;
@@ -276,18 +277,19 @@ export default function ResultsAdmin() {
                       <div key={subKey}>
                         <button
                           onClick={() => hasAnyChart && setExpandedSubId(isSubExpanded ? null : subKey)}
-                          className="w-full flex items-center gap-3 bg-white rounded-xl px-4 py-3 border border-slate-100 transition-all text-left"
+                          className="w-full flex items-center gap-3 bg-white rounded-xl px-4 py-3 border transition-all text-left"
                           style={{
                             cursor: hasAnyChart ? "pointer" : "default",
-                            ...(isSubExpanded ? { borderColor: "#c4b5fd", background: "#faf5ff", borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : {}),
+                            borderColor: 'var(--border-soft)',
+                            ...(isSubExpanded ? { background: 'var(--surface-muted)', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 } : {}),
                           }}
                         >
                           {/* Attempt number */}
-                          <div className="text-[11px] font-bold text-slate-400 w-5 shrink-0 text-center">#{attempt.num}</div>
+                          <div className="text-[11px] font-bold w-5 shrink-0 text-center" style={{ color: 'var(--ink-400)' }}>#{attempt.num}</div>
 
                           {/* Date */}
-                          <div className="text-[11px] text-slate-500 w-28 shrink-0">
-                            <div className="font-medium text-slate-700 leading-tight">{sDateStr}</div>
+                          <div className="text-[11px] w-28 shrink-0" style={{ color: 'var(--ink-500)' }}>
+                            <div className="font-medium leading-tight" style={{ color: 'var(--ink-700)' }}>{sDateStr}</div>
                             <div className="leading-tight">{sTimeStr}</div>
                           </div>
 
@@ -295,28 +297,28 @@ export default function ResultsAdmin() {
                           <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                             {ms && (
                               <div className="flex items-center gap-1.5 min-w-0">
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold shrink-0" style={{ background: "#dcfce7", color: "#16a34a" }}>Ngành</span>
-                                <span className="text-xs text-slate-700 truncate">{ms.majorName || "—"}</span>
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold shrink-0" style={{ background: 'var(--surface-muted)', color: 'var(--brand-blue)' }}>Ngành</span>
+                                <span className="text-xs truncate" style={{ color: 'var(--ink-700)' }}>{ms.majorName || "—"}</span>
                               </div>
                             )}
                             {ss && (
                               <div className="flex items-center gap-1.5 min-w-0">
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold shrink-0" style={{ background: "#dbeafe", color: "#2563eb" }}>Chuyên ngành</span>
-                                <span className="text-xs text-slate-700 truncate">{ss.subMajorName || "—"}</span>
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full font-semibold shrink-0" style={{ background: '#eff7f6', color: 'var(--brand-ocean)' }}>Chuyên ngành</span>
+                                <span className="text-xs truncate" style={{ color: 'var(--ink-700)' }}>{ss.subMajorName || "—"}</span>
                               </div>
                             )}
                           </div>
 
                           {/* Latest badge */}
                           {isLatest && (
-                            <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0" style={{ background: "#fef9c3", color: "#854d0e" }}>
+                            <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0" style={{ background: 'var(--brand-warm-50)', color: 'var(--brand-warm-700)' }}>
                               Mới nhất
                             </span>
                           )}
 
                           {/* Chevron */}
                           {hasAnyChart && (
-                            <svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--brand-blue)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
                               style={{ width: 12, height: 12, flexShrink: 0, transform: isSubExpanded ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
                               <polyline points="6 9 12 15 18 9"/>
                             </svg>
@@ -327,26 +329,26 @@ export default function ResultsAdmin() {
                         {isSubExpanded && hasAnyChart && (
                           <div
                             className="flex gap-8 justify-center flex-wrap px-4 py-5 rounded-b-xl border border-t-0"
-                            style={{ borderColor: "#c4b5fd", background: "#faf5ff" }}
+                            style={{ borderColor: 'var(--border-soft)', background: 'var(--surface-muted)' }}
                           >
                             {hasM && (
                               <ResultChart
                                 title="Top 3 ngành gợi ý"
                                 scores={mScores}
-                                colors={GREEN_SHADES}
-                                accentColor="#16a34a"
+                                colors={MAJOR_SHADES}
+                                accentColor="#DC3E26"
                                 recommended={ms.majorName}
                               />
                             )}
                             {hasM && hasS && (
-                              <div className="w-px bg-purple-100 self-stretch hidden sm:block" />
+                              <div className="w-px self-stretch hidden sm:block" style={{ background: 'var(--border-soft)' }} />
                             )}
                             {hasS && (
                               <ResultChart
                                 title="Top 3 chuyên ngành gợi ý"
                                 scores={sScores}
-                                colors={BLUE_SHADES}
-                                accentColor="#2563eb"
+                                colors={SUB_SHADES}
+                                accentColor="var(--brand-ocean)"
                                 recommended={ss.subMajorName}
                               />
                             )}

@@ -3,13 +3,13 @@ import API, { setAuthToken } from "../../api";
 
 const S = {
   card: { background: "#fff", borderRadius: 14, border: "1px solid #e2e8f0", padding: "20px 24px", boxShadow: "0 1px 6px rgba(0,0,0,0.06)" },
-  label: { fontSize: 11, color: "#94a3b8", marginBottom: 4, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" },
+  label: { fontSize: 11, color: "#5f6876", marginBottom: 4, fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" },
   input: { width: "100%", border: "1px solid #e2e8f0", borderRadius: 8, padding: "9px 12px", fontSize: 14, color: "#1e293b", outline: "none", background: "#fff", boxSizing: "border-box" },
-  btnPrimary: { padding: "9px 20px", borderRadius: 8, background: "#3b82f6", color: "#fff", fontWeight: 600, fontSize: 14, border: "none", cursor: "pointer" },
-  btnEdit: { padding: "6px 14px", borderRadius: 7, background: "#3b82f6", color: "#fff", fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer" },
-  btnDanger: { padding: "6px 14px", borderRadius: 7, background: "#ef4444", color: "#fff", fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer" },
-  btnSecondary: { padding: "6px 14px", borderRadius: 7, background: "#fff", color: "#475569", fontSize: 13, fontWeight: 500, border: "1px solid #e2e8f0", cursor: "pointer" },
-  btnSave: { padding: "6px 14px", borderRadius: 7, background: "#3b82f6", color: "#fff", fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer" },
+  btnPrimary: { padding: "9px 20px", borderRadius: 8, background: "var(--brand-blue)", color: "#fff", fontWeight: 600, fontSize: 14, border: "none", cursor: "pointer" },
+  btnEdit: { padding: "6px 14px", borderRadius: 7, background: "var(--brand-ocean)", color: "#fff", fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer" },
+  btnDanger: { padding: "6px 14px", borderRadius: 7, background: "var(--brand-red)", color: "#fff", fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer" },
+  btnSecondary: { padding: "6px 14px", borderRadius: 7, background: "#fff", color: "#5f6876", fontSize: 13, fontWeight: 500, border: "1px solid #d8dde5", cursor: "pointer" },
+  btnSave: { padding: "6px 14px", borderRadius: 7, background: "var(--brand-blue)", color: "#fff", fontSize: 13, fontWeight: 600, border: "none", cursor: "pointer" },
 };
 
 function MajorCard({ m, onUpdate, onRemove }) {
@@ -52,10 +52,10 @@ function MajorCard({ m, onUpdate, onRemove }) {
         <>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600, marginBottom: 2 }}>Mã: {m.code}</div>
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#8b5cf6", lineHeight: 1.3 }}>{m.name}</div>
+              <div style={{ fontSize: 11, color: "#5f6876", fontWeight: 600, marginBottom: 2 }}>Mã: {m.code}</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--brand-blue)", lineHeight: 1.3 }}>{m.name}</div>
               {m.description && (
-                <div style={{ fontSize: 13, color: "#64748b", marginTop: 6, lineHeight: 1.6 }}>{m.description}</div>
+                <div style={{ fontSize: 13, color: "#5f6876", marginTop: 6, lineHeight: 1.6 }}>{m.description}</div>
               )}
             </div>
             <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
@@ -125,7 +125,7 @@ export default function Majors() {
 
       {/* Create form */}
       <div style={S.card}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: "#1e293b", marginBottom: 16 }}>Thêm ngành mới</div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: "#1d222b", marginBottom: 16 }}>Thêm ngành mới</div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr 3fr", gap: 12, marginBottom: 14 }}>
           <div>
             <div style={S.label}>Mã ngành</div>
@@ -145,15 +145,15 @@ export default function Majors() {
 
       {/* Error */}
       {error && (
-        <div style={{ padding: "10px 16px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 10, fontSize: 13, color: "#b91c1c" }}>
+        <div style={{ padding: "10px 16px", background: "#fdf1f0", border: "1px solid #f3bebc", borderRadius: 10, fontSize: 13, color: "#9f413e" }}>
           {error}
         </div>
       )}
 
       {/* Delete confirm */}
       {confirmId && (
-        <div style={{ padding: "14px 20px", background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-          <span style={{ fontSize: 14, color: "#92400e" }}>Xóa ngành <strong>{confirmName}</strong>? Hành động này không thể hoàn tác.</span>
+        <div style={{ padding: "14px 20px", background: "#fff7e8", border: "1px solid #efcf94", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <span style={{ fontSize: 14, color: "#a7773a" }}>Xóa ngành <strong>{confirmName}</strong>? Hành động này không thể hoàn tác.</span>
           <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
             <button style={S.btnDanger} onClick={remove}>Xác nhận xóa</button>
             <button style={S.btnSecondary} onClick={() => setConfirmId(null)}>Hủy</button>
@@ -164,7 +164,7 @@ export default function Majors() {
       {/* List */}
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: "#1e293b" }}>Danh sách ngành</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "#1d222b" }}>Danh sách ngành</div>
           {loading && <span style={{ fontSize: 12, color: "#94a3b8" }}>Đang tải...</span>}
           {!loading && <span style={{ fontSize: 12, color: "#94a3b8" }}>{items.length} ngành</span>}
         </div>

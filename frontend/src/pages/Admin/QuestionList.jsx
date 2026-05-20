@@ -93,9 +93,9 @@ export default function QuestionList(){
   }
   return (
     <div className="space-y-6">
-      <div style={{ borderRadius: 20, background: '#fff', border: '2px solid #ede9fe', boxShadow: '0 4px 24px rgba(139,92,246,0.08)', overflow: 'hidden' }}>
+      <div style={{ borderRadius: 20, background: '#fff', border: '2px solid #d8dde5', boxShadow: '0 4px 24px rgba(68,76,92,0.08)', overflow: 'hidden' }}>
         {/* Header */}
-        <div style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)', padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div style={{ background: 'linear-gradient(135deg, #444c5c 0%, #78a5a3 100%)', padding: '20px 28px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
             <div style={{ width: 44, height: 44, borderRadius: 12, background: 'rgba(255,255,255,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 22, height: 22 }}>
@@ -125,8 +125,8 @@ export default function QuestionList(){
                 style={{
                   padding: '6px 14px', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, transition: 'all 0.18s',
                   background: String(level) === v ? '#fff' : 'transparent',
-                  color: String(level) === v ? '#7c3aed' : 'rgba(255,255,255,0.85)',
-                  boxShadow: String(level) === v ? '0 2px 8px rgba(0,0,0,0.12)' : 'none',
+                  color: String(level) === v ? '#444c5c' : 'rgba(255,255,255,0.85)',
+                  boxShadow: String(level) === v ? '0 2px 8px rgba(29,34,43,0.12)' : 'none',
                 }}
               >{label}</button>
             ))}
@@ -136,7 +136,7 @@ export default function QuestionList(){
         {/* Body */}
         <div style={{ padding: '24px 28px' }}>
           {toast && (
-            <div style={{ marginBottom: 16, padding: '10px 16px', borderRadius: 10, background: '#f0fdf4', border: '1px solid #bbf7d0', color: '#15803d', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <div style={{ marginBottom: 16, padding: '10px 16px', borderRadius: 10, background: '#eff7f6', border: '1px solid #b8dedd', color: '#4b7473', fontSize: 13, display: 'flex', alignItems: 'center', gap: 8 }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 16, height: 16, flexShrink: 0 }}><polyline points="20 6 9 17 4 12"/></svg>
               {toast}
             </div>
@@ -146,9 +146,9 @@ export default function QuestionList(){
           <div style={{ marginBottom: 20 }}>
             {Number(level) === 2 && (
               <div style={{ marginBottom: 12 }}>
-                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#7c3aed', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Chọn Ngành (Chỉ dùng cho Vòng 2)</label>
+                <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#444c5c', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Chọn Ngành (Chỉ dùng cho Vòng 2)</label>
                 <select
-                  style={{ width: '100%', border: '1.5px solid #ddd6fe', borderRadius: 12, padding: '10px 14px', fontSize: 14, color: '#1e293b', outline: 'none', transition: 'border-color 0.15s', background: '#fff' }}
+                  style={{ width: '100%', border: '1.5px solid #d8dde5', borderRadius: 12, padding: '10px 14px', fontSize: 14, color: '#1e293b', outline: 'none', transition: 'border-color 0.15s', background: '#fff' }}
                   value={selectedMajor}
                   onChange={e => setSelectedMajor(e.target.value)}
                 >
@@ -156,22 +156,22 @@ export default function QuestionList(){
                 </select>
               </div>
             )}
-            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#7c3aed', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nội dung câu hỏi</label>
+            <label style={{ display: 'block', fontSize: 12, fontWeight: 600, color: '#444c5c', marginBottom: 6, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Nội dung câu hỏi</label>
             <textarea
               rows={2}
-              style={{ width: '100%', border: '1.5px solid #ddd6fe', borderRadius: 12, padding: '10px 14px', fontSize: 14, color: '#1e293b', resize: 'vertical', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', transition: 'border-color 0.15s' }}
+              style={{ width: '100%', border: '1.5px solid #d8dde5', borderRadius: 12, padding: '10px 14px', fontSize: 14, color: '#1e293b', resize: 'vertical', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', transition: 'border-color 0.15s' }}
               placeholder="Nhập nội dung câu hỏi..."
               value={qtext}
               onChange={e => setQtext(e.target.value)}
-              onFocus={e => e.target.style.borderColor = '#8b5cf6'}
-              onBlur={e => e.target.style.borderColor = '#ddd6fe'}
+              onFocus={e => e.target.style.borderColor = '#444c5c'}
+              onBlur={e => e.target.style.borderColor = '#d8dde5'}
             />
           </div>
 
           {/* Column headers */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 8, marginBottom: 8, paddingLeft: 40 }}>
             {['Nội dung đáp án', 'Các Ngành & Điểm'].map((h, i) => (
-              <div key={i} style={{ fontSize: 11, fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</div>
+              <div key={i} style={{ fontSize: 11, fontWeight: 600, color: '#5f6876', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</div>
             ))}
           </div>
 
@@ -180,14 +180,14 @@ export default function QuestionList(){
             {options.map((o, idx) => (
               <div key={idx} style={{ display: 'grid', gridTemplateColumns: '32px 1fr 280px', gap: 8, alignItems: 'start' }}>
                 {/* Index badge */}
-                <div style={{ width: 28, height: 28, borderRadius: 8, background: '#f3f0ff', color: '#7c3aed', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 4 }}>{String.fromCharCode(65 + idx)}</div>
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: '#eef1f5', color: '#444c5c', fontSize: 12, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 4 }}>{String.fromCharCode(65 + idx)}</div>
                 <input
-                  style={{ border: '1.5px solid #e2e8f0', borderRadius: 10, padding: '8px 12px', fontSize: 13, color: '#334155', outline: 'none', transition: 'border-color 0.15s' }}
+                  style={{ border: '1.5px solid #d8dde5', borderRadius: 10, padding: '8px 12px', fontSize: 13, color: '#303746', outline: 'none', transition: 'border-color 0.15s' }}
                   placeholder="Nội dung đáp án..."
                   value={o.text}
                   onChange={e => { const c = [...options]; c[idx].text = e.target.value; setOptions(c); }}
-                  onFocus={e => e.target.style.borderColor = '#8b5cf6'}
-                  onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                  onFocus={e => e.target.style.borderColor = '#444c5c'}
+                  onBlur={e => e.target.style.borderColor = '#d8dde5'}
                 />
                 
                 {/* Scorings list */}
@@ -199,15 +199,15 @@ export default function QuestionList(){
                     return (
                     <div key={sIdx} style={{ display: 'grid', gridTemplateColumns: '1fr 60px 28px 28px', gap: 8, alignItems: 'center' }}>
                       <select
-                        style={{ width: '100%', border: '1.5px solid #e2e8f0', borderRadius: 10, padding: '8px 10px', fontSize: 13, color: '#334155', outline: 'none', background: '#fff', transition: 'border-color 0.15s', minWidth: 0 }}
+                        style={{ width: '100%', border: '1.5px solid #d8dde5', borderRadius: 10, padding: '8px 10px', fontSize: 13, color: '#303746', outline: 'none', background: '#fff', transition: 'border-color 0.15s', minWidth: 0 }}
                         value={s.code || firstCode}
                         onChange={e => {
                           const c = [...options];
                           c[idx].scorings[sIdx].code = e.target.value;
                           setOptions(c);
                         }}
-                        onFocus={e => e.target.style.borderColor = '#8b5cf6'}
-                        onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                        onFocus={e => e.target.style.borderColor = '#444c5c'}
+                        onBlur={e => e.target.style.borderColor = '#d8dde5'}
                       >
                         {(availableList || []).map(item => (
                           <option key={item.code} value={item.code}>{item.code}</option>
@@ -217,7 +217,7 @@ export default function QuestionList(){
                         type="number"
                         min="0"
                         max="4"
-                        style={{ width: '100%', border: '1.5px solid #e2e8f0', borderRadius: 10, padding: '8px 10px', fontSize: 13, color: '#334155', outline: 'none', textAlign: 'center', transition: 'border-color 0.15s' }}
+                        style={{ width: '100%', border: '1.5px solid #d8dde5', borderRadius: 10, padding: '8px 10px', fontSize: 13, color: '#303746', outline: 'none', textAlign: 'center', transition: 'border-color 0.15s' }}
                         value={s.points}
                         onChange={e => {
                           const c = [...options];
@@ -225,21 +225,21 @@ export default function QuestionList(){
                           c[idx].scorings[sIdx].points = val === '' ? '' : Math.min(4, Math.max(0, Number(val)));
                           setOptions(c);
                         }}
-                        onFocus={e => e.target.style.borderColor = '#8b5cf6'}
-                        onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+                        onFocus={e => e.target.style.borderColor = '#444c5c'}
+                        onBlur={e => e.target.style.borderColor = '#d8dde5'}
                       />
                       {sIdx > 0 ? (
                         <button onClick={() => {
                           const c = [...options];
                           c[idx].scorings = c[idx].scorings.filter((_, i) => i !== sIdx);
                           setOptions(c);
-                        }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: '#fee2e2', color: '#ef4444', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+                        }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: '#fdf1f0', color: '#ce5a57', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                         </button>
                       ) : (
                         options.length > 2 ? (
                           <button onClick={() => setOptions(opts => opts.filter((_, i) => i !== idx))}
-                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: '#fef2f2', color: '#ef4444', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: '#fdf1f0', color: '#ce5a57', border: 'none', cursor: 'pointer', flexShrink: 0 }}>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                           </button>
                         ) : <div />
@@ -250,7 +250,7 @@ export default function QuestionList(){
                           const c = [...options];
                           c[idx].scorings.push({ code: firstCode, points: 1 });
                           setOptions(c);
-                        }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: '#f0fdf4', color: '#16a34a', border: '1.5px solid #16a34a', cursor: 'pointer', flexShrink: 0 }}>
+                        }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 28, height: 28, borderRadius: 8, background: '#eff7f6', color: '#78a5a3', border: '1.5px solid #78a5a3', cursor: 'pointer', flexShrink: 0 }}>
                           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{ width: 14, height: 14 }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                         </button>
                       ) : <div />}
@@ -265,13 +265,13 @@ export default function QuestionList(){
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <button
               onClick={() => setOptions(opts => [...opts, { text: '', scorings: [{ code: firstCode, points: 1 }] }])}
-              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 10, border: '1.5px dashed #c4b5fd', background: '#faf5ff', color: '#7c3aed', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+              style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '9px 16px', borderRadius: 10, border: '1.5px dashed #bac3cf', background: '#eef1f5', color: '#444c5c', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 15, height: 15 }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Thêm lựa chọn
             </button>
             <button
               onClick={create}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 22px', borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #8b5cf6, #6d28d9)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(109,40,217,0.35)' }}>
+              style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '9px 22px', borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #444c5c, #78a5a3)', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px rgba(68,76,92,0.35)' }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 15, height: 15 }}><polyline points="20 6 9 17 4 12"/></svg>
               Tạo câu hỏi
             </button>
@@ -279,8 +279,8 @@ export default function QuestionList(){
         </div>
       </div>
 
-      <div style={{ borderRadius: 20, background: '#fff', border: '2px solid #ede9fe', boxShadow: '0 4px 24px rgba(139,92,246,0.08)', overflow: 'hidden' }}>
-        <div style={{ background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ borderRadius: 20, background: '#fff', border: '2px solid #d8dde5', boxShadow: '0 4px 24px rgba(68,76,92,0.08)', overflow: 'hidden' }}>
+        <div style={{ background: 'linear-gradient(135deg, #444c5c 0%, #78a5a3 100%)', padding: '16px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
             <div style={{ width: 38, height: 38, borderRadius: 10, background: 'rgba(255,255,255,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <svg viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}>
@@ -296,15 +296,15 @@ export default function QuestionList(){
             {loading && <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>Đang tải...</span>}
           </div>
         </div>
-        {error && <div style={{ margin: '12px 20px', padding: '10px 14px', borderRadius: 10, background: '#fef2f2', border: '1px solid #fecaca', color: '#dc2626', fontSize: 13 }}>{error}</div>}
+        {error && <div style={{ margin: '12px 20px', padding: '10px 14px', borderRadius: 10, background: '#fdf1f0', border: '1px solid #f3bebc', color: '#9f413e', fontSize: 13 }}>{error}</div>}
 
         {/* Render a collapsible group */}
-        {[
-          { key: 'l1', label: 'Vòng 1 – Tiêu chí chọn Ngành', color: '#16a34a', bg: '#dcfce7', border: '#bbf7d0', questions: questionsL1, lvl: 1 },
+        {[ 
+          { key: 'l1', label: 'Vòng 1 – Tiêu chí chọn Ngành', color: '#444c5c', bg: '#eef1f5', border: '#d8dde5', questions: questionsL1, lvl: 1 },
           ...majors.map(m => ({
             key: `l2-${m.code}`,
             label: `Vòng 2 – Nhóm ${m.name || m.code}`,
-            color: '#2563eb', bg: '#dbeafe', border: '#bfdbfe',
+            color: '#78a5a3', bg: '#eff7f6', border: '#b8dedd',
             questions: questionsL2.filter(q => q.major_code === m.code),
             lvl: 2
           }))
@@ -324,7 +324,7 @@ export default function QuestionList(){
             </button>
             {openListGroup === key && (
               <div style={{ padding: '0 24px 16px' }}>
-                {questions.length === 0 && <div style={{ fontSize: 13, color: '#94a3b8', padding: '16px 0', textAlign: 'center' }}>Chưa có câu hỏi nào.</div>}
+                {questions.length === 0 && <div style={{ fontSize: 13, color: '#5f6876', padding: '16px 0', textAlign: 'center' }}>Chưa có câu hỏi nào.</div>}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   {questions.map((q, qi) => (
                     <div key={q.id} style={{ borderRadius: 12, border: `1.5px solid ${border}`, background: '#fafafa', overflow: 'hidden' }}>
@@ -332,11 +332,11 @@ export default function QuestionList(){
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, flex: 1, minWidth: 0 }}>
                           <div style={{ width: 24, height: 24, borderRadius: 8, background: bg, color, fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 1 }}>{qi + 1}</div>
                           <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ fontSize: 13, fontWeight: 600, color: '#1e293b', lineHeight: 1.4 }}>{q.text}</div>
+                            <div style={{ fontSize: 13, fontWeight: 600, color: '#1d222b', lineHeight: 1.4 }}>{q.text}</div>
                             {(q.Options || []).length > 0 && (
                               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 6, marginTop: 8 }}>
                                 {(q.Options || []).map((opt, oi) => (
-                                  <div key={opt.id} style={{ fontSize: 11, color: '#475569', background: '#fff', border: '1px solid #e2e8f0', borderRadius: 8, padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
+                                  <div key={opt.id} style={{ fontSize: 11, color: '#5f6876', background: '#fff', border: '1px solid #d8dde5', borderRadius: 8, padding: '4px 10px', display: 'flex', alignItems: 'center', gap: 6 }}>
                                     <span style={{ fontWeight: 700, color }}>{String.fromCharCode(65 + oi)}.</span> {opt.text}
                                   </div>
                                 ))}
@@ -345,8 +345,8 @@ export default function QuestionList(){
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-                          <a href={`/admin/questions/edit/${q.id}`} style={{ padding: '5px 12px', borderRadius: 8, border: '1.5px solid #e2e8f0', background: '#fff', color: '#475569', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>Sửa</a>
-                          <button onClick={() => remove(q.id, lvl)} style={{ padding: '5px 12px', borderRadius: 8, border: 'none', background: '#fef2f2', color: '#ef4444', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Xóa</button>
+                          <a href={`/admin/questions/edit/${q.id}`} style={{ padding: '5px 12px', borderRadius: 8, border: '1.5px solid #d8dde5', background: '#fff', color: '#5f6876', fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>Sửa</a>
+                          <button onClick={() => remove(q.id, lvl)} style={{ padding: '5px 12px', borderRadius: 8, border: 'none', background: '#fdf1f0', color: '#ce5a57', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Xóa</button>
                         </div>
                       </div>
                     </div>
