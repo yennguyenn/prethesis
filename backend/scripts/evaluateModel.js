@@ -33,17 +33,17 @@ const runEvaluation = async () => {
     console.log('--- BẮT ĐẦU ĐÁNH GIÁ THUẬT TOÁN SAW ---');
     // 1. Kết nối DB
     await db.sequelize.authenticate();
-    console.log('✅ Đã kết nối Database.');
+    console.log(' Đã kết nối Database.');
 
     // 2. Đọc file CSV
     const csvPath = path.join(__dirname, 'test_cases.csv');
     if (!fs.existsSync(csvPath)) {
-      console.log('⚠️ Không tìm thấy file test_cases.csv! Hãy cạo template ở dòng dưới và lưu vào folder scripts!');
+      console.log(' Không tìm thấy file test_cases.csv! Hãy cạo template ở dòng dưới và lưu vào folder scripts!');
       process.exit(1);
     }
 
     const testCases = readCSV(csvPath);
-    console.log(`✅ Đã tải ${testCases.length} mẫu test case từ file CSV.`);
+    console.log(` Đã tải ${testCases.length} mẫu test case từ file CSV.`);
 
     let correctCountTop1 = 0;
     let correctCountTop3 = 0;
@@ -66,7 +66,7 @@ const runEvaluation = async () => {
         }
       }
 
-      console.log(`\n⏳ Đang chấm điểm cho [${studentId}]... Ngành thực tế mong muốn: [${expectedMajor}]`);
+      console.log(`\n Đang chấm điểm cho [${studentId}]... Ngành thực tế mong muốn: [${expectedMajor}]`);
 
       // Mock user dummy
       const mockUser = { id: 1 }; // Không bắt buộc lưu db thật nếu không muốn bị rác DB
@@ -85,9 +85,9 @@ const runEvaluation = async () => {
       if (isHitTop3) correctCountTop3++;
 
       if (isHitTop3) {
-        console.log(`✔️ KIỂM THỬ ĐÚNG: Nằm trong Top 3`);
+        console.log(` KIỂM THỬ ĐÚNG: Nằm trong Top 3`);
       } else {
-        console.log(`❌ KIỂM THỬ SAI: Thuật toán dự đoán lệch lạc!`);
+        console.log(` KIỂM THỬ SAI: Thuật toán dự đoán lệch lạc!`);
       }
     }
 
@@ -101,9 +101,9 @@ const runEvaluation = async () => {
     console.log('------------------------------------------------------');
 
     if (correctCountTop3 / totalCases >= 0.75) {
-      console.log('\n🎉 KẾT LUẬN: THUẬT TOÁN ĐÃ ĐƯỢC TUNING RẤT TỐT! CÓ THỂ ĐEM VÀO BẢO VỆ!');
+      console.log('\n KẾT LUẬN: THUẬT TOÁN ĐÃ ĐƯỢC TUNING RẤT TỐT!');
     } else {
-      console.log('\n⚠️ KẾT LUẬN: ĐỘ CHÍNH XÁC QUÁ THẤP. HÃY KIỂM TRA MỤC TIÊU (WEIGHT) TRONG MA TRẬN!');
+      console.log('\n KẾT LUẬN: ĐỘ CHÍNH XÁC QUÁ THẤP. HÃY KIỂM TRA LẠI');
     }
 
   } catch (error) {

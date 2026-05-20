@@ -17,12 +17,26 @@ import KeywordRule from './keywordRule.js';
 dotenv.config();
 const config = configFile.development;
 
-const sequelize = new Sequelize(config.database, config.username, config.password, {
-  host: config.host,
-  port: config.port,
-  dialect: config.dialect,
-  logging: false
-});
+let sequelize;
+if (process.env.DATABASE_URL) {
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: 'postgres',
+    logging: false,
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false // Cần thiết cho các dịch vụ đám mây như Neon, Render
+      }
+    }
+  });
+} else {
+  sequelize = new Sequelize(config.database, config.username, config.password, {
+    host: config.host,
+    port: config.port,
+    dialect: config.dialect,
+    logging: false
+  });
+}
 
 const db = {};
 db.Sequelize = Sequelize;

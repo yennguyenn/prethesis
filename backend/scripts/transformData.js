@@ -51,7 +51,7 @@ function normalizeText(text) {
 
 async function transformData() {
   try {
-    console.log('⏳ Đang kết nối Database để lấy dữ liệu ánh xạ (Mapping)...');
+    console.log(' Đang kết nối Database để lấy dữ liệu ánh xạ (Mapping)...');
     await db.sequelize.authenticate();
 
     // 1. Lấy danh sách Ngành học
@@ -80,7 +80,7 @@ async function transformData() {
       });
     });
 
-    console.log(`✅ Đã tải ${majors.length} ngành và ${questionIds.length} câu hỏi Level 1 từ DB.`);
+    console.log(` Đã tải ${majors.length} ngành và ${questionIds.length} câu hỏi Level 1 từ DB.`);
 
     // 3. Đọc dữ liệu thô
     const rawPath = path.join(__dirname, 'raw_data.csv');
@@ -98,22 +98,21 @@ async function transformData() {
     const headers = rows[0];
 
     // Xác định vị trí các cột quan trọng
-    let emailColIndex = -1;
     let majorColIndex = -1;
     let satisfactionColIndex = -1;
-    // Cột từ 1 -> 30 là đáp án
+    // Cột timestamp (lúc điền form) thường ở index 0
+    // Cột từ 1 -> 30 là đáp án của 30 câu
     
     headers.forEach((h, idx) => {
       const hn = normalizeText(h);
-      if (hn.includes('email')) emailColIndex = idx;
       if (hn.includes('theo học ngành nào')) majorColIndex = idx;
       if (hn.includes('hài lòng')) satisfactionColIndex = idx;
     });
 
-    // Nếu không tìm thấy bằng chữ, mặc định cứng theo file bạn up
-    if (emailColIndex === -1) emailColIndex = 31;
-    if (majorColIndex === -1) majorColIndex = 32;
-    if (satisfactionColIndex === -1) satisfactionColIndex = 33;
+    // Theo cấu trúc Google form thông thường (cột 0 là Dấu thời gian)
+    // Câu 1 -> 30 sẽ ở cột 1 đến 30
+    if (majorColIndex === -1) majorColIndex = 31; // Cột cho Câu 31
+    if (satisfactionColIndex === -1) satisfactionColIndex = 32; // Cột cho Câu 32
 
     let skippedCount = 0;
     
@@ -127,17 +126,18 @@ async function transformData() {
     // Xử lý từng dòng dữ liệu
     for (let i = 1; i < rows.length; i++) {
       const r = rows[i];
-      if (!r || r.length < majorColIndex) continue;
+      if (!r || r.length < 32) continue; // Phải có ít nhất 32 cột (0->32 = 33 cột, hoặc ít nhất tới trả lời 32)
 
       const satisfyStatus = normalizeText(r[satisfactionColIndex]);
       
-      // BƯỚC BỘ LỌC VÀNG: Chỉ lấy những người "Hài lòng" và "rất hài lòng"
-      if (!satisfyStatus.includes('hài lòng') || satisfyStatus.includes('không')) {
+      // BƯỚC BỘ LỌC VÀNG: Chỉ lấy những người "Có rất hài lòng" hoặc "Hài lòng" 
+      // (loại bỏ "Không hài lòng" và "Cũng bình thường" vì kết quả ngành hiện tại không phải ngành lí tưởng nhất để làm chuẩn đối sánh)
+      if (satisfyStatus.includes('không') || satisfyStatus.includes('bình thường')) {
         skippedCount++;
         continue;
       }
 
-      // Ẩn danh Email sinh viên bằng ID tự động (Ví dụ: SV_001, SV_002...)
+      // Ẩn danh sinh viên bằng ID tự động (Ví dụ: SV_001, SV_002...)
       const email = `SV_${String(extractedData.length + 1).padStart(3, '0')}`;
       const rawMajorName = normalizeText(r[majorColIndex]);
       
@@ -201,12 +201,12 @@ async function transformData() {
     fs.writeFileSync(outPath, outputCSV);
 
     console.log(`\n================================`);
-    console.log(`🎉 BIẾN ĐỔI DỮ LIỆU THÀNH CÔNG!`);
+    console.log(` BIẾN ĐỔI DỮ LIỆU THÀNH CÔNG!`);
     console.log(`- Đã quét: ${rows.length - 1} mẫu`);
     console.log(`- Bỏ qua do không Hài lòng: ${skippedCount} mẫu`);
     console.log(`- Lưu thành công vào file test test_cases.csv: ${extractedData.length} mẫu`);
     console.log(`================================`);
-    console.log(`\n👉 Trạng thái Sẵn sàng! Hãy chạy lệnh: node scripts/evaluateModel.js để xem kết quả!`);
+    console.log(`\n Trạng thái Sẵn sàng! Hãy chạy lệnh: node scripts/evaluateModel.js để xem kết quả!`);
 
   } catch (err) {
     console.error('Lỗi khi biến đổi dữ liệu:', err);
