@@ -16,18 +16,15 @@ export default function Layout() {
     : undefined;
 
   return (
-    <div className="flex h-screen w-screen p-3 md:p-6 overflow-hidden" style={{ fontFamily: "'Mulish', sans-serif", background: "var(--surface-body)" }}>
-      {/* App Container */}
-      <div className="flex flex-1 overflow-hidden shadow-sm rounded-[32px] border border-slate-100" style={{ background: "var(--surface-app)" }}>
-        {/* Left sidebar */}
-        <Navbar activePage={activePage} />
-        {/* Main content */}
-        <div className="flex-1 flex flex-col overflow-hidden min-w-0 rounded-[32px]">
-          <main className="flex-1 overflow-auto custom-scrollbar">
-            <Outlet />
-          </main>
-          {/* <Footer /> - Temporarily hidden or keep it depending on design */}
-        </div>
+    <div className="flex h-screen overflow-hidden" style={{ fontFamily: "'Mulish', sans-serif", background: "var(--surface-muted)" }}>
+      {/* Left sidebar */}
+      <Navbar activePage={activePage} />
+      {/* Main content */}
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
+        <main className="flex-1 overflow-auto" style={{ background: "var(--surface-muted)" }}>
+          <Outlet />
+        </main>
+        <Footer />
       </div>
     </div>
   );

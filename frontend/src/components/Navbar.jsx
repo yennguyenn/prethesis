@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 
 const NAV_ITEMS = [
@@ -19,14 +19,21 @@ const NAV_ITEMS = [
 
 export default function Navbar({ activePage = 'home' }) {
   const [collapsed, setCollapsed] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuRef]);
 
   const token = localStorage.getItem('token');
   let isAdmin = false;
-  let userObj = null;
-  const userStr = localStorage.getItem('user');
-  if (userStr) {
-    try { userObj = JSON.parse(userStr); } catch (e) {}
-  }
   if (token) {
     try {
       const parts = token.split('.');
@@ -40,34 +47,42 @@ export default function Navbar({ activePage = 'home' }) {
     }
   }
 
+  let user = null;
+  try {
+    const userStr = localStorage.getItem('user');
+    if (userStr) user = JSON.parse(userStr);
+  } catch (e) { }
+
   const items = [
     ...NAV_ITEMS,
-    ...(token ? [{ to: '/results', key: 'results', label: 'Kết quả của tôi', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg> }] : []),
     ...(isAdmin ? [{ to: '/admin', key: 'admin', label: 'Quản trị', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20 }}><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> }] : []),
   ];
 
   return (
     <aside
-      className="flex flex-col flex-shrink-0 transition-all duration-300 border-r border-slate-200/60"
-      style={{ width: collapsed ? 88 : 260, background: 'var(--surface-app)' }}
+      className="flex flex-col flex-shrink-0 shadow-lg transition-all duration-300 border-r"
+      style={{ width: collapsed ? 64 : 240, background: 'var(--brand-blue)', borderColor: 'rgba(255,255,255,0.12)' }}
     >
       {/* Brand + collapse toggle */}
       <div
-        className="flex items-center flex-shrink-0 mt-4 mb-2"
-        style={{ padding: collapsed ? '10px 0' : '10px 24px', gap: collapsed ? 0 : 10, justifyContent: collapsed ? 'center' : 'space-between' }}
+        className="flex items-center border-b flex-shrink-0"
+        style={{ padding: collapsed ? '18px 14px' : '18px 16px', gap: collapsed ? 0 : 10, justifyContent: collapsed ? 'center' : 'space-between', borderColor: 'rgba(255,255,255,0.12)' }}
       >
         {!collapsed && (
-          <Link to="/" className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 22, height: 22 }}><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-            </div>
-            <span className="font-extrabold text-lg tracking-tight truncate" style={{ color: '#111' }}>Support<br/>Career</span>
+          <Link to="/" className="flex items-center gap-2 min-w-0">
+            <img
+              src="/assets/icon.jpg"
+              alt="Support Career logo"
+              className="flex-shrink-0 rounded-xl"
+              style={{ width: 34, height: 34, objectFit: 'cover' }}
+            />
+            <span className="font-bold text-sm tracking-wide truncate" style={{ color: '#ffffff' }}>Support Career</span>
           </Link>
         )}
         <button
           onClick={() => setCollapsed(c => !c)}
-          className="flex-shrink-0 flex items-center justify-center rounded-full transition-colors hover:bg-slate-200"
-          style={{ width: 36, height: 36, color: '#333', border: 'none', background: collapsed ? '#f0ede8' : 'transparent', cursor: 'pointer', margin: collapsed ? '0 auto' : 0 }}
+          className="flex-shrink-0 flex items-center justify-center rounded-lg transition-colors hover:bg-white/20"
+          style={{ width: 32, height: 32, color: '#eef1f5', border: 'none', background: 'transparent', cursor: 'pointer' }}
           aria-label="Toggle sidebar"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 18, height: 18 }}>
@@ -77,8 +92,8 @@ export default function Navbar({ activePage = 'home' }) {
       </div>
 
       {/* Nav links */}
-      <nav className="flex-1 py-6 overflow-y-auto overflow-x-hidden custom-scrollbar">
-        <div className="flex flex-col gap-3">
+      <nav className="flex-1 py-4 overflow-y-auto overflow-x-hidden custom-scrollbar">
+        <div className="flex flex-col gap-1 px-2">
           {items.map(item => {
             const active = activePage === item.key;
             return (
@@ -86,28 +101,19 @@ export default function Navbar({ activePage = 'home' }) {
                 key={item.key}
                 to={item.to}
                 title={collapsed ? item.label : undefined}
-                className="flex items-center transition-all hover:opacity-80 mx-4"
+                className="flex items-center rounded-xl transition-all hover:bg-white/10"
                 style={{
-                  gap: collapsed ? 0 : 14,
-                  padding: collapsed ? '14px 0' : '14px 20px',
+                  gap: collapsed ? 0 : 10,
+                  padding: collapsed ? '10px 0' : '10px 12px',
                   justifyContent: collapsed ? 'center' : 'flex-start',
-                  background: active ? '#111' : 'transparent',
-                  color: active ? '#fff' : '#666',
-                  fontWeight: active ? 700 : 600,
-                  fontSize: 15,
+                  background: active ? 'rgba(255, 255, 255, 0.14)' : 'transparent',
+                  color: active ? '#ffffff' : 'rgba(238, 241, 245, 0.86)',
+                  fontWeight: active ? 600 : 400,
+                  fontSize: 14,
                   textDecoration: 'none',
-                  borderRadius: 999,
                 }}
               >
-                <div className="flex-shrink-0 flex items-center justify-center" style={{ 
-                  width: collapsed ? 44 : 'auto', 
-                  height: collapsed ? 44 : 'auto', 
-                  background: collapsed && active ? '#111' : (collapsed ? '#fff' : 'transparent'),
-                  borderRadius: 999,
-                  color: collapsed && active ? '#fff' : (collapsed ? '#111' : 'inherit')
-                }}>
-                  {item.icon}
-                </div>
+                <span className="flex-shrink-0">{item.icon}</span>
                 {!collapsed && <span className="truncate">{item.label}</span>}
               </Link>
             );
@@ -116,66 +122,87 @@ export default function Navbar({ activePage = 'home' }) {
       </nav>
 
       {/* Bottom: login/logout */}
-      <div className="p-4 flex-shrink-0 pb-6">
+      <div className="border-t p-2 flex-shrink-0 relative" style={{ borderColor: 'rgba(255,255,255,0.12)' }} ref={menuRef}>
         {token ? (
-          <div className="flex flex-col gap-3">
-            <div
-              className="flex items-center rounded-[24px]"
-              style={{
-                gap: collapsed ? 0 : 12,
-                padding: collapsed ? '0' : '12px',
-                justifyContent: collapsed ? 'center' : 'flex-start',
-                background: collapsed ? 'transparent' : '#fff',
-                boxShadow: collapsed ? 'none' : '0 4px 12px rgba(0,0,0,0.03)',
-              }}
-              title={collapsed && userObj ? userObj.name || userObj.email : undefined}
-            >
-              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm bg-pastel-purple" style={{ color: '#111' }}>
-                {userObj?.name ? userObj.name.charAt(0).toUpperCase() : (userObj?.email ? userObj.email.charAt(0).toUpperCase() : 'U')}
-              </div>
-              {!collapsed && (
-                <div className="flex flex-col min-w-0">
-                  <span className="text-sm font-extrabold text-[#111] truncate">{userObj?.name || 'Người dùng'}</span>
-                  <span className="text-xs text-slate-500 font-semibold truncate">{userObj?.email || ''}</span>
+          <>
+            {showUserMenu && (
+              <div className="absolute bottom-full left-0 mb-2 w-full px-2 z-50">
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden py-1 border border-gray-100">
+                  <Link
+                    to="/results"
+                    onClick={() => setShowUserMenu(false)}
+                    className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                    style={{ textDecoration: 'none' }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+                    Kết quả của tôi
+                  </Link>
+                  <button
+                    onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = '/'; }}
+                    className="flex items-center w-full gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium border-none bg-transparent cursor-pointer text-left"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Đăng xuất
+                  </button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
             <button
-              onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = '/'; }}
-              className="flex items-center w-full rounded-full transition-all hover:bg-slate-200"
+              onClick={() => setShowUserMenu(!showUserMenu)}
+              className="flex items-center w-full rounded-xl transition-all hover:bg-white/10"
               style={{
                 gap: collapsed ? 0 : 10,
-                padding: collapsed ? '12px 0' : '12px 16px',
+                padding: collapsed ? '10px 0' : '10px 12px',
                 justifyContent: collapsed ? 'center' : 'flex-start',
-                color: '#666',
-                fontWeight: 700,
+                color: 'rgba(238, 241, 245, 0.86)',
                 fontSize: 14,
                 border: 'none',
-                background: 'transparent',
+                background: showUserMenu ? 'rgba(255,255,255,0.1)' : 'transparent',
                 cursor: 'pointer',
               }}
-              title={collapsed ? 'Đăng xuất' : undefined}
+              title={collapsed ? (user?.name || user?.username || 'Tài khoản') : undefined}
             >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20, flexShrink: 0 }}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-              {!collapsed && <span>Đăng xuất</span>}
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 border border-white/20">
+                <span className="font-bold text-white text-sm">
+                  {(user?.name || user?.username || user?.email || 'U').charAt(0).toUpperCase()}
+                </span>
+              </div>
+              {!collapsed && (
+                <>
+                  <div className="flex flex-col items-start truncate min-w-0 flex-1">
+                    <span className="font-medium text-white truncate w-full text-left leading-tight">
+                      {user?.name || user?.username || 'Người dùng'}
+                    </span>
+                    <span className="text-xs text-white/60 truncate w-full text-left mt-0.5">
+                      {user?.email || 'Học viên'}
+                    </span>
+                  </div>
+                  <svg 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    className={`w-4 h-4 flex-shrink-0 transition-transform duration-200 ${showUserMenu ? 'rotate-180' : ''}`}
+                  >
+                    <polyline points="18 15 12 9 6 15"/>
+                  </svg>
+                </>
+              )}
             </button>
-          </div>
+          </>
         ) : (
           <Link
             to="/login"
-            className="flex items-center w-full rounded-full transition-all hover:bg-slate-200 mx-auto"
+            className="flex items-center w-full rounded-xl transition-all hover:bg-white/10"
             style={{
               gap: collapsed ? 0 : 10,
-              padding: collapsed ? '14px 0' : '14px 20px',
+              padding: collapsed ? '10px 0' : '10px 12px',
               justifyContent: collapsed ? 'center' : 'flex-start',
-              color: '#111',
-              fontWeight: 700,
-              fontSize: 15,
+              color: 'rgba(238, 241, 245, 0.86)',
+              fontSize: 14,
               textDecoration: 'none',
-              background: '#fff',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-              width: collapsed ? 44 : 'calc(100% - 16px)',
-              height: collapsed ? 44 : 'auto',
             }}
             title={collapsed ? 'Đăng nhập' : undefined}
           >
