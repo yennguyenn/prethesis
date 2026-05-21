@@ -47,7 +47,6 @@ export default function Navbar({ activePage = 'home' }) {
   ];
 
   return (
-  return (
     <aside
       className="flex flex-col flex-shrink-0 transition-all duration-300 border-r border-slate-200/60"
       style={{ width: collapsed ? 88 : 260, background: 'var(--surface-app)' }}
