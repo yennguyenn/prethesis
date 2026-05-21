@@ -22,6 +22,11 @@ export default function Navbar({ activePage = 'home' }) {
 
   const token = localStorage.getItem('token');
   let isAdmin = false;
+  let userObj = null;
+  const userStr = localStorage.getItem('user');
+  if (userStr) {
+    try { userObj = JSON.parse(userStr); } catch (e) {}
+  }
   if (token) {
     try {
       const parts = token.split('.');
@@ -107,24 +112,46 @@ export default function Navbar({ activePage = 'home' }) {
       {/* Bottom: login/logout */}
       <div className="border-t p-2 flex-shrink-0" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
         {token ? (
-          <button
-            onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = '/'; }}
-            className="flex items-center w-full rounded-xl transition-all hover:bg-white/10"
-            style={{
-              gap: collapsed ? 0 : 10,
-              padding: collapsed ? '10px 0' : '10px 12px',
-              justifyContent: collapsed ? 'center' : 'flex-start',
-              color: 'rgba(238, 241, 245, 0.86)',
-              fontSize: 14,
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer',
-            }}
-            title={collapsed ? 'Đăng xuất' : undefined}
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20, flexShrink: 0 }}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            {!collapsed && <span>Đăng xuất</span>}
-          </button>
+          <div className="flex flex-col gap-2">
+            <div
+              className="flex items-center rounded-xl"
+              style={{
+                gap: collapsed ? 0 : 10,
+                padding: collapsed ? '10px 0' : '10px 12px',
+                justifyContent: collapsed ? 'center' : 'flex-start',
+                background: 'rgba(255,255,255,0.05)',
+              }}
+              title={collapsed && userObj ? userObj.name || userObj.email : undefined}
+            >
+              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm" style={{ background: 'rgba(255,255,255,0.2)' }}>
+                {userObj?.name ? userObj.name.charAt(0).toUpperCase() : (userObj?.email ? userObj.email.charAt(0).toUpperCase() : 'U')}
+              </div>
+              {!collapsed && (
+                <div className="flex flex-col min-w-0">
+                  <span className="text-sm font-semibold text-white truncate">{userObj?.name || 'Người dùng'}</span>
+                  <span className="text-xs text-white/70 truncate">{userObj?.email || ''}</span>
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = '/'; }}
+              className="flex items-center w-full rounded-xl transition-all hover:bg-white/10 mt-1"
+              style={{
+                gap: collapsed ? 0 : 10,
+                padding: collapsed ? '10px 0' : '10px 12px',
+                justifyContent: collapsed ? 'center' : 'flex-start',
+                color: 'rgba(238, 241, 245, 0.86)',
+                fontSize: 14,
+                border: 'none',
+                background: 'transparent',
+                cursor: 'pointer',
+              }}
+              title={collapsed ? 'Đăng xuất' : undefined}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 20, height: 20, flexShrink: 0 }}><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              {!collapsed && <span>Đăng xuất</span>}
+            </button>
+          </div>
         ) : (
           <Link
             to="/login"
