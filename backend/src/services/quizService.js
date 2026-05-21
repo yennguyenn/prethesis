@@ -389,17 +389,18 @@ export const submitMajorQuizService = async (answers, user) => {
   }
 
   let submissionId = null;
-  if (user && recommended) {
+  const majorToSave = recommended || first;
+  if (user && majorToSave) {
     try {
       const submission = await db.Submission.create({
         userId: user.id,
-        majorCode: recommended.code || null,
-        majorName: recommended.name || null,
+        majorCode: majorToSave.code || null,
+        majorName: majorToSave.name || null,
         subMajorCode: null,
         subMajorName: null,
-        score: topScore,
-        percentage: recommended.percentage,
-        totalPoints: recommended.totalPoints,
+        score: topScore || majorToSave.score,
+        percentage: majorToSave.percentage,
+        totalPoints: majorToSave.totalPoints,
         details: {
           decisionMatrix,
           normalizedMatrix,
@@ -414,6 +415,7 @@ export const submitMajorQuizService = async (answers, user) => {
       submissionId = submission.id;
     } catch (e) {
       // log error
+      console.error('Failed to save submission:', e);
     }
   }
 

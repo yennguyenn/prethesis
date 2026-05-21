@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 async function migrateDirectly() {
-  console.log('⏳ Đang thiết lập kết nối...');
+  console.log(' Đang thiết lập kết nối...');
   
   // 1. Kết nối tới Database ở máy tính (Local)
   const localDb = new Sequelize('dss_db', 'postgres', 'yennguyen@', {
@@ -28,7 +28,7 @@ async function migrateDirectly() {
   try {
     await localDb.authenticate();
     await remoteDb.authenticate();
-    console.log('✔️ Kết nối thành công cả Local và Neon!');
+    console.log(' Kết nối thành công cả Local và Neon!');
 
     // Danh sách các bảng cần copy dữ liệu (theo thứ tự khóa ngoại)
     const tables = [
@@ -43,7 +43,7 @@ async function migrateDirectly() {
     ];
 
     for (const table of tables) {
-      console.log(`\n⏳ Đang copy bảng: ${table}...`);
+      console.log(`\n Đang copy bảng: ${table}...`);
       
       // Lấy dữ liệu từ máy tính
       const [rows] = await localDb.query(`SELECT * FROM ${table}`);
@@ -71,11 +71,11 @@ async function migrateDirectly() {
           );
           successCount++;
         } catch (err) {
-          console.error(`   ❌ Lỗi chèn dòng vào ${table}:`, err.message);
+          console.error(`    Lỗi chèn dòng vào ${table}:`, err.message);
         }
       }
       
-      console.log(`✔️ Hoàn thành bảng ${table}: Đã copy ${successCount}/${rows.length} dòng.`);
+      console.log(` Hoàn thành bảng ${table}: Đã copy ${successCount}/${rows.length} dòng.`);
     }
 
     // Reset sequence cho các bảng để tránh lỗi ID sau này
@@ -86,10 +86,10 @@ async function migrateDirectly() {
        await remoteDb.query(`SELECT setval('"Levels_id_seq"', (SELECT MAX(id) FROM "Levels"));`).catch(()=>{});
     } catch(e) {}
 
-    console.log('\n🎉 XONG TOÀN BỘ! DATABASE TRÊN MẠNG ĐÃ ĐẦY ĐỦ DỮ LIỆU CHUẨN 100%!');
+    console.log('\n XONG TOÀN BỘ! DATABASE TRÊN MẠNG ĐÃ ĐẦY ĐỦ DỮ LIỆU CHUẨN 100%!');
     process.exit(0);
   } catch (error) {
-    console.error('❌ Lỗi hệ thống:', error);
+    console.error(' Lỗi hệ thống:', error);
     process.exit(1);
   }
 }

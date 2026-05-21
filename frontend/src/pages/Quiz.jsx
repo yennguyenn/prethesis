@@ -129,6 +129,22 @@ export default function Quiz() {
     setCurrentIndex(questions.length - 1);
   };
 
+  const fillRandomAnswers = () => {
+    const mapped = { ...answers };
+    for (const q of questions) {
+      if (!mapped[q.id]) {
+        if (q.options && q.options.length > 0) {
+          const randomOpt = q.options[Math.floor(Math.random() * q.options.length)];
+          mapped[q.id] = randomOpt.id;
+        } else {
+          mapped[q.id] = "Random answer text";
+        }
+      }
+    }
+    setAnswers(mapped);
+    setCurrentIndex(questions.length - 1);
+  };
+
   const choose = (optionId) => {
     if (!currentQuestion) return;
     setAnswers(prev => ({ ...prev, [currentQuestion.id]: optionId }));
@@ -536,7 +552,15 @@ export default function Quiz() {
             <div key={currentQuestion.id} className="rounded-3xl bg-white/80 backdrop-blur-sm shadow-lg p-6 md:p-8 fade-in dark:bg-slate-800/70 dark:border-slate-700" style={{ border: '1px solid var(--border-soft)' }}>
               <div className="flex items-start justify-between gap-4 mb-6">
                 <h3 className="text-xl md:text-2xl font-semibold leading-relaxed" style={{ color: "var(--brand-blue)" }}>{currentQuestion.text}</h3>
-                {/* Admin actions removed */}
+                {isAdmin && (
+                  <button 
+                    onClick={fillRandomAnswers} 
+                    className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-amber-100 text-amber-700 hover:bg-amber-200 transition shadow-sm"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    Random Fill (Test)
+                  </button>
+                )}
               </div>
               {currentQuestion.options && currentQuestion.options.length > 0 ? (
                 <div className="grid gap-4">
