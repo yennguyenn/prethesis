@@ -47,30 +47,28 @@ export default function Navbar({ activePage = 'home' }) {
   ];
 
   return (
+  return (
     <aside
-      className="flex flex-col flex-shrink-0 shadow-lg transition-all duration-300 border-r"
-      style={{ width: collapsed ? 64 : 240, background: 'var(--brand-blue)', borderColor: 'rgba(255,255,255,0.12)' }}
+      className="flex flex-col flex-shrink-0 transition-all duration-300 border-r border-slate-200/60"
+      style={{ width: collapsed ? 88 : 260, background: 'var(--surface-app)' }}
     >
       {/* Brand + collapse toggle */}
       <div
-        className="flex items-center border-b flex-shrink-0"
-        style={{ padding: collapsed ? '18px 14px' : '18px 16px', gap: collapsed ? 0 : 10, justifyContent: collapsed ? 'center' : 'space-between', borderColor: 'rgba(255,255,255,0.12)' }}
+        className="flex items-center flex-shrink-0 mt-4 mb-2"
+        style={{ padding: collapsed ? '10px 0' : '10px 24px', gap: collapsed ? 0 : 10, justifyContent: collapsed ? 'center' : 'space-between' }}
       >
         {!collapsed && (
-          <Link to="/" className="flex items-center gap-2 min-w-0">
-            <img
-              src="/assets/icon.jpg"
-              alt="Support Career logo"
-              className="flex-shrink-0 rounded-xl"
-              style={{ width: 34, height: 34, objectFit: 'cover' }}
-            />
-            <span className="font-bold text-sm tracking-wide truncate" style={{ color: '#ffffff' }}>Support Career</span>
+          <Link to="/" className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 22, height: 22 }}><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <span className="font-extrabold text-lg tracking-tight truncate" style={{ color: '#111' }}>Support<br/>Career</span>
           </Link>
         )}
         <button
           onClick={() => setCollapsed(c => !c)}
-          className="flex-shrink-0 flex items-center justify-center rounded-lg transition-colors hover:bg-white/20"
-          style={{ width: 32, height: 32, color: '#eef1f5', border: 'none', background: 'transparent', cursor: 'pointer' }}
+          className="flex-shrink-0 flex items-center justify-center rounded-full transition-colors hover:bg-slate-200"
+          style={{ width: 36, height: 36, color: '#333', border: 'none', background: collapsed ? '#f0ede8' : 'transparent', cursor: 'pointer', margin: collapsed ? '0 auto' : 0 }}
           aria-label="Toggle sidebar"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ width: 18, height: 18 }}>
@@ -80,8 +78,8 @@ export default function Navbar({ activePage = 'home' }) {
       </div>
 
       {/* Nav links */}
-      <nav className="flex-1 py-4 overflow-y-auto overflow-x-hidden custom-scrollbar">
-        <div className="flex flex-col gap-1 px-2">
+      <nav className="flex-1 py-6 overflow-y-auto overflow-x-hidden custom-scrollbar">
+        <div className="flex flex-col gap-3">
           {items.map(item => {
             const active = activePage === item.key;
             return (
@@ -89,19 +87,28 @@ export default function Navbar({ activePage = 'home' }) {
                 key={item.key}
                 to={item.to}
                 title={collapsed ? item.label : undefined}
-                className="flex items-center rounded-xl transition-all hover:bg-white/10"
+                className="flex items-center transition-all hover:opacity-80 mx-4"
                 style={{
-                  gap: collapsed ? 0 : 10,
-                  padding: collapsed ? '10px 0' : '10px 12px',
+                  gap: collapsed ? 0 : 14,
+                  padding: collapsed ? '14px 0' : '14px 20px',
                   justifyContent: collapsed ? 'center' : 'flex-start',
-                  background: active ? 'rgba(255, 255, 255, 0.14)' : 'transparent',
-                  color: active ? '#ffffff' : 'rgba(238, 241, 245, 0.86)',
-                  fontWeight: active ? 600 : 400,
-                  fontSize: 14,
+                  background: active ? '#111' : 'transparent',
+                  color: active ? '#fff' : '#666',
+                  fontWeight: active ? 700 : 600,
+                  fontSize: 15,
                   textDecoration: 'none',
+                  borderRadius: 999,
                 }}
               >
-                <span className="flex-shrink-0">{item.icon}</span>
+                <div className="flex-shrink-0 flex items-center justify-center" style={{ 
+                  width: collapsed ? 44 : 'auto', 
+                  height: collapsed ? 44 : 'auto', 
+                  background: collapsed && active ? '#111' : (collapsed ? '#fff' : 'transparent'),
+                  borderRadius: 999,
+                  color: collapsed && active ? '#fff' : (collapsed ? '#111' : 'inherit')
+                }}>
+                  {item.icon}
+                </div>
                 {!collapsed && <span className="truncate">{item.label}</span>}
               </Link>
             );
@@ -110,37 +117,39 @@ export default function Navbar({ activePage = 'home' }) {
       </nav>
 
       {/* Bottom: login/logout */}
-      <div className="border-t p-2 flex-shrink-0" style={{ borderColor: 'rgba(255,255,255,0.12)' }}>
+      <div className="p-4 flex-shrink-0 pb-6">
         {token ? (
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <div
-              className="flex items-center rounded-xl"
+              className="flex items-center rounded-[24px]"
               style={{
-                gap: collapsed ? 0 : 10,
-                padding: collapsed ? '10px 0' : '10px 12px',
+                gap: collapsed ? 0 : 12,
+                padding: collapsed ? '0' : '12px',
                 justifyContent: collapsed ? 'center' : 'flex-start',
-                background: 'rgba(255,255,255,0.05)',
+                background: collapsed ? 'transparent' : '#fff',
+                boxShadow: collapsed ? 'none' : '0 4px 12px rgba(0,0,0,0.03)',
               }}
               title={collapsed && userObj ? userObj.name || userObj.email : undefined}
             >
-              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm" style={{ background: 'rgba(255,255,255,0.2)' }}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm bg-pastel-purple" style={{ color: '#111' }}>
                 {userObj?.name ? userObj.name.charAt(0).toUpperCase() : (userObj?.email ? userObj.email.charAt(0).toUpperCase() : 'U')}
               </div>
               {!collapsed && (
                 <div className="flex flex-col min-w-0">
-                  <span className="text-sm font-semibold text-white truncate">{userObj?.name || 'Người dùng'}</span>
-                  <span className="text-xs text-white/70 truncate">{userObj?.email || ''}</span>
+                  <span className="text-sm font-extrabold text-[#111] truncate">{userObj?.name || 'Người dùng'}</span>
+                  <span className="text-xs text-slate-500 font-semibold truncate">{userObj?.email || ''}</span>
                 </div>
               )}
             </div>
             <button
               onClick={() => { localStorage.removeItem('token'); localStorage.removeItem('user'); window.location.href = '/'; }}
-              className="flex items-center w-full rounded-xl transition-all hover:bg-white/10 mt-1"
+              className="flex items-center w-full rounded-full transition-all hover:bg-slate-200"
               style={{
                 gap: collapsed ? 0 : 10,
-                padding: collapsed ? '10px 0' : '10px 12px',
+                padding: collapsed ? '12px 0' : '12px 16px',
                 justifyContent: collapsed ? 'center' : 'flex-start',
-                color: 'rgba(238, 241, 245, 0.86)',
+                color: '#666',
+                fontWeight: 700,
                 fontSize: 14,
                 border: 'none',
                 background: 'transparent',
@@ -155,14 +164,19 @@ export default function Navbar({ activePage = 'home' }) {
         ) : (
           <Link
             to="/login"
-            className="flex items-center w-full rounded-xl transition-all hover:bg-white/10"
+            className="flex items-center w-full rounded-full transition-all hover:bg-slate-200 mx-auto"
             style={{
               gap: collapsed ? 0 : 10,
-              padding: collapsed ? '10px 0' : '10px 12px',
+              padding: collapsed ? '14px 0' : '14px 20px',
               justifyContent: collapsed ? 'center' : 'flex-start',
-              color: 'rgba(238, 241, 245, 0.86)',
-              fontSize: 14,
+              color: '#111',
+              fontWeight: 700,
+              fontSize: 15,
               textDecoration: 'none',
+              background: '#fff',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+              width: collapsed ? 44 : 'calc(100% - 16px)',
+              height: collapsed ? 44 : 'auto',
             }}
             title={collapsed ? 'Đăng nhập' : undefined}
           >

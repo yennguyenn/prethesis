@@ -84,30 +84,34 @@
 /* Custom base overrides */
 @layer base {
   :root {
-    --brand-blue: #444c5c;
-    --brand-blue-50: #eef1f5;
-    --brand-blue-100: #d8dde5;
-    --brand-blue-200: #bac3cf;
-    --brand-blue-700: #303746;
-    --brand-purple: #78a5a3;
-    --brand-purple-50: #eff7f6;
-    --brand-purple-100: #d8eceb;
-    --brand-purple-200: #b8dedd;
-    --brand-purple-700: #4b7473;
-    --brand-red: #ce5a57;
-    --brand-red-50: #fdf1f0;
-    --brand-red-100: #f9dcdc;
-    --brand-red-200: #f3bebc;
-    --brand-red-700: #9f413e;
-    --brand-ocean: #78a5a3;
-    --brand-warm: #e1b16a;
+    --brand-blue: #111111; /* Changed to near black for active accents */
+    --brand-blue-50: #f1f3f5;
+    --brand-blue-100: #e9ecef;
+    --brand-blue-200: #dee2e6;
+    --brand-blue-700: #343a40;
+    --brand-purple: #D6CFFC;
+    --brand-purple-50: #f3f1ff;
+    --brand-purple-100: #e9e5ff;
+    --brand-purple-200: #dcd6ff;
+    --brand-purple-700: #a795f5;
+    --brand-red: #FAD0D3;
+    --brand-red-50: #fff3f4;
+    --brand-red-100: #ffe8e9;
+    --brand-red-200: #ffd7d9;
+    --brand-red-700: #e5878d;
+    --brand-ocean: #C5F5E0;
+    --brand-warm: #FDE0C3;
+    
     --surface: #ffffff;
-    --surface-muted: #f7f4ee;
-    --surface-subtle: #efebe4;
-    --ink-900: #1d222b;
-    --ink-700: #303746;
-    --ink-500: #5f6876;
-    --border-soft: #d8dde5;
+    --surface-app: #FAF7F2; /* Cream background for main app */
+    --surface-muted: #FAF7F2;
+    --surface-subtle: #f0ede8;
+    --surface-body: #E5F6F1; /* Mint background outside app window */
+    
+    --ink-900: #111111;
+    --ink-700: #333333;
+    --ink-500: #666666;
+    --border-soft: #eae5de;
   }
   *, *::before, *::after { box-sizing: border-box; }
   body {
@@ -115,7 +119,7 @@
     font-family: 'Mulish', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background: linear-gradient(180deg, #f8f5ef 0%, var(--surface-muted) 100%);
+    background-color: var(--surface-body);
     color: var(--ink-900);
     transition: background-color .3s ease, color .3s ease;
   }
@@ -123,6 +127,14 @@
     background-color: #1d222b;
     color: #eef1f5;
   }
+
+  /* Pastel card utilities */
+  .bg-pastel-pink { background-color: #FAD0D3; }
+  .bg-pastel-orange { background-color: #FDE0C3; }
+  .bg-pastel-purple { background-color: #D6CFFC; }
+  .bg-pastel-green { background-color: #C5F5E0; }
+  .bg-pastel-yellow { background-color: #FDF1C3; }
+  .bg-pastel-blue { background-color: #C3E7FD; }
 }
 
 /* Extra utilities */
