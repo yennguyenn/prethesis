@@ -91,7 +91,9 @@ export default function Quiz() {
       if (token) setAuthToken(token);
       const query = effectiveLevel === 2 && majorCode ? `?major=${encodeURIComponent(majorCode)}` : '';
       const res = await API.get(`/quiz/${effectiveLevel}${query}`);
-      setQuestions(res.data || []);
+      const data = res.data || [];
+      const filteredData = data.filter(q => q.question_type !== 'text_autocomplete');
+      setQuestions(filteredData);
       setCurrentIndex(0);
       setAnswers({});
     } catch (e) {
