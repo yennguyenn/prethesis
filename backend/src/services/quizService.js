@@ -69,7 +69,7 @@ export const getQuizService = async (level, majorCode) => {
     return ids.map(id => ({ id, options: optionsByQuestionId[id] || [] }));
   };
 
-  let whereClause = { level_id: levelId };
+  let whereClause = { level_id: levelId, question_type: 'multiple_choice' };
   if (levelId === 2 && normalizedMajorCode) {
     whereClause.major_code = normalizedMajorCode;
   }
@@ -79,13 +79,14 @@ export const getQuizService = async (level, majorCode) => {
     where: whereClause,
     include: [{ model: db.Option }],
     order: [['id', 'ASC']],
-    limit: levelId === 2 ? 50 : 30,
+    limit: levelId === 2 ? 50 : 35,
   });
 
   if (questions && questions.length > 0) {
     return questions.map((q) => ({
       id: q.id,
       text: q.text,
+      question_type: q.question_type,
       options: (q.Options || []).map((o) => ({ id: o.id, text: o.text })),
     }));
   }
@@ -102,7 +103,7 @@ export const getQuizService = async (level, majorCode) => {
   let questionRows = [];
   try {
     questionRows = await db.sequelize.query(
-      'SELECT id, text FROM questions WHERE level_id = :levelId ORDER BY id ASC LIMIT 30',
+      "SELECT id, text, question_type FROM questions WHERE level_id = :levelId AND question_type = 'multiple_choice' ORDER BY id ASC LIMIT 35",
       { replacements: { levelId }, type: db.Sequelize.QueryTypes.SELECT }
     );
   } catch (_) { /* ignore */ }
@@ -110,7 +111,7 @@ export const getQuizService = async (level, majorCode) => {
   if (questionRows && questionRows.length > 0) {
     const byId = await fetchByIds(questionRows.map(q => q.id));
     const optMap = Object.fromEntries(byId.map(r => [r.id, r.options]));
-    return questionRows.map(q => ({ id: q.id, text: q.text, options: optMap[q.id] || [] }));
+    return questionRows.map(q => ({ id: q.id, text: q.text, question_type: q.question_type, options: optMap[q.id] || [] }));
   }
 
   // Fallback B: when requesting Level 2 but no level_id=2 rows exist,
@@ -119,7 +120,7 @@ export const getQuizService = async (level, majorCode) => {
   if (levelId === 2) {
     try {
       questionRows = await db.sequelize.query(
-        'SELECT id, text FROM questions WHERE level_id = 1 ORDER BY id ASC LIMIT 30 OFFSET 30',
+        "SELECT id, text, question_type FROM questions WHERE level_id = 1 AND question_type = 'multiple_choice' ORDER BY id ASC LIMIT 30 OFFSET 30",
         { type: db.Sequelize.QueryTypes.SELECT }
       );
     } catch (_) { /* ignore */ }
@@ -127,7 +128,7 @@ export const getQuizService = async (level, majorCode) => {
     if (questionRows && questionRows.length > 0) {
       const byId = await fetchByIds(questionRows.map(q => q.id));
       const optMap = Object.fromEntries(byId.map(r => [r.id, r.options]));
-      return questionRows.map(q => ({ id: q.id, text: q.text, options: optMap[q.id] || [] }));
+      return questionRows.map(q => ({ id: q.id, text: q.text, question_type: q.question_type, options: optMap[q.id] || [] }));
     }
   }
 
