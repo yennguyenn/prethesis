@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import API, { setAuthToken } from "../../api";
+import { RiasecRadarChart, XaiModal } from "../Results";
 
 const MAJOR_SHADES  = ["#DC3E26", "#78a5a3", "#e1b16a"];
 const SUB_SHADES     = ["#78a5a3", "#e1b16a", "#444c5c"];
@@ -72,6 +73,7 @@ export default function ResultsAdmin() {
   const [query, setQuery] = useState("");
   const [expandedUser, setExpandedUser] = useState(null);
   const [expandedSubId, setExpandedSubId] = useState(null);
+  const [xaiData, setXaiData] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -220,29 +222,48 @@ export default function ResultsAdmin() {
               </div>
             </div>
 
-            {/* Charts: up to 2 side-by-side (latest attempt) */}
             {(hasMajor || hasSubMajor) ? (
-              <div className="px-5 py-5 flex gap-8 justify-center flex-wrap">
-                {hasMajor && (
-                  <ResultChart
-                    title="Top 3 ngành gợi ý"
-                    scores={majorScores}
-                    colors={MAJOR_SHADES}
-                    accentColor="#DC3E26"
-                    recommended={recommendedMajor}
-                  />
-                )}
-                {hasMajor && hasSubMajor && (
-                  <div className="w-px bg-slate-100 self-stretch hidden sm:block" />
-                )}
-                {hasSubMajor && (
-                  <ResultChart
-                    title="Top 3 chuyên ngành gợi ý"
-                    scores={subMajorScores}
-                    colors={SUB_SHADES}
-                    accentColor="var(--brand-ocean)"
-                    recommended={recommendedSubMajor}
-                  />
+              <div className="flex flex-col w-full">
+                <div className="px-5 py-5 flex gap-8 justify-center flex-wrap">
+                  {hasMajor && (
+                    <ResultChart
+                      title="Top 3 ngành gợi ý"
+                      scores={majorScores}
+                      colors={MAJOR_SHADES}
+                      accentColor="#DC3E26"
+                      recommended={recommendedMajor}
+                    />
+                  )}
+                  {hasMajor && hasSubMajor && (
+                    <div className="w-px bg-slate-100 self-stretch hidden sm:block" />
+                  )}
+                  {hasSubMajor && (
+                    <ResultChart
+                      title="Top 3 chuyên ngành gợi ý"
+                      scores={subMajorScores}
+                      colors={SUB_SHADES}
+                      accentColor="var(--brand-ocean)"
+                      recommended={recommendedSubMajor}
+                    />
+                  )}
+                </div>
+                
+                {/* Phần chung: Radar & XAI */}
+                {(latestMajor?.details?.weights || latestSubMajor?.details?.weights) && (
+                  <div className="px-5 pb-6 flex flex-col items-center justify-center border-t border-slate-100 pt-5 mt-2">
+                    <div className="w-full max-w-[350px]">
+                      <RiasecRadarChart weights={latestMajor?.details?.weights || latestSubMajor?.details?.weights} />
+                    </div>
+                    
+                    {(latestMajor?.details?.normalizedMatrix || latestSubMajor?.details?.normalizedMatrix) && (
+                      <button 
+                        onClick={() => setXaiData(latestMajor?.details || latestSubMajor?.details)}
+                        className="mt-4 px-4 py-2 text-sm font-semibold rounded-xl bg-[color:var(--brand-blue-50)] text-[color:var(--brand-blue)] hover:bg-[color:var(--brand-blue-100)] transition-colors border border-[color:var(--brand-blue-200)] flex items-center gap-2 shadow-sm"
+                      >
+                        <span className="text-lg">⚙️</span> Giải mã Thuật toán SAW
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             ) : (
@@ -363,6 +384,8 @@ export default function ResultsAdmin() {
           </div>
         );
       })}
+
+      <XaiModal details={xaiData} onClose={() => setXaiData(null)} />
     </div>
   );
 }

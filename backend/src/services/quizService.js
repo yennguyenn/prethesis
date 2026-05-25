@@ -120,7 +120,7 @@ export const getQuizService = async (level, majorCode) => {
   if (levelId === 2) {
     try {
       questionRows = await db.sequelize.query(
-        "SELECT id, text, question_type FROM questions WHERE level_id = 1 AND question_type = 'multiple_choice' ORDER BY id ASC LIMIT 30 OFFSET 30",
+        'SELECT id, text, question_type FROM questions WHERE level_id = 1 ORDER BY id ASC LIMIT 30 OFFSET 30',
         { type: db.Sequelize.QueryTypes.SELECT }
       );
     } catch (_) { /* ignore */ }
@@ -298,51 +298,76 @@ export const submitMajorQuizService = async (answers, user) => {
   const questionToCriteria = await getQuestionToCriteriaMap();
   const emptyScoresTemplate = buildEmptyScores(CRITERIA);
 
-  // Step 2: Build decision matrix
-  const decisionMatrix = {};
+  // Step 2: Tính điểm Trọng số (Weights) của học sinh dựa trên bài test
+  const studentWeights = { ...emptyScoresTemplate };
   const invalidOptionIds = [];
+  
   for (const a of answers) {
     const optId = a?.optionId;
     const freeText = a?.text;
     const qId = a?.questionId;
     if (!qId) { invalidOptionIds.push(optId); continue; }
-    let scoring = null;
+    
+    // Câu hỏi Trắc nghiệm
     if (optId) {
       const option = await db.Option.findByPk(optId);
       if (!option) { invalidOptionIds.push(optId); continue; }
-      scoring = option.scoring || option.dataValues?.scoring || {};
-    } else if (freeText) {
-      scoring = await scoreSubjectiveAnswer(1, qId, freeText);
+      
+      const scoring = option.scoring || option.dataValues?.scoring || {};
+      for (const [code, pts] of Object.entries(scoring)) {
+         if (studentWeights[code] !== undefined) {
+            studentWeights[code] += Number(pts);
+         }
+      }
+    } 
+    // Câu hỏi Tự luận
+    else if (freeText) {
+      const scoring = await scoreSubjectiveAnswer(1, qId, freeText);
+      for (const [code, pts] of Object.entries(scoring || {})) {
+         if (studentWeights[code] !== undefined) {
+            studentWeights[code] += Number(pts);
+         }
+      }
     } else {
       invalidOptionIds.push(optId);
-      continue;
-    }
-
-    const { code: mappedCode, weight: mappedWeight } = questionToCriteria[qId] || {};
-    const crit = mappedCode || CRITERIA[0]?.key || 'C1';
-    const critWeight = Number(mappedWeight) || 1;
-    for (const [code, pts] of Object.entries(scoring || {})) {
-      let majorCode = null;
-      if (majorMeta[code]) {
-        majorCode = code;
-      } else if (subToMajorCode[code]) {
-        majorCode = subToMajorCode[code];
-      } else {
-        continue;
-      }
-      if (!decisionMatrix[majorCode]) decisionMatrix[majorCode] = { ...emptyScoresTemplate };
-      decisionMatrix[majorCode][crit] += (Number(pts) || 0) * critWeight;
     }
   }
+
   if (invalidOptionIds.length > 0) {
     const err = new Error('Invalid optionId(s) provided');
     err.invalidOptionIds = invalidOptionIds;
     throw err;
   }
 
-  // Step 3: Normalize and calculate SAW
+  // Step 3: Tính Ma trận Quyết định (Decision Matrix) từ điểm chuẩn O*NET của 23 Ngành học
+  const decisionMatrix = {};
+  const majors = await db.Major.findAll();
+  for (const m of majors) {
+      const onetScores = m.riasec_scores || {};
+      decisionMatrix[m.code] = { ...emptyScoresTemplate };
+      for (const crit of CRITERIA) {
+          decisionMatrix[m.code][crit.key] = Number(onetScores[crit.key]) || 0;
+      }
+  }
+
+  // Lọc bỏ các ngành không có dữ liệu O*NET
+  for (const key of Object.keys(decisionMatrix)) {
+      const hasScore = Object.values(decisionMatrix[key]).some(v => v > 0);
+      if (!hasScore) delete decisionMatrix[key];
+  }
+
+  // Step 4: Normalize and calculate SAW
   const normalizedMatrix = normalizeDecisionMatrix(decisionMatrix, CRITERIA);
-  const weights = getWeightsForCriteria(CRITERIA);
+  
+  // Chuẩn hóa Trọng số Học sinh (tổng = 1)
+  let totalStudentWeight = 0;
+  for (const crit of CRITERIA) totalStudentWeight += studentWeights[crit.key];
+  
+  const weights = {};
+  for (const crit of CRITERIA) {
+      weights[crit.key] = totalStudentWeight > 0 ? (studentWeights[crit.key] / totalStudentWeight) : 0;
+  }
+
   const sawScores = calculateSAWScores(normalizedMatrix, CRITERIA, weights);
 
   // Step 4: Rank majors by SAW score

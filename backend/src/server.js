@@ -100,7 +100,7 @@ async function start() {
     } catch (cleanErr) {
       console.warn('Pre-sync cleanup warning:', cleanErr.message);
     }
-    await db.sequelize.sync({ alter: true }); // dev: alter true; prod: use migrations
+    await db.sequelize.sync(); // Removed { alter: true } to prevent drop constraint crash
 
     // try listening; if port is in use, try next ports up to +10
     let port = Number(PORT);

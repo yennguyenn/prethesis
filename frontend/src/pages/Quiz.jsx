@@ -271,7 +271,7 @@ export default function Quiz() {
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-8">
               <div>
                 <div className="rcm-eyebrow">Kết quả định hướng</div>
-                <h2 className="rcm-title">Ngành phù hợp nhất</h2>
+                <h2 className="rcm-title">{topRanks[0]?.name ? `Ngành ${topRanks[0].name}` : "Ngành phù hợp nhất"}</h2>
                 <p className="rcm-subtitle">Ngành phù hợp nhất dựa trên 30 câu hỏi.</p>
               </div>
               <div className="rcm-pill">Mức 1</div>
