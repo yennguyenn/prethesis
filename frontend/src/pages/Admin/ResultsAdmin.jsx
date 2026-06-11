@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import API, { setAuthToken } from "../../api";
-import { RiasecRadarChart, XaiModal } from "../Results";
+import { XaiModal } from "../Results";
 
 const MAJOR_SHADES  = ["#DC3E26", "#78a5a3", "#e1b16a"];
 const SUB_SHADES     = ["#78a5a3", "#e1b16a", "#444c5c"];
@@ -251,10 +251,6 @@ export default function ResultsAdmin() {
                 {/* Phần chung: Radar & XAI */}
                 {(latestMajor?.details?.weights || latestSubMajor?.details?.weights) && (
                   <div className="px-5 pb-6 flex flex-col items-center justify-center border-t border-slate-100 pt-5 mt-2">
-                    <div className="w-full max-w-[350px]">
-                      <RiasecRadarChart weights={latestMajor?.details?.weights || latestSubMajor?.details?.weights} />
-                    </div>
-                    
                     {(latestMajor?.details?.normalizedMatrix || latestSubMajor?.details?.normalizedMatrix) && (
                       <button 
                         onClick={() => setXaiData(latestMajor?.details || latestSubMajor?.details)}

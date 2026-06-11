@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
+
 import API, { setAuthToken } from "../api";
 
 const MAJOR_SHADES = ["#DC3E26", "#78a5a3", "#e1b16a"];
@@ -65,36 +65,7 @@ function ResultChart({ title, scores, colors, accentColor, recommended }) {
   );
 }
 
-export function RiasecRadarChart({ weights }) {
-  if (!weights) return null;
-  const labels = { C1: 'Thực tế (R)', C2: 'Nghiên cứu (I)', C3: 'Nghệ thuật (A)', C4: 'Xã hội (S)', C5: 'Quản lý (E)', C6: 'Nghiệp vụ (C)' };
-  
-  // Lấy giá trị lớn nhất để scale biểu đồ đẹp hơn
-  const values = Object.keys(labels).map(key => weights[key] ? Number((weights[key] * 100).toFixed(1)) : 0);
-  const maxVal = Math.max(...values, 20); // Ít nhất 20% để không bị zoom quá to
 
-  const data = Object.keys(labels).map((key, i) => ({
-    subject: labels[key],
-    A: values[i],
-    fullMark: 100,
-  }));
-  return (
-    <div className="flex flex-col items-center flex-1 min-w-0 bg-slate-50/50 rounded-2xl p-4 border border-slate-100" style={{ height: 300, minWidth: 280 }}>
-      <div className="text-sm font-bold mb-2 text-slate-700 flex items-center gap-2">
-        <svg className="w-4 h-4 text-[color:var(--brand-ocean)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" /></svg>
-        Phân tích tính cách RIASEC
-      </div>
-      <ResponsiveContainer width="100%" height="100%">
-        <RadarChart cx="50%" cy="50%" outerRadius="65%" data={data}>
-          <PolarGrid stroke="#e2e8f0" />
-          <PolarAngleAxis dataKey="subject" tick={{ fill: '#64748b', fontSize: 11, fontWeight: 600 }} />
-          <PolarRadiusAxis angle={90} domain={[0, maxVal + 5]} tick={false} axisLine={false} />
-          <Radar name="Student" dataKey="A" stroke="var(--brand-ocean)" strokeWidth={2} fill="var(--brand-ocean)" fillOpacity={0.4} />
-        </RadarChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
 
 export function XaiModal({ details, onClose }) {
   if (!details) return null;
@@ -137,9 +108,9 @@ export function XaiModal({ details, onClose }) {
           <section>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-8 h-8 rounded-full bg-[color:var(--brand-blue)] text-white flex items-center justify-center font-bold">1</div>
-              <h3 className="text-lg font-bold text-slate-800">Hồ sơ Tính cách của Người dùng (W)</h3>
+              <h3 className="text-lg font-bold text-slate-800">Trọng số Tiêu chí Đánh giá (W)</h3>
             </div>
-            <p className="text-sm text-slate-500 mb-5 ml-11">Từ 30 câu hỏi đánh giá, hệ thống đúc kết được thế mạnh của người dùng ở 6 nhóm tính cách (Tổng = 100%):</p>
+            <p className="text-sm text-slate-500 mb-5 ml-11">Dựa trên bài đánh giá, hệ thống đúc kết được trọng số ưu tiên của bạn cho các tiêu chí chọn ngành (Tổng = 100%):</p>
             
             <div className="ml-11 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
               {criteria && [...criteria].sort((a, b) => (weights[b.key] || 0) - (weights[a.key] || 0)).map(c => {
@@ -167,7 +138,7 @@ export function XaiModal({ details, onClose }) {
               <h3 className="text-lg font-bold text-slate-800">Quá trình "Matching" & Chấm điểm</h3>
             </div>
             <p className="text-sm text-slate-500 mb-6 ml-11">
-              Hệ thống lấy <strong className="text-[color:var(--brand-blue)]">Thế mạnh của Người dùng</strong> nhân với <strong className="text-[color:var(--brand-ocean)]">Yêu cầu của Ngành</strong>.
+              Hệ thống lấy <strong className="text-[color:var(--brand-blue)]">Trọng số Ưu tiên của Người dùng</strong> nhân với <strong className="text-[color:var(--brand-ocean)]">Hệ số Tiêu chuẩn của Ngành</strong>.
               Ngành nào có tổng điểm cộng dồn cao nhất sẽ lọt vào Top gợi ý.
             </p>
             
@@ -418,11 +389,7 @@ export default function Results() {
                 {/* Charts */}
                 {(hasMajor || hasSubMajor) && (
                   <div className="flex flex-col gap-6 pt-2">
-                    {majorSub?.details?.weights && (
-                      <div className="flex justify-center w-full mb-4">
-                        <RiasecRadarChart weights={majorSub.details.weights} />
-                      </div>
-                    )}
+
                     <div className="flex gap-8 justify-center flex-wrap">
                       {hasMajor && (
                         <ResultChart

@@ -113,8 +113,12 @@ export default function Quiz() {
         console.warn('Failed to load majors metadata', error);
       }
     })();
-    loadQuestions(1);
-  }, [loadQuestions]);
+    // Only load Level 1 questions on initial mount if level is 1
+    if (level === 1) {
+      loadQuestions(1);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // No admin detection
 
   const currentQuestion = questions[currentIndex];
@@ -564,7 +568,7 @@ export default function Quiz() {
                   </button>
                 )}
               </div>
-              {currentQuestion.options && currentQuestion.options.length > 0 ? (
+              {currentQuestion.options && currentQuestion.options.length > 0 && (
                 <div className="grid gap-4">
                   {currentQuestion.options.map((opt, idx) => {
                     const active = answers[currentQuestion.id] === opt.id;
@@ -594,18 +598,6 @@ export default function Quiz() {
                       </label>
                     );
                   })}
-                </div>
-              ) : (
-                <div className="mt-2">
-                  <textarea
-                    value={answers[currentQuestion.id] || ''}
-                    rows={4}
-                    className="w-full rounded-2xl border border-slate-200 px-5 py-4 text-sm text-slate-700 leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-primary-400 resize-none transition dark:bg-slate-700/80 dark:border-slate-600 dark:text-slate-200 dark:placeholder-slate-400"
-                  />
-                  <p className="text-xs text-slate-400 mt-2 flex items-center gap-1.5">
-                    <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    Hãy mô tả ngắn gọn — hệ thống phân tích từ khóa trong câu trả lời của bạn.
-                  </p>
                 </div>
               )}
             </div>

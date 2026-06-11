@@ -21,7 +21,7 @@ export const getQuiz = async (req, res) => {
 /**
  * Nhận kết quả trắc nghiệm và xác định chuyên ngành phù hợp
  */
-export const submitQuiz = async (req, res, next) => {
+export const submitQuiz = async (req, res) => {
   try {
     const { answers } = req.body;
     const result = await submitQuizService(answers, req.user);
@@ -38,7 +38,7 @@ export const submitQuiz = async (req, res, next) => {
     if (err.message === 'No answers submitted') {
       err.status = 400;
     }
-    next(err);
+    throw err;
   }
 };
 
@@ -46,7 +46,7 @@ export const submitQuiz = async (req, res, next) => {
  * Submit Level 1 Major Orientation quiz answers.
  * Similar to submitQuiz but aggregates scores by Major codes (from Option.scoring).
  */
-export const submitMajorQuiz = async (req, res, next) => {
+export const submitMajorQuiz = async (req, res) => {
   try {
     const { answers } = req.body;
     const result = await submitMajorQuizService(answers, req.user);
@@ -63,6 +63,6 @@ export const submitMajorQuiz = async (req, res, next) => {
     if (err.message === 'No answers submitted') {
       err.status = 400;
     }
-    next(err);
+    throw err;
   }
 };

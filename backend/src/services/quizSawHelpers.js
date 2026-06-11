@@ -1,59 +1,32 @@
 // Helper functions for submitMajorQuizService (SAW method)
 import db from '../models/index.js';
-import { evaluateShortAnswer } from './geminiAiService.js';
 
-// Sử dụng bảng Option làm nơi lưu trữ đáp án chuẩn và phân bổ điểm cho câu tự luận.
-// Với mỗi câu hỏi tự luận, Admin chỉ cần tạo ĐÚNG 1 Option.
-// - Option.text: Chứa đáp án mẫu (những ý chính cần có).
-// - Option.scoring: Chứa phân bổ điểm cho các ngành (Ví dụ: {"CIT": 5, "IS": 3}).
+// Subjective keyword rules are stored in the `keyword_rules` DB table.
+// Use getKeywordRules(level, questionId) to fetch them at runtime.
+
+export async function getKeywordRules(level, questionId) {
+  const rows = await db.sequelize.query(
+    'SELECT keywords, scores FROM keyword_rules WHERE level = :level AND question_id = :questionId',
+    { replacements: { level, questionId }, type: db.Sequelize.QueryTypes.SELECT }
+  );
+  return rows; // [{ keywords: string[], scores: { SE: 3, ... } }]
+}
 
 export async function scoreSubjectiveAnswer(level, questionId, answerText) {
   if (!answerText || !questionId) return {};
-
-  // Tìm Option duy nhất của câu hỏi tự luận này
-  const option = await db.Option.findOne({ where: { questionId } });
-  
-  if (!option) {
-    console.warn(`[AI Grading] Không tìm thấy Option (đáp án chuẩn) cho câu hỏi tự luận ID: ${questionId}`);
-    return {};
-  }
-
-  // Lấy Đáp án chuẩn và Cấu hình điểm tối đa từ Option
-  const correctAnswerText = option.text || "";
-  const baseScores = option.scoring || {};
-  
-  if (Object.keys(baseScores).length === 0) {
-    console.warn(`[AI Grading] Option của câu hỏi ${questionId} chưa có cấu hình điểm (scoring).`);
-    return {};
-  }
-
-  // Lấy nội dung câu hỏi để AI hiểu ngữ cảnh
-  let questionText = `Câu hỏi tự luận (ID: ${questionId})`;
-  try {
-    const q = await db.Question.findByPk(questionId);
-    if (q && q.text) questionText = q.text;
-  } catch (e) {}
-
-  const correctAnswer = `Đáp án chuẩn lý tưởng cần chứa các ý sau: ${correctAnswerText}`;
+  const rules = await getKeywordRules(level, questionId);
+  if (!rules || rules.length === 0) return {};
+  const text = String(answerText).toLowerCase();
   const scores = {};
-
-  try {
-    // Gọi Gemini AI chấm điểm (trả về thang 10)
-    const aiResult = await evaluateShortAnswer(questionText, correctAnswer, answerText);
-    const ratio = aiResult.score / 10.0;
-    
-    console.log(`[AI Grading] Q:${questionId} | Điểm AI: ${aiResult.score}/10 | Tỷ lệ: ${ratio} | Feedback: ${aiResult.feedback}`);
-
-    // Phân bổ điểm cho các ngành theo tỷ lệ
-    // Nếu AI cho 8/10 -> ratio = 0.8 -> Điểm ngành CIT = 5 * 0.8 = 4
-    for (const [code, pts] of Object.entries(baseScores)) {
-      scores[code] = (Number(pts) || 0) * ratio;
+  for (const rule of rules) {
+    const kw = Array.isArray(rule.keywords) ? rule.keywords : [];
+    const hit = kw.some(k => text.includes(String(k).toLowerCase()));
+    if (!hit) continue;
+    const ruleScores = rule.scores || {};
+    for (const [code, pts] of Object.entries(ruleScores)) {
+      scores[code] = (scores[code] || 0) + (Number(pts) || 0);
     }
-  } catch (error) {
-    console.error(`[AI Grading Error] Q:${questionId} | Lỗi chấm điểm AI:`, error.message);
-    // Nếu lỗi gọi API, hệ thống đành chịu trả về 0 điểm vì không có fallback.
   }
-
   return scores;
 }
 
@@ -84,18 +57,22 @@ export async function getCriteria(levelId = 1) {
   const codePattern = levelId === 2 ? 'CCIT%' : 'C_%';
   try {
     criteriaRows = await db.sequelize.query(
-      'SELECT code, name, description FROM criteria WHERE level_id = :levelId ORDER BY code',
+      'SELECT code, name, description, weight FROM criteria WHERE level_id = :levelId ORDER BY code',
       { replacements: { levelId }, type: db.Sequelize.QueryTypes.SELECT }
     );
   } catch (err) {
-    // Nếu bảng chưa có level_id thì fallback
+    // level_id column may not exist — filter by code prefix instead
     try {
+      criteriaRows = await db.sequelize.query(
+        'SELECT code, name, description, weight FROM criteria WHERE code LIKE :pattern ORDER BY code',
+        { replacements: { pattern: codePattern }, type: db.Sequelize.QueryTypes.SELECT }
+      );
+    } catch (_) {
+      // weight column also missing — select without it, still filter by prefix
       criteriaRows = await db.sequelize.query(
         'SELECT code, name, description FROM criteria WHERE code LIKE :pattern ORDER BY code',
         { replacements: { pattern: codePattern }, type: db.Sequelize.QueryTypes.SELECT }
       );
-    } catch (_) {
-      criteriaRows = [];
     }
   }
 
@@ -103,7 +80,7 @@ export async function getCriteria(levelId = 1) {
     key: row.code,
     label: row.name,
     description: row.description,
-    weight: 1,
+    weight: row.weight != null ? Number(row.weight) : null,
   }));
 }
 
