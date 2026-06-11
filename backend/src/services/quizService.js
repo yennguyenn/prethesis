@@ -250,6 +250,7 @@ export const submitQuizService = async (answers, user) => {
           recommendedSubmajor: recommended,
           allScores,
           totalAnswered: answers.length,
+          answerDetails,
         }
       });
     } catch (e) {
@@ -290,23 +291,45 @@ export const submitMajorQuizService = async (answers, user) => {
   const questionToCriteria = await getQuestionToCriteriaMap();
   const emptyScoresTemplate = buildEmptyScores(CRITERIA);
 
-  // Step 2: Build decision matrix
+  // Pre-fetch all needed questions and options to avoid N+1
+  const questionIds = answers.map(a => a.questionId).filter(Boolean);
+  const optionIds = answers.map(a => a.optionId).filter(Boolean);
+  
+  const fetchedQuestions = await db.Question.findAll({ where: { id: questionIds } });
+  const fetchedOptions = await db.Option.findAll({ where: { id: optionIds } });
+  const qMap = Object.fromEntries(fetchedQuestions.map(q => [q.id, q]));
+  const oMap = Object.fromEntries(fetchedOptions.map(o => [o.id, o]));
+
   const decisionMatrix = {};
   const invalidOptionIds = [];
+  const answerDetails = [];
+
   for (const a of answers) {
     const optId = a?.optionId;
-    const freeText = a?.text;
     const qId = a?.questionId;
     if (!qId) { invalidOptionIds.push(optId); continue; }
+    
     let scoring = null;
+    let optionText = null;
+    let questionText = qMap[qId]?.text || `Câu hỏi ${qId}`;
+
     if (optId) {
-      const option = await db.Option.findByPk(optId);
+      const option = oMap[optId];
       if (!option) { invalidOptionIds.push(optId); continue; }
       scoring = option.scoring || option.dataValues?.scoring || {};
+      optionText = option.text;
     } else {
       invalidOptionIds.push(optId);
       continue;
     }
+
+    answerDetails.push({
+      questionId: qId,
+      questionText,
+      optionId: optId,
+      optionText,
+      scoring
+    });
 
     const { code: mappedCode, weight: mappedWeight } = questionToCriteria[qId] || {};
     const crit = mappedCode || CRITERIA[0]?.key || 'C1';

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import API, { setAuthToken } from "../../api";
-import { XaiModal } from "../Results";
 
 const MAJOR_SHADES  = ["#DC3E26", "#78a5a3", "#e1b16a"];
 const SUB_SHADES     = ["#78a5a3", "#e1b16a", "#444c5c"];
@@ -249,15 +248,44 @@ export default function ResultsAdmin() {
                 </div>
                 
                 {/* Phần chung: Radar & XAI */}
-                {(latestMajor?.details?.weights || latestSubMajor?.details?.weights) && (
+                {/* Phần Chi tiết đáp án */}
+                {(latestMajor?.details?.answerDetails || latestSubMajor?.details?.answerDetails) && (
                   <div className="px-5 pb-6 flex flex-col items-center justify-center border-t border-slate-100 pt-5 mt-2">
-                    {(latestMajor?.details?.normalizedMatrix || latestSubMajor?.details?.normalizedMatrix) && (
-                      <button 
-                        onClick={() => setXaiData(latestMajor?.details || latestSubMajor?.details)}
-                        className="mt-4 px-4 py-2 text-sm font-semibold rounded-xl bg-[color:var(--brand-blue-50)] text-[color:var(--brand-blue)] hover:bg-[color:var(--brand-blue-100)] transition-colors border border-[color:var(--brand-blue-200)] flex items-center gap-2 shadow-sm"
-                      >
-                        <span className="text-lg">⚙️</span> Giải mã Thuật toán SAW
-                      </button>
+                    <button 
+                      onClick={() => setExpandedUser(expandedUser === `${g.key}-answers` ? null : `${g.key}-answers`)}
+                      className="mt-2 px-4 py-2 text-sm font-semibold rounded-xl bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors border border-slate-200 flex items-center gap-2 shadow-sm"
+                    >
+                      <span className="text-lg">📝</span> Chi tiết đáp án
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                        style={{ width: 14, height: 14, transform: expandedUser === `${g.key}-answers` ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
+                        <polyline points="6 9 12 15 18 9"/>
+                      </svg>
+                    </button>
+                    
+                    {expandedUser === `${g.key}-answers` && (
+                      <div className="w-full mt-6 space-y-4 text-left">
+                        {(latestSubMajor?.details?.answerDetails || latestMajor?.details?.answerDetails).map((ans, i) => (
+                          <div key={i} className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-sm">
+                            <div className="font-semibold text-slate-800 mb-2">{ans.questionText}</div>
+                            <div className="flex items-start gap-2 mb-2">
+                              <span className="shrink-0 mt-0.5 text-slate-400">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                              </span>
+                              <span className="font-medium text-[color:var(--brand-blue)]">{ans.optionText}</span>
+                            </div>
+                            {ans.scoring && Object.keys(ans.scoring).length > 0 && (
+                              <div className="flex flex-wrap gap-2 mt-2 pl-6">
+                                {Object.entries(ans.scoring).map(([k, v]) => (
+                                  <span key={k} className="text-[10px] px-2 py-0.5 bg-white border border-slate-200 rounded-full text-slate-600 font-medium">
+                                    <span className="text-slate-400 mr-1">{k}:</span>
+                                    <span className={v > 0 ? "text-emerald-600 font-bold" : ""}>+{v}</span>
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     )}
                   </div>
                 )}
@@ -380,9 +408,6 @@ export default function ResultsAdmin() {
           </div>
         );
       })}
-
-      <XaiModal details={xaiData} onClose={() => setXaiData(null)} />
     </div>
   );
 }
-

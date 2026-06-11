@@ -65,152 +65,6 @@ function ResultChart({ title, scores, colors, accentColor, recommended }) {
   );
 }
 
-
-
-export function XaiModal({ details, onClose }) {
-  if (!details) return null;
-  const { normalizedMatrix, weights, criteria, allScores } = details;
-  
-  // Lấy Top 3 ngành
-  const top3Scores = (allScores || []).slice(0, 3);
-  
-  // Hàm chuyển điểm chuẩn hóa sang chữ dễ hiểu
-  const getRequirementLabel = (val) => {
-    if (val === 0) return "Không yêu cầu";
-    if (val < 0.4) return "Yêu cầu Thấp";
-    if (val < 0.7) return "Yêu cầu Vừa";
-    if (val < 1.0) return "Yêu cầu Cao";
-    return "Yêu cầu Rất Cao";
-  };
-  
-  const rankColors = ['var(--brand-red)', 'var(--brand-ocean)', 'var(--brand-warm)'];
-  
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6 overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-        
-        {/* Header */}
-        <div className="p-6 border-b bg-[color:var(--surface-muted)] flex justify-between items-center shrink-0">
-          <div>
-            <h2 className="text-2xl font-black text-[color:var(--brand-blue)] flex items-center gap-2">
-              <span className="text-3xl">⚙️</span> Giải mã Thuật toán SAW (Minh bạch AI)
-            </h2>
-            <p className="text-sm text-[color:var(--ink-500)] mt-1 font-medium">Phân tích chi tiết kết quả của người dùng.</p>
-          </div>
-          <button onClick={onClose} className="text-slate-400 hover:bg-slate-200 hover:text-slate-700 w-10 h-10 flex items-center justify-center rounded-full transition">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-        </div>
-        
-        <div className="p-6 sm:p-8 overflow-y-auto space-y-10 bg-white custom-scrollbar">
-          
-          {/* Step 1: User Profile */}
-          <section>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 rounded-full bg-[color:var(--brand-blue)] text-white flex items-center justify-center font-bold">1</div>
-              <h3 className="text-lg font-bold text-slate-800">Trọng số Tiêu chí Đánh giá (W)</h3>
-            </div>
-            <p className="text-sm text-slate-500 mb-5 ml-11">Dựa trên bài đánh giá, hệ thống đúc kết được trọng số ưu tiên của bạn cho các tiêu chí chọn ngành (Tổng = 100%):</p>
-            
-            <div className="ml-11 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-              {criteria && [...criteria].sort((a, b) => (weights[b.key] || 0) - (weights[a.key] || 0)).map(c => {
-                const pct = ((weights[c.key] || 0) * 100).toFixed(1);
-                return (
-                  <div key={c.key} className="flex items-center gap-4">
-                    <div className="w-32 text-sm font-semibold text-slate-700 flex justify-between">
-                      {c.name} <span className="text-[color:var(--brand-blue)] font-bold">{pct}%</span>
-                    </div>
-                    <div className="flex-1 h-3 bg-slate-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-[color:var(--brand-blue)] rounded-full transition-all duration-1000" style={{ width: `${pct}%` }}></div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-
-          <div className="w-full h-px bg-slate-100 my-4"></div>
-
-          {/* Step 2: Matching Process */}
-          <section>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-8 h-8 rounded-full bg-[color:var(--brand-ocean)] text-white flex items-center justify-center font-bold">2</div>
-              <h3 className="text-lg font-bold text-slate-800">Quá trình "Matching" & Chấm điểm</h3>
-            </div>
-            <p className="text-sm text-slate-500 mb-6 ml-11">
-              Hệ thống lấy <strong className="text-[color:var(--brand-blue)]">Trọng số Ưu tiên của Người dùng</strong> nhân với <strong className="text-[color:var(--brand-ocean)]">Hệ số Tiêu chuẩn của Ngành</strong>.
-              Ngành nào có tổng điểm cộng dồn cao nhất sẽ lọt vào Top gợi ý.
-            </p>
-            
-            <div className="ml-11 space-y-6">
-              {top3Scores.map((major, idx) => {
-                const norm = normalizedMatrix[major.code] || {};
-                
-                return (
-                  <div key={major.code} className="bg-slate-50 border border-slate-200 rounded-2xl overflow-hidden transition hover:shadow-md">
-                    {/* Header */}
-                    <div className="bg-white px-5 py-4 border-b border-slate-100 flex justify-between items-center">
-                      <div className="flex items-center gap-3">
-                        <span className="w-8 h-8 rounded-full text-white font-black flex items-center justify-center" style={{ backgroundColor: rankColors[idx] }}>#{idx + 1}</span>
-                        <h4 className="text-base font-bold text-slate-800">{major.name}</h4>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-[10px] uppercase font-bold text-slate-400">Điểm phù hợp</div>
-                        <div className="text-lg font-black" style={{ color: rankColors[idx] }}>{major.score.toFixed(4)}</div>
-                      </div>
-                    </div>
-                    
-                    {/* Grid criteria */}
-                    <div className="p-5 grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      {criteria && criteria.map((c) => {
-                         const w = weights[c.key] || 0;
-                         const x = norm[c.key] || 0;
-                         const pointsEarned = w * x;
-                         
-                         // Bỏ qua hiển thị nếu mảng này học sinh = 0 hoặc ngành không yêu cầu
-                         if (w === 0 && x === 0) return null;
-                         
-                         return (
-                           <div key={c.key} className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-100">
-                             <div>
-                               <div className="text-xs font-bold text-slate-700">{c.name}</div>
-                               <div className="text-[10px] text-slate-500 mt-0.5">
-                                 Hệ số ngành: <strong className="text-[color:var(--brand-ocean)]">{x.toFixed(2)}</strong> ({getRequirementLabel(x)})
-                               </div>
-                             </div>
-                             
-                             <div className="flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">
-                               <div className="text-[11px] font-bold text-[color:var(--brand-blue)]" title="Trọng số người dùng">{(w * 100).toFixed(0)}%</div>
-                               <div className="text-[10px] font-black text-slate-300">×</div>
-                               <div className="text-[11px] font-bold text-[color:var(--brand-ocean)]" title="Hệ số ngành">{x.toFixed(2)}</div>
-                               <div className="text-[10px] font-black text-slate-300">=</div>
-                               <div className="text-[12px] font-black" style={{ color: rankColors[idx] }}>
-                                 +{pointsEarned.toFixed(3)}
-                               </div>
-                             </div>
-                           </div>
-                         );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </section>
-
-          {/* Note */}
-          <div className="ml-11 bg-[color:var(--surface-muted)] text-[color:var(--ink-700)] text-xs p-4 rounded-xl flex gap-3 items-start border border-slate-200">
-            <svg className="w-5 h-5 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <p>
-              <strong>Giải thích chuyên sâu:</strong> Phương pháp sử dụng gọi là SAW (Simple Additive Weighting). Quá trình trên bản chất là việc lấy "Ma trận trọng số người dùng" nhân với "Ma trận yêu cầu tiêu chuẩn của ngành" (đã được chuẩn hóa từ dữ liệu của tổ chức O*NET). 
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // Convert {code: score} object + namesObj to sorted array
 function toScoreArray(scoresObj, namesObj) {
   if (!scoresObj || typeof scoresObj !== "object") return [];
@@ -414,16 +268,45 @@ export default function Results() {
                       )}
                     </div>
                     
-                    {/* XAI Button */}
-                    {majorSub?.details?.allScores && (
-                      <div className="flex justify-center mt-6">
+                    {/* Phần Chi tiết đáp án */}
+                    {(majorSub?.details?.answerDetails || subMajorSub?.details?.answerDetails) && (
+                      <div className="flex flex-col items-center mt-6 w-full border-t border-slate-100 pt-5">
                         <button 
-                          onClick={() => setXaiData(majorSub.details)}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-[color:var(--brand-blue-50)] hover:bg-[color:var(--brand-blue-100)] text-[color:var(--brand-blue)] text-xs font-bold rounded-lg border border-[color:var(--brand-blue-200)] transition shadow-sm"
+                          onClick={() => setXaiData(xaiData === i ? null : i)}
+                          className="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 text-sm font-semibold rounded-xl border border-slate-200 transition flex items-center gap-2 shadow-sm"
                         >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 21h7a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v11m0 5l4.879-4.879m0 0a3 3 0 104.243-4.242 3 3 0 00-4.243 4.242z" /></svg>
-                          Xem thuật toán SAW (XAI Debug)
+                          <span className="text-lg">📝</span> Chi tiết đáp án
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                            style={{ width: 14, height: 14, transform: xaiData === i ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>
+                            <polyline points="6 9 12 15 18 9"/>
+                          </svg>
                         </button>
+                        
+                        {xaiData === i && (
+                          <div className="w-full mt-6 space-y-4 text-left px-2">
+                            {(subMajorSub?.details?.answerDetails || majorSub?.details?.answerDetails).map((ans, idx) => (
+                              <div key={idx} className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-sm">
+                                <div className="font-semibold text-slate-800 mb-2">{ans.questionText}</div>
+                                <div className="flex items-start gap-2 mb-2">
+                                  <span className="shrink-0 mt-0.5 text-slate-400">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                  </span>
+                                  <span className="font-medium text-[color:var(--brand-blue)]">{ans.optionText}</span>
+                                </div>
+                                {ans.scoring && Object.keys(ans.scoring).length > 0 && (
+                                  <div className="flex flex-wrap gap-2 mt-2 pl-6">
+                                    {Object.entries(ans.scoring).map(([k, v]) => (
+                                      <span key={k} className="text-[10px] px-2 py-0.5 bg-white border border-slate-200 rounded-full text-slate-600 font-medium">
+                                        <span className="text-slate-400 mr-1">{k}:</span>
+                                        <span className={v > 0 ? "text-emerald-600 font-bold" : ""}>+{v}</span>
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -437,8 +320,6 @@ export default function Results() {
           </div>
         );
       })}
-      
-      <XaiModal details={xaiData} onClose={() => setXaiData(null)} />
     </div>
   );
 }
